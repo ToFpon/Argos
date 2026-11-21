@@ -9,3 +9,4 @@
 overlay:hover > .argos-arrow { opacity: 0.85; }
 window.argos-fullscreen .argos-view { background-color: black; }
 .argos-status { min-height: 30px; }
+.argos-tree listview.navigation-sidebar > row { min-height: 26px; padding-top: 1px; padding-bottom: 1px; margin-top: 0; margin-bottom: 0; }

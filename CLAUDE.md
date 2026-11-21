@@ -66,6 +66,15 @@ Nom : Argos le géant aux cent yeux (et le chien d'Ulysse, le seul à le reconna
   Enregistrer sous…, Annuler les modifications), `guard(then)` = question « Enregistrer les modifications ? »
   avant de changer de photo, revenir à la grille ou fermer. Clavier en capture (`_on_key`) : ← → Espace Retour
   arrière Page↑↓ Début Fin, Échap (recadrage → plein écran → grille), Entrée applique le recadrage.
+- `ui/sidebar.py` (demande de Tof, comme gThumb) : arbre des dossiers à gauche de la grille (Adw.OverlaySplitView,
+  F9 / bouton, réglage `sidebar`, repliée sous 600 sp). Racines : Dossier personnel, Images, Bureau,
+  Téléchargements, disques montés (Gio.VolumeMonitor, suivis), Ordinateur (/). Gtk.TreeListModel : GTK demande les
+  enfants de CHAQUE ligne affichée (flèche) → lectures par UN fil, dernière demande d'abord (un fil par ligne en
+  lançait des centaines). `reveal(chemin)` déplie jusqu'au dossier ouvert et le sélectionne, branche par branche
+  au fil des lectures (`_advance`, rappelé seulement par une branche sur le chemin).
+- PIÈGE vu chez Tof (vignettes mélangées dans la grille) : `lambda cb=cb: cb(tex)` dans la boucle du fil des
+  miniatures capturait `tex`, déjà remplacée par la suivante quand l'idle passait → toujours lier
+  (`tex=tex`). Testé dans ui_smoke (une miniature distincte par photo).
 - `ui/info.py` : propriétés (fichier) + prise de vue par GExiv2 (date, appareil, objectif, exposition, ouverture,
   ISO, focale, flash, position), dans un fil.
 - `app.py` : instance unique ; `argos PHOTO` → son dossier, photo affichée ; `argos DOSSIER` → grille ; seul →

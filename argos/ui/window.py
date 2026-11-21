@@ -92,6 +92,9 @@ class MainWindow(Adw.ApplicationWindow):
         header = Adw.HeaderBar()
         self.up_button = Gtk.Button(icon_name="go-up-symbolic", tooltip_text=tr("Dossier parent (Alt+↑)"),
                                     action_name="win.up")
+        self.sidebar_button = Gtk.ToggleButton(icon_name="sidebar-show-symbolic", active=settings["sidebar"],
+                                               tooltip_text=tr("Barre latérale (F9)"))
+        header.pack_start(self.sidebar_button)
         header.pack_start(self.up_button)
         header.pack_start(Gtk.Button(icon_name="folder-open-symbolic", tooltip_text=tr("Ouvrir un dossier (Ctrl+O)"),
                                      action_name="win.open-folder"))
@@ -107,7 +110,19 @@ class MainWindow(Adw.ApplicationWindow):
         self.browser_stack.add_named(self.empty, "empty")
         self.browser_stack.add_named(Adw.Spinner() if hasattr(Adw, "Spinner") else Gtk.Spinner(spinning=True),
                                      "loading")
-        view = Adw.ToolbarView(content=self.browser_stack)
+        from .sidebar import FolderTree
+        self.tree = FolderTree()
+        self.tree.connect("picked", lambda _t, path: path != self.folder and self.open_folder(path))
+        self.browser_split = Adw.OverlaySplitView(sidebar=self.tree, content=self.browser_stack,
+                                                  show_sidebar=settings["sidebar"], min_sidebar_width=230,
+                                                  max_sidebar_width=320, sidebar_width_fraction=0.25)
+        self.sidebar_button.bind_property("active", self.browser_split, "show-sidebar",
+                                          GObject.BindingFlags.BIDIRECTIONAL)
+        self.browser_split.connect("notify::show-sidebar", self._sidebar_toggled)
+        narrow = Adw.Breakpoint.new(Adw.BreakpointCondition.parse("max-width: 600sp"))
+        narrow.add_setter(self.browser_split, "collapsed", True)
+        self.add_breakpoint(narrow)
+        view = Adw.ToolbarView(content=self.browser_split)
         view.add_top_bar(header)
         return view
 
@@ -249,7 +264,7 @@ class MainWindow(Adw.ApplicationWindow):
         add("zoom-toggle", self.zoom_toggle)
         add("rotate-right", lambda: self.rotate(1), ["r"])
         add("rotate-left", lambda: self.rotate(3), ["<Shift>r"])
-        add("filmstrip", lambda: self.strip_button.set_active(not self.strip_button.get_active()), ["F9"])
+        add("filmstrip", self.toggle_side, ["F9"])
         add("info", lambda: self.info_button.set_active(not self.info_button.get_active()), ["i"])
         add("trash", self.trash, ["Delete"])
         add("crop", self.start_crop, ["c"])
@@ -265,7 +280,7 @@ class MainWindow(Adw.ApplicationWindow):
                                                           self._set_option(key, a.get_state().get_boolean())))
             self.add_action(a)
         self._viewer_actions = ("back", "fullscreen", "zoom-in", "zoom-out", "zoom-fit", "zoom-100", "zoom-toggle",
-                                "rotate-right", "rotate-left", "filmstrip", "info", "trash", "crop", "save", "save-as",
+                                "rotate-right", "rotate-left", "info", "trash", "crop", "save", "save-as",
                                 "revert")
         self._sync_actions()
 
@@ -282,6 +297,7 @@ class MainWindow(Adw.ApplicationWindow):
         self.browser_title.set_title(shown(os.path.basename(path) or path))
         self.browser_title.set_subtitle(shown(self._pretty(path)))
         self.up_button.set_sensitive(os.path.dirname(path) != path)
+        self.tree.reveal(path)
         if show is None:
             self.show_browser()
         self._watch(path)
@@ -439,6 +455,17 @@ class MainWindow(Adw.ApplicationWindow):
             if f is not None and f.get_path():
                 self.open_path(f.get_path())
         d.open(self, None, done)
+
+    def _sidebar_toggled(self, *_):
+        if not self.browser_split.get_collapsed():       # repliée par la largeur : pas un choix
+            settings["sidebar"] = self.browser_split.get_show_sidebar()
+
+    def toggle_side(self):
+        """F9 : barre latérale dans la grille, bande de vignettes dans la visionneuse."""
+        if self.stack.get_visible_child_name() == "viewer":
+            self.strip_button.set_active(not self.strip_button.get_active())
+        else:
+            self.sidebar_button.set_active(not self.sidebar_button.get_active())
 
     def _set_sort(self, key: str):
         settings["sort_key"] = key

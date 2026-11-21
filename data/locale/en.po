@@ -208,8 +208,8 @@ msgstr "Fullscreen"
 msgid "Quitter le plein écran, puis revenir au dossier"
 msgstr "Leave fullscreen, then back to the folder"
 
-msgid "Bande de vignettes"
-msgstr "Thumbnail strip"
+msgid "Barre latérale (grille) / bande de vignettes (photo)"
+msgstr "Sidebar (grid) / thumbnail strip (photo)"
 
 msgid "Dossier parent"
 msgstr "Parent folder"
@@ -234,6 +234,12 @@ msgstr "Drag: move the zoomed photo"
 
 msgid "Double-clic : plein écran"
 msgstr "Double click: fullscreen"
+
+msgid "Dossier personnel"
+msgstr "Home"
+
+msgid "Ordinateur"
+msgstr "Computer"
 
 msgid "Ouvrir un dossier…"
 msgstr "Open a Folder…"
@@ -270,6 +276,9 @@ msgstr "Main menu"
 
 msgid "Dossier parent (Alt+↑)"
 msgstr "Parent folder (Alt+↑)"
+
+msgid "Barre latérale (F9)"
+msgstr "Sidebar (F9)"
 
 msgid "Aucune photo"
 msgstr "No photos"

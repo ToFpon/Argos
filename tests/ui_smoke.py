@@ -75,6 +75,22 @@ def steps(app):
     check(len(win.images) == 8 and len(win.dirs) == 1, "dossier lu : 8 photos, 1 sous-dossier")
     check([e.name for e in win.images][:2] == ["photo 1.jpg", "photo 2.jpg"], "ordre naturel")
 
+    # arbre des dossiers : déplié jusqu'au dossier affiché, sélectionné
+    def tree_selected():
+        item = win.tree.selection.get_selected_item()
+        return item is not None and item.get_item().path == PHOTOS
+    yield tree_selected
+    check(tree_selected(), "barre latérale : dossier affiché sélectionné")
+
+    # miniatures : chaque case reçoit SA miniature (bug vu chez Tof : les miniatures se mélangeaient)
+    from argos.ui.thumbs import shared
+    got = {}
+    for e in win.images[:6]:
+        shared().get(e.path, e.mtime, lambda tex, p=e.path: got.__setitem__(p, tex))
+    yield lambda: len(got) == 6
+    sizes = {p: (t.get_width(), t.get_height()) if t else None for p, t in got.items()}
+    check(len({id(t) for t in got.values()}) == 6 and all(sizes.values()), "une miniature distincte par photo")
+
     # ouvrir une photo depuis la grille
     win.open_entry(win.images[1])
     yield lambda: win.picture is not None and win.picture.path.endswith("photo 2.jpg")

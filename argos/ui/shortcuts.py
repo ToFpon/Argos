@@ -31,7 +31,7 @@ def _groups():
         (tr("Fenêtre"), [
             ("f F11", tr("Plein écran")),
             ("Escape", tr("Quitter le plein écran, puis revenir au dossier")),
-            ("F9", tr("Bande de vignettes")),
+            ("F9", tr("Barre latérale (grille) / bande de vignettes (photo)")),
             ("<Alt>Up", tr("Dossier parent")),
             ("<Control>o", tr("Ouvrir un dossier")),
             ("<Control>comma", tr("Préférences")),

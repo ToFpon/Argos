@@ -65,8 +65,8 @@ class ThumbLoader:
                 self._tex[path] = tex
                 while len(self._tex) > KEEP:
                     self._tex.popitem(last=False)
-            for cb in cbs:
-                GLib.idle_add(lambda cb=cb: (cb(tex), False)[1])
+            for cb in cbs:          # tex LIÉ tout de suite : sinon la miniature suivante du fil arrivait à sa place
+                GLib.idle_add(lambda cb=cb, tex=tex: (cb(tex), False)[1])
 
     def _make(self, path: str, mtime: float):
         png = thumbnails.lookup(path, mtime, self.pixels)

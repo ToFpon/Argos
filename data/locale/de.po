@@ -208,8 +208,8 @@ msgstr "Vollbild"
 msgid "Quitter le plein écran, puis revenir au dossier"
 msgstr "Vollbild verlassen, dann zurück zum Ordner"
 
-msgid "Bande de vignettes"
-msgstr "Vorschauleiste"
+msgid "Barre latérale (grille) / bande de vignettes (photo)"
+msgstr "Seitenleiste (Raster) / Vorschauleiste (Foto)"
 
 msgid "Dossier parent"
 msgstr "Übergeordneter Ordner"
@@ -234,6 +234,12 @@ msgstr "Ziehen: vergrößertes Foto verschieben"
 
 msgid "Double-clic : plein écran"
 msgstr "Doppelklick: Vollbild"
+
+msgid "Dossier personnel"
+msgstr "Persönlicher Ordner"
+
+msgid "Ordinateur"
+msgstr "Rechner"
 
 msgid "Ouvrir un dossier…"
 msgstr "Ordner öffnen …"
@@ -270,6 +276,9 @@ msgstr "Hauptmenü"
 
 msgid "Dossier parent (Alt+↑)"
 msgstr "Übergeordneter Ordner (Alt+↑)"
+
+msgid "Barre latérale (F9)"
+msgstr "Seitenleiste (F9)"
 
 msgid "Aucune photo"
 msgstr "Keine Fotos"
