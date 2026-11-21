@@ -129,20 +129,20 @@ class Grid(Gtk.ScrolledWindow):
 
 
 class Filmstrip(Gtk.ScrolledWindow):
-    """Bande de vignettes (photos seulement). Signal « picked » (index) quand on clique une vignette."""
+    """Vignettes sous la photo (photos seulement), comme gThumb : une GRILLE qui passe à la ligne, dans un séparateur
+    réglable (demande de Tof) — une rangée par défaut, plus en la montant. Signal « picked » (index) au clic."""
 
     __gsignals__ = {"picked": (GObject.SignalFlags.RUN_FIRST, None, (int,))}
     SIZE = 72
 
     def __init__(self):
-        super().__init__(vscrollbar_policy=Gtk.PolicyType.NEVER, hscrollbar_policy=Gtk.PolicyType.AUTOMATIC)
+        super().__init__(hscrollbar_policy=Gtk.PolicyType.NEVER, vscrollbar_policy=Gtk.PolicyType.AUTOMATIC)
         self.selection = Gtk.SingleSelection(autoselect=False, can_unselect=False)
-        self.view = Gtk.ListView(model=self.selection, factory=_factory(self.SIZE, False),
-                                 orientation=Gtk.Orientation.HORIZONTAL, single_click_activate=True)
+        self.view = Gtk.GridView(model=self.selection, factory=_factory(self.SIZE, False), max_columns=200,
+                                 single_click_activate=True)
         self.view.add_css_class("argos-filmstrip")
         self.view.connect("activate", lambda _v, pos: self.emit("picked", pos))
         self.set_child(self.view)
-        self._quiet = False
 
     def set_model(self, store: Gio.ListStore):
         self.selection.set_model(store)

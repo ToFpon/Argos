@@ -75,6 +75,13 @@ Nom : Argos le géant aux cent yeux (et le chien d'Ulysse, le seul à le reconna
 - PIÈGE vu chez Tof (vignettes mélangées dans la grille) : `lambda cb=cb: cb(tex)` dans la boucle du fil des
   miniatures capturait `tex`, déjà remplacée par la suivante quand l'idle passait → toujours lier
   (`tex=tex`). Testé dans ui_smoke (une miniature distincte par photo).
+- Bande de vignettes (demande de Tof) : GRILLE (Gtk.GridView, passe à la ligne) dans un Gtk.Paned vertical sous la
+  photo (`strip_paned`, `resize_end_child=False` : sa hauteur ne change pas avec la fenêtre), hauteur retenue
+  (`strip_height`, au glisser seulement), posée quand le séparateur a une taille (« notify::max-position » :
+  au « map » il n'en a pas encore), masquée en plein écran.
+- Grille : barre d'état en bas (« 14 photos (3,4 Mo) · « x » sélectionnée (1,7 Mo) ») et bouton (i) / touche I =
+  propriétés de l'élément sélectionné SOUS l'arbre des dossiers (Gtk.Paned, réglage `browser_info`), comme gThumb
+  (demande de Tof) ; `InfoPanel.show_path` lit dimensions et format dans un fil.
 - `ui/info.py` : propriétés (fichier) + prise de vue par GExiv2 (date, appareil, objectif, exposition, ouverture,
   ISO, focale, flash, position), dans un fil.
 - `app.py` : instance unique ; `argos PHOTO` → son dossier, photo affichée ; `argos DOSSIER` → grille ; seul →

@@ -91,10 +91,29 @@ def steps(app):
     sizes = {p: (t.get_width(), t.get_height()) if t else None for p, t in got.items()}
     check(len({id(t) for t in got.values()}) == 6 and all(sizes.values()), "une miniature distincte par photo")
 
+    # propriétés dans la grille (bouton (i) de la barre d'état)
+    win.browser_info_button.set_active(True)
+    win.grid.select_path(win.images[0].path)
+    yield lambda: win.browser_info.box.get_first_child() is not None
+    check("photo 1.jpg" in win.browser_status.get_label(), "barre d'état de la grille : photo sélectionnée")
+    texts = []
+    c = win.browser_info.box.get_first_child()
+    while c is not None:
+        texts.append(c.get_label() if isinstance(c, Gtk.Label) else "")
+        c = c.get_next_sibling()
+    check(len(texts) > 3, "propriétés de la photo sélectionnée sous l'arbre")
+    win.browser_info_button.set_active(False)
+
     # ouvrir une photo depuis la grille
     win.open_entry(win.images[1])
     yield lambda: win.picture is not None and win.picture.path.endswith("photo 2.jpg")
     check(win.stack.get_visible_child_name() == "viewer", "visionneuse affichée")
+    yield lambda: win.strip_paned.get_height() > 0 and not win._strip_pending
+    h = win.strip_paned.get_height() - win.strip_paned.get_position()
+    check(abs(h - settings["strip_height"]) < 12, f"bande à la hauteur retenue ({h} px)")
+    win.strip_paned.set_position(win.strip_paned.get_height() - 200)
+    yield 50
+    check(abs(settings["strip_height"] - 200) < 12, "hauteur de la bande retenue au glisser")
     check(win.viewer_title.get_title() == "photo 2.jpg", "titre = nom de la photo")
     check("2 / 8" in win.status.get_label() and "300 × 200" in win.status.get_label(), "barre d'état")
 

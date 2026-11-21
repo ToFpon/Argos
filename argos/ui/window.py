@@ -113,7 +113,27 @@ class MainWindow(Adw.ApplicationWindow):
         from .sidebar import FolderTree
         self.tree = FolderTree()
         self.tree.connect("picked", lambda _t, path: path != self.folder and self.open_folder(path))
-        self.browser_split = Adw.OverlaySplitView(sidebar=self.tree, content=self.browser_stack,
+        # propriétés sous l'arbre, comme gThumb (demande de Tof), affichées par le bouton (i) de la barre d'état
+        self.browser_info = InfoPanel()
+        self.browser_info.set_visible(settings["browser_info"])
+        side = Gtk.Paned(orientation=Gtk.Orientation.VERTICAL, start_child=self.tree, end_child=self.browser_info,
+                         resize_end_child=False, shrink_end_child=False, shrink_start_child=False, wide_handle=True)
+        self.side_paned = side
+        side.connect("map", lambda *_: GLib.idle_add(
+            lambda: (self.browser_info.get_visible() and side.set_position(int(side.get_height() * 0.55)), False)[1]))
+        bar = Gtk.Box(spacing=6, margin_start=12, margin_end=6, margin_top=2, margin_bottom=2)
+        bar.add_css_class("argos-status")
+        self.browser_status = Gtk.Label(xalign=0, hexpand=True, ellipsize=Pango.EllipsizeMode.END)
+        self.browser_status.add_css_class("caption")
+        self.browser_status.add_css_class("numeric")
+        bar.append(self.browser_status)
+        self.browser_info_button = Gtk.ToggleButton(icon_name="document-properties-symbolic", css_classes=["flat"],
+                                                    active=settings["browser_info"],
+                                                    tooltip_text=tr("Propriétés (I)"))
+        self.browser_info_button.connect("toggled", lambda b: self._set_browser_info(b.get_active()))
+        bar.append(self.browser_info_button)
+        self.grid.selection.connect("notify::selected", lambda *_: self._grid_selected())
+        self.browser_split = Adw.OverlaySplitView(sidebar=side, content=self.browser_stack,
                                                   show_sidebar=settings["sidebar"], min_sidebar_width=230,
                                                   max_sidebar_width=320, sidebar_width_fraction=0.25)
         self.sidebar_button.bind_property("active", self.browser_split, "show-sidebar",
@@ -122,7 +142,8 @@ class MainWindow(Adw.ApplicationWindow):
         narrow = Adw.Breakpoint.new(Adw.BreakpointCondition.parse("max-width: 600sp"))
         narrow.add_setter(self.browser_split, "collapsed", True)
         self.add_breakpoint(narrow)
-        view = Adw.ToolbarView(content=self.browser_split)
+        view = Adw.ToolbarView(content=self.browser_split, bottom_bar_style=Adw.ToolbarStyle.RAISED_BORDER)
+        view.add_bottom_bar(bar)
         view.add_top_bar(header)
         return view
 
@@ -190,8 +211,16 @@ class MainWindow(Adw.ApplicationWindow):
 
         self.filmstrip = Filmstrip()
         self.filmstrip.connect("picked", lambda _f, i: i == self.index or self.guard(lambda: self.show_index(i)))
-        self.strip_revealer = Gtk.Revealer(child=self.filmstrip, reveal_child=settings["filmstrip"],
-                                           transition_type=Gtk.RevealerTransitionType.SLIDE_UP)
+        self.filmstrip.set_visible(settings["filmstrip"])
+        # séparateur réglable (demande de Tof) : la bande garde sa hauteur quand la fenêtre change de taille
+        self.strip_paned = Gtk.Paned(orientation=Gtk.Orientation.VERTICAL, start_child=self.split,
+                                     end_child=self.filmstrip, resize_start_child=True, resize_end_child=False,
+                                     shrink_start_child=False, shrink_end_child=False, wide_handle=True)
+        self.strip_paned.connect("notify::position", self._strip_moved)
+        # hauteur posée une fois le séparateur dimensionné (au « map », il n'a pas encore de taille)
+        self.strip_paned.connect("notify::max-position", lambda *_: self._strip_pending and self._place_strip())
+        self._strip_pending = True
+        self._placing = False
         status = Gtk.Box(spacing=6, margin_start=12, margin_end=6, margin_top=2, margin_bottom=2)
         status.add_css_class("argos-status")
         self.status = Gtk.Label(xalign=0, hexpand=True, ellipsize=Pango.EllipsizeMode.END)
@@ -204,10 +233,9 @@ class MainWindow(Adw.ApplicationWindow):
         status.append(self.strip_button)
         bottom = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
         bottom.append(self._build_crop_bar())
-        bottom.append(self.strip_revealer)
         bottom.append(status)
 
-        self.viewer = Adw.ToolbarView(content=self.split, top_bar_style=Adw.ToolbarStyle.FLAT,
+        self.viewer = Adw.ToolbarView(content=self.strip_paned, top_bar_style=Adw.ToolbarStyle.FLAT,
                                       bottom_bar_style=Adw.ToolbarStyle.RAISED_BORDER)
         self.viewer.add_top_bar(header)
         self.viewer.add_bottom_bar(bottom)
@@ -343,6 +371,7 @@ class MainWindow(Adw.ApplicationWindow):
             self.browser_stack.set_visible_child_name("empty")
         else:
             self.browser_stack.set_visible_child_name("grid")
+        self._grid_selected()
         want = self._want_path
         self._want_path = None
         if want is not None:
@@ -455,6 +484,28 @@ class MainWindow(Adw.ApplicationWindow):
             if f is not None and f.get_path():
                 self.open_path(f.get_path())
         d.open(self, None, done)
+
+    def _set_browser_info(self, on: bool):
+        settings["browser_info"] = on
+        self.browser_info.set_visible(on)
+        if on:
+            h = self.side_paned.get_height()
+            if h > 0:
+                self.side_paned.set_position(int(h * 0.55))
+            self._grid_selected()
+
+    def _grid_selected(self):
+        item = self.grid.selection.get_selected_item()
+        entry = item.entry if item is not None else None
+        n = len(self.images)
+        total = sum(e.size for e in self.images)
+        parts = [ntr("{0} photo ({1})", "{0} photos ({1})", n).format(n, fold.human_size(total))]
+        if entry is not None:
+            parts.append(tr("« {0} » sélectionné").format(shown(entry.name)) if entry.is_dir else
+                         tr("« {0} » sélectionnée ({1})").format(shown(entry.name), fold.human_size(entry.size)))
+        self.browser_status.set_label("  ·  ".join(parts))
+        if self.browser_info.get_visible():
+            self.browser_info.show_path(entry.path if entry is not None else None)
 
     def _sidebar_toggled(self, *_):
         if not self.browser_split.get_collapsed():       # repliée par la largeur : pas un choix
@@ -760,9 +811,32 @@ class MainWindow(Adw.ApplicationWindow):
         if self.split.get_show_sidebar():
             self.info.show_picture(self.picture)
 
+    STRIP_MIN = 96
+
+    def _place_strip(self):
+        """Hauteur retenue de la bande (`strip_height`), posée par la position du séparateur."""
+        h = self.strip_paned.get_height()
+        if h <= 0 or not self.filmstrip.get_visible():
+            return
+        self._strip_pending = False
+        want = max(self.STRIP_MIN, min(settings["strip_height"], h - 150))
+        self._placing = True
+        self.strip_paned.set_position(h - want)
+        self._placing = False
+
+    def _strip_moved(self, *_):
+        if self._placing or not self.filmstrip.get_visible() or self.is_fullscreen():
+            return
+        h = self.strip_paned.get_height()
+        if h > 0 and self.strip_paned.get_mapped():
+            settings["strip_height"] = max(self.STRIP_MIN, h - self.strip_paned.get_position())
+
     def set_filmstrip(self, on: bool):
         settings["filmstrip"] = on
-        self.strip_revealer.set_reveal_child(on)
+        self.filmstrip.set_visible(on and not self.is_fullscreen())
+        if on:
+            self._strip_pending = True
+            GLib.idle_add(lambda: (self._place_strip(), False)[1])
         if on and 0 <= self.index < len(self.images):
             GLib.idle_add(lambda: (self.filmstrip.show_index(self.index), False)[1])
 
@@ -778,6 +852,10 @@ class MainWindow(Adw.ApplicationWindow):
         full = self.is_fullscreen()
         self.viewer.set_reveal_top_bars(not full)
         self.viewer.set_reveal_bottom_bars(not full)
+        self.filmstrip.set_visible(settings["filmstrip"] and not full)
+        if not full:
+            self._strip_pending = True
+            GLib.idle_add(lambda: (self._place_strip(), False)[1])
         if full:
             self.split.set_show_sidebar(False)
             self.add_css_class("argos-fullscreen")
@@ -808,6 +886,10 @@ class MainWindow(Adw.ApplicationWindow):
 
     def _on_key(self, ctrl, keyval, keycode, state):
         if self.stack.get_visible_child_name() != "viewer":
+            if keyval in (Gdk.KEY_i, Gdk.KEY_I) and not state & Gdk.ModifierType.CONTROL_MASK \
+                    and not isinstance(self.get_focus(), Gtk.Text):
+                self.browser_info_button.set_active(not self.browser_info_button.get_active())
+                return True
             if keyval == Gdk.KEY_BackSpace and not isinstance(self.get_focus(), Gtk.Text):
                 self.go_up()
                 return True

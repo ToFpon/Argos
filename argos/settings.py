@@ -19,6 +19,8 @@ DEFAULTS: dict[str, Any] = {
     "window_maximized": False,
     "last_folder": "",              # dossier ouvert la dernière fois (vide : Images)
     "filmstrip": True,
+    "strip_height": 110,            # hauteur de la bande de vignettes (séparateur réglable)
+    "browser_info": False,          # propriétés sous l'arbre des dossiers (grille)
     "sidebar": True,                # arbre des dossiers à gauche de la grille              # bande de vignettes sous la photo
     "grid_size": 160,               # taille des vignettes de la grille (px)
     "sort_key": "name",             # name, date, size

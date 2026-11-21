@@ -97,14 +97,14 @@ msgstr "Name"
 msgid "Dossier"
 msgstr "Ordner"
 
-msgid "Taille"
-msgstr "Größe"
-
 msgid "Prise de vue"
 msgstr "Aufnahme"
 
 msgid "Dimensions"
 msgstr "Abmessungen"
+
+msgid "Taille"
+msgstr "Größe"
 
 msgid "Format"
 msgstr "Format"
@@ -358,6 +358,11 @@ msgstr "Nach rechts drehen (R)"
 msgid "Proportions"
 msgstr "Seitenverhältnis"
 
+msgid "{0} photo ({1})"
+msgid_plural "{0} photos ({1})"
+msgstr[0] "{0} Foto ({1})"
+msgstr[1] "{0} Fotos ({1})"
+
 msgid "« {0} » a été pivotée ou recadrée."
 msgstr "„{0}“ wurde gedreht oder zugeschnitten."
 
@@ -389,6 +394,12 @@ msgid "{0} sur {1} photo"
 msgid_plural "{0} sur {1} photos"
 msgstr[0] "{0} von {1} Foto"
 msgstr[1] "{0} von {1} Fotos"
+
+msgid "« {0} » sélectionné"
+msgstr "„{0}“ ausgewählt"
+
+msgid "« {0} » sélectionnée ({1})"
+msgstr "„{0}“ ausgewählt ({1})"
 
 msgid "Impossible d'annuler"
 msgstr "Rückgängig machen nicht möglich"

@@ -97,14 +97,14 @@ msgstr "Name"
 msgid "Dossier"
 msgstr "Folder"
 
-msgid "Taille"
-msgstr "Size"
-
 msgid "Prise de vue"
 msgstr "Shot"
 
 msgid "Dimensions"
 msgstr "Dimensions"
+
+msgid "Taille"
+msgstr "Size"
 
 msgid "Format"
 msgstr "Format"
@@ -358,6 +358,11 @@ msgstr "Rotate right (R)"
 msgid "Proportions"
 msgstr "Aspect ratio"
 
+msgid "{0} photo ({1})"
+msgid_plural "{0} photos ({1})"
+msgstr[0] "{0} photo ({1})"
+msgstr[1] "{0} photos ({1})"
+
 msgid "« {0} » a été pivotée ou recadrée."
 msgstr "“{0}” has been rotated or cropped."
 
@@ -389,6 +394,12 @@ msgid "{0} sur {1} photo"
 msgid_plural "{0} sur {1} photos"
 msgstr[0] "{0} of {1} photo"
 msgstr[1] "{0} of {1} photos"
+
+msgid "« {0} » sélectionné"
+msgstr "“{0}” selected"
+
+msgid "« {0} » sélectionnée ({1})"
+msgstr "“{0}” selected ({1})"
 
 msgid "Impossible d'annuler"
 msgstr "Cannot undo"

@@ -12,7 +12,8 @@ from typing import Optional
 import gi
 
 gi.require_version("Gtk", "4.0")
-from gi.repository import GLib, Gtk  # noqa: E402
+gi.require_version("GdkPixbuf", "2.0")
+from gi.repository import GdkPixbuf, GLib, Gtk  # noqa: E402
 
 from ..backend.folder import human_size  # noqa: E402
 from ..i18n import LANGUAGE, decimal, tr  # noqa: E402
@@ -139,17 +140,49 @@ class InfoPanel(Gtk.ScrolledWindow):
         rows = [(tr("Nom"), os.path.basename(pic.path)), (tr("Dossier"), os.path.dirname(pic.path))]
         if pic.width:
             rows.append((tr("Dimensions"), f"{pic.width} × {pic.height} ({decimal(pic.width * pic.height / 1e6)} Mpx)"))
-        rows.append((tr("Taille"), human_size(pic.size)))
+        if not getattr(pic, "is_dir", False):
+            rows.append((tr("Taille"), human_size(pic.size)))
         if pic.format:
             rows.append((tr("Format"), pic.format))
         if pic.mtime:
             rows.append((tr("Modifié le"), date_text(datetime.datetime.fromtimestamp(pic.mtime))))
         self._group(tr("Fichier"), rows)
         path = pic.path
+        if getattr(pic, "is_dir", False):
+            return
 
         def work():
             fields = exif_fields(path)
             GLib.idle_add(lambda: (self._exif(path, fields), False)[1])
+        threading.Thread(target=work, daemon=True).start()
+
+    def show_path(self, path):
+        """Pour la grille : photo ou dossier sélectionné (dimensions et format lus dans un fil)."""
+        if path is None:
+            self.show_picture(None)
+            return
+        self._path = path
+
+        def work():
+            from types import SimpleNamespace
+            from ..backend.loader import format_name
+            try:
+                st = os.stat(path)
+            except OSError:
+                return
+            w = h = 0
+            fmt = ""
+            if not os.path.isdir(path):
+                try:
+                    info = GdkPixbuf.Pixbuf.get_file_info(path)
+                    if isinstance(info, tuple) and info[0] is not None:
+                        w, h = info[1], info[2]
+                except GLib.Error:
+                    pass
+                fmt = format_name(path)
+            pic = SimpleNamespace(path=path, width=w, height=h, size=0 if os.path.isdir(path) else st.st_size,
+                                  format=fmt, mtime=st.st_mtime, is_dir=os.path.isdir(path))
+            GLib.idle_add(lambda: (self._path == path and self.show_picture(pic), False)[1])
         threading.Thread(target=work, daemon=True).start()
 
     def _exif(self, path, fields):

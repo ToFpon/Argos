@@ -26,7 +26,7 @@ import json  # noqa: E402
 os.makedirs(os.path.join(cfg, "argos"))
 with open(os.path.join(cfg, "argos", "settings.json"), "w") as fh:
     json.dump({"window_width": int(w), "window_height": int(h), "theme": "dark" if opts.get("dark") else "light",
-               "filmstrip": not opts.get("no-strip")}, fh)
+               "filmstrip": not opts.get("no-strip"), "strip_height": int(opts.get("strip", 110))}, fh)
 
 import gi  # noqa: E402
 
@@ -58,6 +58,9 @@ def stage():
         win.view.set_zoom(float(opts["zoom"]))
     if opts.get("info"):
         win.info_button.set_active(True)
+        win.browser_info_button.set_active(True)
+        if win.images:
+            win.grid.select_path(win.images[0].path)
     if opts.get("crop"):
         win.start_crop()
         fw, fh = win.view.full_size()

@@ -79,75 +79,75 @@ msgstr ""
 msgid "Demande ImageMagick (paquet imagemagick)"
 msgstr ""
 
-#: argos/ui/info.py:147
+#: argos/ui/info.py:149
 msgid "Fichier"
 msgstr ""
 
-#: argos/ui/info.py:72
+#: argos/ui/info.py:73
 msgid "Prise le"
 msgstr ""
 
-#: argos/ui/info.py:76
+#: argos/ui/info.py:77
 msgid "Appareil"
 msgstr ""
 
-#: argos/ui/info.py:79
+#: argos/ui/info.py:80
 msgid "Objectif"
 msgstr ""
 
-#: argos/ui/info.py:82
+#: argos/ui/info.py:83
 msgid "Exposition"
 msgstr ""
 
-#: argos/ui/info.py:85
+#: argos/ui/info.py:86
 msgid "Ouverture"
 msgstr ""
 
-#: argos/ui/info.py:88
+#: argos/ui/info.py:89
 msgid "Sensibilité"
 msgstr ""
 
-#: argos/ui/info.py:95
+#: argos/ui/info.py:96
 msgid "Focale"
 msgstr ""
 
-#: argos/ui/info.py:98
+#: argos/ui/info.py:99
 msgid "Flash"
 msgstr ""
 
-#: argos/ui/info.py:104
+#: argos/ui/info.py:105
 msgid "Position"
 msgstr ""
 
-#: argos/ui/info.py:139 argos/ui/window.py:75
+#: argos/ui/info.py:140 argos/ui/window.py:75
 msgid "Nom"
 msgstr ""
 
-#: argos/ui/info.py:139
+#: argos/ui/info.py:140
 msgid "Dossier"
 msgstr ""
 
-#: argos/ui/info.py:142 argos/ui/window.py:77
-msgid "Taille"
-msgstr ""
-
-#: argos/ui/info.py:157
+#: argos/ui/info.py:190
 msgid "Prise de vue"
 msgstr ""
 
-#: argos/ui/info.py:141
+#: argos/ui/info.py:142
 msgid "Dimensions"
 msgstr ""
 
-#: argos/ui/info.py:144
-msgid "Format"
+#: argos/ui/info.py:144 argos/ui/window.py:77
+msgid "Taille"
 msgstr ""
 
 #: argos/ui/info.py:146
+msgid "Format"
+msgstr ""
+
+#: argos/ui/info.py:148
 msgid "Modifié le"
 msgstr ""
 
-#: argos/ui/info.py:94
+#: argos/ui/info.py:95
 msgid "(équivalent {0} mm)"
 msgstr ""
 
@@ -283,7 +283,7 @@ msgstr ""
 msgid "Dossier parent"
 msgstr ""
 
-#: argos/ui/shortcuts.py:36 argos/ui/window.py:425
+#: argos/ui/shortcuts.py:36 argos/ui/window.py:454
 msgid "Ouvrir un dossier"
 msgstr ""
 
@@ -347,15 +347,15 @@ msgstr ""
 msgid "À propos d'Argos"
 msgstr ""
 
-#: argos/ui/window.py:162
+#: argos/ui/window.py:183
 msgid "Enregistrer sous…"
 msgstr ""
 
-#: argos/ui/window.py:163
+#: argos/ui/window.py:184
 msgid "Annuler les modifications"
 msgstr ""
 
-#: argos/ui/window.py:628
+#: argos/ui/window.py:679
 msgid "Enregistrer les modifications ?"
 msgstr ""
 
@@ -371,75 +371,75 @@ msgstr ""
 msgid "Barre latérale (F9)"
 msgstr ""
 
-#: argos/ui/window.py:106 argos/ui/window.py:341
+#: argos/ui/window.py:106 argos/ui/window.py:369
 msgid "Aucune photo"
 msgstr ""
 
-#: argos/ui/window.py:107 argos/ui/window.py:342
+#: argos/ui/window.py:107 argos/ui/window.py:370
 msgid "Ce dossier ne contient ni photo ni sous-dossier"
 msgstr ""
 
-#: argos/ui/window.py:138
+#: argos/ui/window.py:132 argos/ui/window.py:159
 msgid "Propriétés (I)"
 msgstr ""
 
-#: argos/ui/window.py:145
+#: argos/ui/window.py:166
 msgid "Ajuster à la fenêtre / taille réelle (0 / 1)"
 msgstr ""
 
-#: argos/ui/window.py:158
+#: argos/ui/window.py:179
 msgid "Recadrer (C)"
 msgstr ""
 
-#: argos/ui/window.py:164 argos/ui/window.py:630
+#: argos/ui/window.py:185 argos/ui/window.py:681
 msgid "Enregistrer"
 msgstr ""
 
-#: argos/ui/window.py:165
+#: argos/ui/window.py:186
 msgid "Remplacer la photo (Ctrl+S)"
 msgstr ""
 
-#: argos/ui/window.py:202
+#: argos/ui/window.py:231
 msgid "Bande de vignettes (F9)"
 msgstr ""
 
-#: argos/ui/window.py:222
+#: argos/ui/window.py:250
 msgid "Libre"
 msgstr ""
 
-#: argos/ui/window.py:222
+#: argos/ui/window.py:250
 msgid "Comme l'original"
 msgstr ""
 
-#: argos/ui/window.py:226
+#: argos/ui/window.py:254
 msgid "Glissez pour tracer le cadre, ses bords et ses coins pour l'ajuster"
 msgstr ""
 
-#: argos/ui/window.py:230 argos/ui/window.py:668 argos/ui/window.py:630
+#: argos/ui/window.py:258 argos/ui/window.py:719 argos/ui/window.py:681
 msgid "Annuler"
 msgstr ""
 
-#: argos/ui/window.py:233
+#: argos/ui/window.py:261
 msgid "Recadrer"
 msgstr ""
 
-#: argos/ui/window.py:337
+#: argos/ui/window.py:365
 msgid "Accès impossible"
 msgstr ""
 
-#: argos/ui/window.py:439
+#: argos/ui/window.py:468
 msgid "Ouvrir des photos"
 msgstr ""
 
-#: argos/ui/window.py:440
+#: argos/ui/window.py:469
 msgid "Images"
 msgstr ""
 
-#: argos/ui/window.py:551
+#: argos/ui/window.py:602
 msgid "Lecture impossible"
 msgstr ""
 
-#: argos/ui/window.py:691
+#: argos/ui/window.py:742
 msgid "Enregistrer sous"
 msgstr ""
 
@@ -447,88 +447,102 @@ msgstr ""
 msgid "Ouvrir un dossier (Ctrl+O)"
 msgstr ""
 
-#: argos/ui/window.py:132
+#: argos/ui/window.py:153
 msgid "Retour au dossier (Échap)"
 msgstr ""
 
-#: argos/ui/window.py:140
+#: argos/ui/window.py:161
 msgid "Plein écran (F11)"
 msgstr ""
 
-#: argos/ui/window.py:143
+#: argos/ui/window.py:164
 msgid "Zoom arrière (−)"
 msgstr ""
 
-#: argos/ui/window.py:149
+#: argos/ui/window.py:170
 msgid "Zoom avant (+)"
 msgstr ""
 
-#: argos/ui/window.py:153
+#: argos/ui/window.py:174
 msgid "Pivoter à gauche (Maj+R)"
 msgstr ""
 
-#: argos/ui/window.py:155
+#: argos/ui/window.py:176
 msgid "Pivoter à droite (R)"
 msgstr ""
 
-#: argos/ui/window.py:221
+#: argos/ui/window.py:249
 msgid "Proportions"
 msgstr ""
 
-#: argos/ui/window.py:629
+#: argos/ui/window.py:502
+msgid "{0} photo ({1})"
+msgid_plural "{0} photos ({1})"
+msgstr[0] ""
+msgstr[1] ""
+
+#: argos/ui/window.py:680
 msgid "« {0} » a été pivotée ou recadrée."
 msgstr ""
 
-#: argos/ui/window.py:630
+#: argos/ui/window.py:681
 msgid "Abandonner"
 msgstr ""
 
-#: argos/ui/window.py:717
+#: argos/ui/window.py:768
 msgid "Format inconnu"
 msgstr ""
 
-#: argos/ui/window.py:795
+#: argos/ui/window.py:873
 msgid "Impossible de mettre à la corbeille"
 msgstr ""
 
-#: argos/ui/window.py:801
+#: argos/ui/window.py:879
 msgid "« {0} » mis à la corbeille"
 msgstr ""
 
-#: argos/ui/window.py:180
+#: argos/ui/window.py:201
 msgid "Photo précédente"
 msgstr ""
 
-#: argos/ui/window.py:180
+#: argos/ui/window.py:201
 msgid "Photo suivante"
 msgstr ""
 
-#: argos/ui/window.py:668
+#: argos/ui/window.py:719
 msgid "« {0} » enregistrée"
 msgstr ""
 
-#: argos/ui/window.py:670
+#: argos/ui/window.py:721
 msgid "Enregistrée sous « {0} »"
 msgstr ""
 
-#: argos/ui/window.py:744
+#: argos/ui/window.py:795
 msgid "{0} sur {1} photo"
 msgid_plural "{0} sur {1} photos"
 msgstr[0] ""
 msgstr[1] ""
 
-#: argos/ui/window.py:663
+#: argos/ui/window.py:504
+msgid "« {0} » sélectionné"
+msgstr ""
+
+#: argos/ui/window.py:505
+msgid "« {0} » sélectionnée ({1})"
+msgstr ""
+
+#: argos/ui/window.py:714
 msgid "Impossible d'annuler"
 msgstr ""
 
-#: argos/ui/window.py:693
+#: argos/ui/window.py:744
 msgid "modifiée"
 msgstr ""
 
-#: argos/ui/window.py:718
+#: argos/ui/window.py:769
 msgid "Terminez le nom par l'extension du format voulu : {0}"
 msgstr ""
 
-#: argos/ui/window.py:651 argos/ui/window.py:729
+#: argos/ui/window.py:702 argos/ui/window.py:780
 msgid "Enregistrement impossible"
 msgstr ""
