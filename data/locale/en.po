@@ -1,0 +1,394 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Argos\n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "Remerciements"
+msgstr "Thanks"
+
+msgid "Visionneuse de photos simple et rapide"
+msgstr "A simple, fast photo viewer"
+
+msgid "Ko"
+msgstr "kB"
+
+msgid "Mo"
+msgstr "MB"
+
+msgid "Go"
+msgstr "GB"
+
+msgid "To"
+msgstr "TB"
+
+msgid "o"
+msgstr "B"
+
+msgid "Image trop grande"
+msgstr "Image too large"
+
+msgid "Format non pris en charge : installez le paquet « {0} »"
+msgstr "Unsupported format: install the “{0}” package"
+
+msgid "Molette = photo suivante"
+msgstr "Wheel = next photo"
+
+msgid "La molette passe à la photo suivante ou précédente, Ctrl + molette zoome (comme FastStone) ; coupée, la molette zoome"
+msgstr "The wheel goes to the next or previous photo, Ctrl + wheel zooms (like FastStone); when off, the wheel zooms"
+
+msgid "Revenir au début"
+msgstr "Loop"
+
+msgid "Après la dernière photo du dossier, on repart de la première"
+msgstr "After the last photo of the folder, start again from the first"
+
+msgid "Préchargement"
+msgstr "Preloading"
+
+msgid "Les photos voisines sont lues d'avance : la suivante s'affiche tout de suite"
+msgstr "Neighbouring photos are read in advance: the next one shows up instantly"
+
+msgid "Retouche simple"
+msgstr "Simple editing"
+
+msgid "Pivoter, recadrer et enregistrer sous un autre format"
+msgstr "Rotate, crop and save in another format"
+
+msgid "Demande ImageMagick (paquet imagemagick)"
+msgstr "Requires ImageMagick (imagemagick package)"
+
+msgid "Fichier"
+msgstr "File"
+
+msgid "Prise le"
+msgstr "Taken on"
+
+msgid "Appareil"
+msgstr "Camera"
+
+msgid "Objectif"
+msgstr "Lens"
+
+msgid "Exposition"
+msgstr "Exposure"
+
+msgid "Ouverture"
+msgstr "Aperture"
+
+msgid "Sensibilité"
+msgstr "Sensitivity"
+
+msgid "Focale"
+msgstr "Focal length"
+
+msgid "Flash"
+msgstr "Flash"
+
+msgid "Position"
+msgstr "Location"
+
+msgid "Nom"
+msgstr "Name"
+
+msgid "Dossier"
+msgstr "Folder"
+
+msgid "Taille"
+msgstr "Size"
+
+msgid "Prise de vue"
+msgstr "Shot"
+
+msgid "Dimensions"
+msgstr "Dimensions"
+
+msgid "Format"
+msgstr "Format"
+
+msgid "Modifié le"
+msgstr "Modified"
+
+msgid "(équivalent {0} mm)"
+msgstr "({0} mm equivalent)"
+
+msgid "Style"
+msgstr "Style"
+
+msgid "Taille des vignettes"
+msgstr "Thumbnail size"
+
+msgid "Dans la grille du dossier (appliquée au prochain démarrage)"
+msgstr "In the folder grid (applied at next start)"
+
+msgid "Préférences"
+msgstr "Preferences"
+
+msgid "Général"
+msgstr "General"
+
+msgid "Visionneuse de photos par défaut"
+msgstr "Default photo viewer"
+
+msgid "Les photos s'ouvrent avec Argos ; coupé, l'application d'avant reprend la main."
+msgstr "Photos open with Argos; when off, the previous application takes over again."
+
+msgid "Apparence"
+msgstr "Appearance"
+
+msgid "Comme le système"
+msgstr "Follow system"
+
+msgid "Clair"
+msgstr "Light"
+
+msgid "Sombre"
+msgstr "Dark"
+
+msgid "Langue"
+msgstr "Language"
+
+msgid "Appliquée au prochain démarrage"
+msgstr "Applied at next start"
+
+msgid "Affichage"
+msgstr "Display"
+
+msgid "Fonctionnalités"
+msgstr "Features"
+
+msgid "Chaque fonctionnalité s'active ou se coupe tout de suite, sans redémarrer Argos"
+msgstr "Each feature turns on or off right away, without restarting Argos"
+
+msgid "{0} n'est pas installé (lancé depuis les sources)"
+msgstr "{0} is not installed (run from source)"
+
+msgid "Photos"
+msgstr "Photos"
+
+msgid "Zoom"
+msgstr "Zoom"
+
+msgid "Fenêtre"
+msgstr "Window"
+
+msgid "Souris"
+msgstr "Mouse"
+
+msgid "Photo suivante / précédente"
+msgstr "Next / previous photo"
+
+msgid "Première / dernière photo"
+msgstr "First / last photo"
+
+msgid "Mettre à la corbeille"
+msgstr "Move to trash"
+
+msgid "Pivoter à droite / à gauche"
+msgstr "Rotate right / left"
+
+msgid "Propriétés"
+msgstr "Properties"
+
+msgid "Zoom avant / arrière"
+msgstr "Zoom in / out"
+
+msgid "Ajuster à la fenêtre"
+msgstr "Fit to window"
+
+msgid "Taille réelle (100 %)"
+msgstr "Actual size (100%)"
+
+msgid "Plein écran"
+msgstr "Fullscreen"
+
+msgid "Quitter le plein écran, puis revenir au dossier"
+msgstr "Leave fullscreen, then back to the folder"
+
+msgid "Bande de vignettes"
+msgstr "Thumbnail strip"
+
+msgid "Dossier parent"
+msgstr "Parent folder"
+
+msgid "Ouvrir un dossier"
+msgstr "Open a folder"
+
+msgid "Raccourcis clavier"
+msgstr "Keyboard shortcuts"
+
+msgid "Fermer la fenêtre"
+msgstr "Close window"
+
+msgid "Molette : photo suivante / précédente"
+msgstr "Wheel: next / previous photo"
+
+msgid "Ctrl + molette : zoom autour du pointeur"
+msgstr "Ctrl + wheel: zoom around the pointer"
+
+msgid "Glisser : déplacer la photo agrandie"
+msgstr "Drag: move the zoomed photo"
+
+msgid "Double-clic : plein écran"
+msgstr "Double click: fullscreen"
+
+msgid "Ouvrir un dossier…"
+msgstr "Open a Folder…"
+
+msgid "Ouvrir des photos…"
+msgstr "Open Photos…"
+
+msgid "Date de modification"
+msgstr "Modification date"
+
+msgid "Ordre inverse"
+msgstr "Reverse order"
+
+msgid "Trier par"
+msgstr "Sort by"
+
+msgid "Afficher les fichiers cachés"
+msgstr "Show hidden files"
+
+msgid "À propos d'Argos"
+msgstr "About Argos"
+
+msgid "Enregistrer sous…"
+msgstr "Save As…"
+
+msgid "Annuler les modifications"
+msgstr "Discard changes"
+
+msgid "Enregistrer les modifications ?"
+msgstr "Save changes?"
+
+msgid "Menu principal"
+msgstr "Main menu"
+
+msgid "Dossier parent (Alt+↑)"
+msgstr "Parent folder (Alt+↑)"
+
+msgid "Aucune photo"
+msgstr "No photos"
+
+msgid "Ce dossier ne contient ni photo ni sous-dossier"
+msgstr "This folder contains no photos and no subfolders"
+
+msgid "Propriétés (I)"
+msgstr "Properties (I)"
+
+msgid "Ajuster à la fenêtre / taille réelle (0 / 1)"
+msgstr "Fit to window / actual size (0 / 1)"
+
+msgid "Recadrer (C)"
+msgstr "Crop (C)"
+
+msgid "Enregistrer"
+msgstr "Save"
+
+msgid "Remplacer la photo (Ctrl+S)"
+msgstr "Replace the photo (Ctrl+S)"
+
+msgid "Bande de vignettes (F9)"
+msgstr "Thumbnail strip (F9)"
+
+msgid "Libre"
+msgstr "Free"
+
+msgid "Comme l'original"
+msgstr "Original"
+
+msgid "Glissez pour tracer le cadre, ses bords et ses coins pour l'ajuster"
+msgstr "Drag to draw the frame, drag its edges and corners to adjust it"
+
+msgid "Annuler"
+msgstr "Cancel"
+
+msgid "Recadrer"
+msgstr "Crop"
+
+msgid "Accès impossible"
+msgstr "Cannot access"
+
+msgid "Ouvrir des photos"
+msgstr "Open Photos"
+
+msgid "Images"
+msgstr "Images"
+
+msgid "Lecture impossible"
+msgstr "Cannot read"
+
+msgid "Enregistrer sous"
+msgstr "Save As"
+
+msgid "Ouvrir un dossier (Ctrl+O)"
+msgstr "Open a folder (Ctrl+O)"
+
+msgid "Retour au dossier (Échap)"
+msgstr "Back to the folder (Esc)"
+
+msgid "Plein écran (F11)"
+msgstr "Fullscreen (F11)"
+
+msgid "Zoom arrière (−)"
+msgstr "Zoom out (−)"
+
+msgid "Zoom avant (+)"
+msgstr "Zoom in (+)"
+
+msgid "Pivoter à gauche (Maj+R)"
+msgstr "Rotate left (Shift+R)"
+
+msgid "Pivoter à droite (R)"
+msgstr "Rotate right (R)"
+
+msgid "Proportions"
+msgstr "Aspect ratio"
+
+msgid "« {0} » a été pivotée ou recadrée."
+msgstr "“{0}” has been rotated or cropped."
+
+msgid "Abandonner"
+msgstr "Discard"
+
+msgid "Format inconnu"
+msgstr "Unknown format"
+
+msgid "Impossible de mettre à la corbeille"
+msgstr "Cannot move to trash"
+
+msgid "« {0} » mis à la corbeille"
+msgstr "“{0}” moved to trash"
+
+msgid "Photo précédente"
+msgstr "Previous photo"
+
+msgid "Photo suivante"
+msgstr "Next photo"
+
+msgid "« {0} » enregistrée"
+msgstr "“{0}” saved"
+
+msgid "Enregistrée sous « {0} »"
+msgstr "Saved as “{0}”"
+
+msgid "{0} sur {1} photo"
+msgid_plural "{0} sur {1} photos"
+msgstr[0] "{0} of {1} photo"
+msgstr[1] "{0} of {1} photos"
+
+msgid "Impossible d'annuler"
+msgstr "Cannot undo"
+
+msgid "modifiée"
+msgstr "edited"
+
+msgid "Terminez le nom par l'extension du format voulu : {0}"
+msgstr "End the name with the extension of the wanted format: {0}"
+
+msgid "Enregistrement impossible"
+msgstr "Cannot save"

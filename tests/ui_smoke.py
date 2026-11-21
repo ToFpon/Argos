@@ -27,6 +27,7 @@ gi.require_version("Adw", "1")
 from gi.repository import Adw, GLib, Gtk  # noqa: E402
 
 from argos.app import ArgosApp  # noqa: E402
+from argos.i18n import tr  # noqa: E402
 from argos.settings import settings  # noqa: E402
 
 PHOTOS = os.path.join(TMP, "Photos")
@@ -142,7 +143,7 @@ def steps(app):
     win.go(1)
     yield lambda: len(dialogs(app)) == 1
     d = dialogs(app)[0]
-    check(d.get_heading() == "Enregistrer les modifications ?", "question avant de quitter la photo")
+    check(d.get_heading() == tr("Enregistrer les modifications ?"), "question avant de quitter la photo")
     d.response("save")
     d.close()
     yield lambda: dims(path) == (100, 100)

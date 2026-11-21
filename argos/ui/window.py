@@ -19,7 +19,7 @@ from gi.repository import Adw, Gdk, Gio, GLib, GObject, Gtk, Pango  # noqa: E402
 from .. import APP_NAME, features  # noqa: E402
 from ..backend import folder as fold  # noqa: E402
 from ..backend.loader import Loader, Picture  # noqa: E402
-from ..i18n import decimal, ntr, tr  # noqa: E402
+from ..i18n import LANGUAGE, decimal, ntr, tr  # noqa: E402
 from ..settings import settings  # noqa: E402
 from .common import alert, shown, toast  # noqa: E402
 from .gallery import Filmstrip, Grid, store_of  # noqa: E402
@@ -30,7 +30,7 @@ from .viewer import ImageView  # noqa: E402
 
 def percent(zoom: float) -> str:
     p = zoom * 100
-    return f"{decimal(p, 0 if p >= 10 else 1)} %"
+    return decimal(p, 0 if p >= 10 else 1) + ("%" if LANGUAGE == "en" else " %")
 
 
 class MainWindow(Adw.ApplicationWindow):

@@ -23,6 +23,7 @@ DEFAULTS: dict[str, Any] = {
     "sort_key": "name",             # name, date, size
     "sort_reverse": False,
     "show_hidden": False,
+    "previous_defaults": {},        # application par défaut d'avant, par type (defaultapp.py)
     "features": {},                 # fonctionnalités activées / désactivées (voir features.py)
 }
 

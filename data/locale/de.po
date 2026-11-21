@@ -1,0 +1,394 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Argos\n"
+"Language: de\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "Remerciements"
+msgstr "Danksagungen"
+
+msgid "Visionneuse de photos simple et rapide"
+msgstr "Ein einfacher, schneller Fotobetrachter"
+
+msgid "Ko"
+msgstr "kB"
+
+msgid "Mo"
+msgstr "MB"
+
+msgid "Go"
+msgstr "GB"
+
+msgid "To"
+msgstr "TB"
+
+msgid "o"
+msgstr "B"
+
+msgid "Image trop grande"
+msgstr "Bild zu groß"
+
+msgid "Format non pris en charge : installez le paquet « {0} »"
+msgstr "Format nicht unterstützt: Installieren Sie das Paket „{0}“"
+
+msgid "Molette = photo suivante"
+msgstr "Mausrad = nächstes Foto"
+
+msgid "La molette passe à la photo suivante ou précédente, Ctrl + molette zoome (comme FastStone) ; coupée, la molette zoome"
+msgstr "Das Mausrad wechselt zum nächsten oder vorherigen Foto, Strg + Mausrad zoomt (wie FastStone); ausgeschaltet zoomt das Mausrad"
+
+msgid "Revenir au début"
+msgstr "Von vorne beginnen"
+
+msgid "Après la dernière photo du dossier, on repart de la première"
+msgstr "Nach dem letzten Foto des Ordners geht es mit dem ersten weiter"
+
+msgid "Préchargement"
+msgstr "Vorladen"
+
+msgid "Les photos voisines sont lues d'avance : la suivante s'affiche tout de suite"
+msgstr "Benachbarte Fotos werden im Voraus gelesen: das nächste erscheint sofort"
+
+msgid "Retouche simple"
+msgstr "Einfache Bearbeitung"
+
+msgid "Pivoter, recadrer et enregistrer sous un autre format"
+msgstr "Drehen, zuschneiden und in einem anderen Format speichern"
+
+msgid "Demande ImageMagick (paquet imagemagick)"
+msgstr "Benötigt ImageMagick (Paket imagemagick)"
+
+msgid "Fichier"
+msgstr "Datei"
+
+msgid "Prise le"
+msgstr "Aufgenommen am"
+
+msgid "Appareil"
+msgstr "Kamera"
+
+msgid "Objectif"
+msgstr "Objektiv"
+
+msgid "Exposition"
+msgstr "Belichtung"
+
+msgid "Ouverture"
+msgstr "Blende"
+
+msgid "Sensibilité"
+msgstr "Empfindlichkeit"
+
+msgid "Focale"
+msgstr "Brennweite"
+
+msgid "Flash"
+msgstr "Blitz"
+
+msgid "Position"
+msgstr "Standort"
+
+msgid "Nom"
+msgstr "Name"
+
+msgid "Dossier"
+msgstr "Ordner"
+
+msgid "Taille"
+msgstr "Größe"
+
+msgid "Prise de vue"
+msgstr "Aufnahme"
+
+msgid "Dimensions"
+msgstr "Abmessungen"
+
+msgid "Format"
+msgstr "Format"
+
+msgid "Modifié le"
+msgstr "Geändert am"
+
+msgid "(équivalent {0} mm)"
+msgstr "(entspricht {0} mm)"
+
+msgid "Style"
+msgstr "Stil"
+
+msgid "Taille des vignettes"
+msgstr "Vorschaugröße"
+
+msgid "Dans la grille du dossier (appliquée au prochain démarrage)"
+msgstr "Im Ordnerraster (beim nächsten Start übernommen)"
+
+msgid "Préférences"
+msgstr "Einstellungen"
+
+msgid "Général"
+msgstr "Allgemein"
+
+msgid "Visionneuse de photos par défaut"
+msgstr "Standard-Bildbetrachter"
+
+msgid "Les photos s'ouvrent avec Argos ; coupé, l'application d'avant reprend la main."
+msgstr "Fotos werden mit Argos geöffnet; ausgeschaltet übernimmt wieder die vorherige Anwendung."
+
+msgid "Apparence"
+msgstr "Erscheinungsbild"
+
+msgid "Comme le système"
+msgstr "Wie das System"
+
+msgid "Clair"
+msgstr "Hell"
+
+msgid "Sombre"
+msgstr "Dunkel"
+
+msgid "Langue"
+msgstr "Sprache"
+
+msgid "Appliquée au prochain démarrage"
+msgstr "Wird beim nächsten Start übernommen"
+
+msgid "Affichage"
+msgstr "Anzeige"
+
+msgid "Fonctionnalités"
+msgstr "Funktionen"
+
+msgid "Chaque fonctionnalité s'active ou se coupe tout de suite, sans redémarrer Argos"
+msgstr "Jede Funktion wird sofort ein- oder ausgeschaltet, ohne Argos neu zu starten"
+
+msgid "{0} n'est pas installé (lancé depuis les sources)"
+msgstr "{0} ist nicht installiert (aus den Quellen gestartet)"
+
+msgid "Photos"
+msgstr "Fotos"
+
+msgid "Zoom"
+msgstr "Zoom"
+
+msgid "Fenêtre"
+msgstr "Fenster"
+
+msgid "Souris"
+msgstr "Maus"
+
+msgid "Photo suivante / précédente"
+msgstr "Nächstes / vorheriges Foto"
+
+msgid "Première / dernière photo"
+msgstr "Erstes / letztes Foto"
+
+msgid "Mettre à la corbeille"
+msgstr "In den Papierkorb verschieben"
+
+msgid "Pivoter à droite / à gauche"
+msgstr "Nach rechts / links drehen"
+
+msgid "Propriétés"
+msgstr "Eigenschaften"
+
+msgid "Zoom avant / arrière"
+msgstr "Vergrößern / Verkleinern"
+
+msgid "Ajuster à la fenêtre"
+msgstr "An Fenster anpassen"
+
+msgid "Taille réelle (100 %)"
+msgstr "Originalgröße (100 %)"
+
+msgid "Plein écran"
+msgstr "Vollbild"
+
+msgid "Quitter le plein écran, puis revenir au dossier"
+msgstr "Vollbild verlassen, dann zurück zum Ordner"
+
+msgid "Bande de vignettes"
+msgstr "Vorschauleiste"
+
+msgid "Dossier parent"
+msgstr "Übergeordneter Ordner"
+
+msgid "Ouvrir un dossier"
+msgstr "Ordner öffnen"
+
+msgid "Raccourcis clavier"
+msgstr "Tastenkürzel"
+
+msgid "Fermer la fenêtre"
+msgstr "Fenster schließen"
+
+msgid "Molette : photo suivante / précédente"
+msgstr "Mausrad: nächstes / vorheriges Foto"
+
+msgid "Ctrl + molette : zoom autour du pointeur"
+msgstr "Strg + Mausrad: um den Zeiger zoomen"
+
+msgid "Glisser : déplacer la photo agrandie"
+msgstr "Ziehen: vergrößertes Foto verschieben"
+
+msgid "Double-clic : plein écran"
+msgstr "Doppelklick: Vollbild"
+
+msgid "Ouvrir un dossier…"
+msgstr "Ordner öffnen …"
+
+msgid "Ouvrir des photos…"
+msgstr "Fotos öffnen …"
+
+msgid "Date de modification"
+msgstr "Änderungsdatum"
+
+msgid "Ordre inverse"
+msgstr "Umgekehrte Reihenfolge"
+
+msgid "Trier par"
+msgstr "Sortieren nach"
+
+msgid "Afficher les fichiers cachés"
+msgstr "Verborgene Dateien anzeigen"
+
+msgid "À propos d'Argos"
+msgstr "Info zu Argos"
+
+msgid "Enregistrer sous…"
+msgstr "Speichern unter …"
+
+msgid "Annuler les modifications"
+msgstr "Änderungen verwerfen"
+
+msgid "Enregistrer les modifications ?"
+msgstr "Änderungen speichern?"
+
+msgid "Menu principal"
+msgstr "Hauptmenü"
+
+msgid "Dossier parent (Alt+↑)"
+msgstr "Übergeordneter Ordner (Alt+↑)"
+
+msgid "Aucune photo"
+msgstr "Keine Fotos"
+
+msgid "Ce dossier ne contient ni photo ni sous-dossier"
+msgstr "Dieser Ordner enthält weder Fotos noch Unterordner"
+
+msgid "Propriétés (I)"
+msgstr "Eigenschaften (I)"
+
+msgid "Ajuster à la fenêtre / taille réelle (0 / 1)"
+msgstr "An Fenster anpassen / Originalgröße (0 / 1)"
+
+msgid "Recadrer (C)"
+msgstr "Zuschneiden (C)"
+
+msgid "Enregistrer"
+msgstr "Speichern"
+
+msgid "Remplacer la photo (Ctrl+S)"
+msgstr "Foto ersetzen (Strg+S)"
+
+msgid "Bande de vignettes (F9)"
+msgstr "Vorschauleiste (F9)"
+
+msgid "Libre"
+msgstr "Frei"
+
+msgid "Comme l'original"
+msgstr "Wie das Original"
+
+msgid "Glissez pour tracer le cadre, ses bords et ses coins pour l'ajuster"
+msgstr "Ziehen, um den Rahmen zu zeichnen; Kanten und Ecken ziehen, um ihn anzupassen"
+
+msgid "Annuler"
+msgstr "Abbrechen"
+
+msgid "Recadrer"
+msgstr "Zuschneiden"
+
+msgid "Accès impossible"
+msgstr "Kein Zugriff"
+
+msgid "Ouvrir des photos"
+msgstr "Fotos öffnen"
+
+msgid "Images"
+msgstr "Bilder"
+
+msgid "Lecture impossible"
+msgstr "Lesen nicht möglich"
+
+msgid "Enregistrer sous"
+msgstr "Speichern unter"
+
+msgid "Ouvrir un dossier (Ctrl+O)"
+msgstr "Ordner öffnen (Strg+O)"
+
+msgid "Retour au dossier (Échap)"
+msgstr "Zurück zum Ordner (Esc)"
+
+msgid "Plein écran (F11)"
+msgstr "Vollbild (F11)"
+
+msgid "Zoom arrière (−)"
+msgstr "Verkleinern (−)"
+
+msgid "Zoom avant (+)"
+msgstr "Vergrößern (+)"
+
+msgid "Pivoter à gauche (Maj+R)"
+msgstr "Nach links drehen (Umschalt+R)"
+
+msgid "Pivoter à droite (R)"
+msgstr "Nach rechts drehen (R)"
+
+msgid "Proportions"
+msgstr "Seitenverhältnis"
+
+msgid "« {0} » a été pivotée ou recadrée."
+msgstr "„{0}“ wurde gedreht oder zugeschnitten."
+
+msgid "Abandonner"
+msgstr "Verwerfen"
+
+msgid "Format inconnu"
+msgstr "Unbekanntes Format"
+
+msgid "Impossible de mettre à la corbeille"
+msgstr "Verschieben in den Papierkorb nicht möglich"
+
+msgid "« {0} » mis à la corbeille"
+msgstr "„{0}“ in den Papierkorb verschoben"
+
+msgid "Photo précédente"
+msgstr "Vorheriges Foto"
+
+msgid "Photo suivante"
+msgstr "Nächstes Foto"
+
+msgid "« {0} » enregistrée"
+msgstr "„{0}“ gespeichert"
+
+msgid "Enregistrée sous « {0} »"
+msgstr "Gespeichert als „{0}“"
+
+msgid "{0} sur {1} photo"
+msgid_plural "{0} sur {1} photos"
+msgstr[0] "{0} von {1} Foto"
+msgstr[1] "{0} von {1} Fotos"
+
+msgid "Impossible d'annuler"
+msgstr "Rückgängig machen nicht möglich"
+
+msgid "modifiée"
+msgstr "bearbeitet"
+
+msgid "Terminez le nom par l'extension du format voulu : {0}"
+msgstr "Beenden Sie den Namen mit der Endung des gewünschten Formats: {0}"
+
+msgid "Enregistrement impossible"
+msgstr "Speichern nicht möglich"
