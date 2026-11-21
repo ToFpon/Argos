@@ -1,0 +1,5 @@
+debian/bin/argos-viewer usr/bin
+data/io.github.argos.Argos.desktop usr/share/applications
+data/io.github.argos.Argos.metainfo.xml usr/share/metainfo
+data/icons/hicolor/scalable/apps/io.github.argos.Argos.svg usr/share/icons/hicolor/scalable/apps
+data/icons/hicolor/symbolic/apps/io.github.argos.Argos-symbolic.svg usr/share/icons/hicolor/symbolic/apps

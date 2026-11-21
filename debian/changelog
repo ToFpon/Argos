@@ -1,0 +1,8 @@
+argos-viewer (0.1.0~noble1) noble; urgency=medium
+
+  * Première version : grille des photos avec l'arbre des dossiers et les
+    propriétés, visionneuse (molette = photo suivante, Ctrl + molette =
+    zoom, plein écran au double-clic), bande de vignettes réglable,
+    retouche simple (pivoter, recadrer, enregistrer sous).
+
+ -- Tof <nourpon@gmail.com>  Sat, 21 Nov 2026 07:01:05 +0000

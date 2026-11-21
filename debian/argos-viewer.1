@@ -1,0 +1,32 @@
+.TH ARGOS-VIEWER 1 "November 2026" "Argos 0.1.0" "User Commands"
+.SH NAME
+argos-viewer \- simple and fast photo viewer for GNOME (Argos)
+.SH SYNOPSIS
+.B argos-viewer
+[\fIFILE\fR|\fIFOLDER\fR]
+.SH DESCRIPTION
+Argos shows the photos of a folder as a grid of thumbnails, with a folder tree
+on the side, and opens them in a viewer with a thumbnail strip, a status bar and
+a properties panel. The mouse wheel goes to the next or previous photo,
+Ctrl + wheel zooms around the pointer, a double click shows the photo full
+screen. Photos can be rotated, cropped and saved in another format.
+.PP
+With a photo, Argos opens its folder and shows the photo; with a folder, the
+grid of that folder; without argument, the last folder opened (or Pictures).
+If Argos is already running, the request goes to the running instance.
+.SH OPTIONS
+.TP
+.B \-\-version
+Print the version and exit.
+.SH FILES
+.TP
+.I ~/.config/argos/settings.json
+Preferences.
+.TP
+.I ~/.cache/thumbnails/
+Thumbnails, shared with Nautilus and other file managers.
+.TP
+.I ~/.cache/argos/undo/
+Originals kept for "Undo" after saving an edited photo (removed after a day).
+.SH AUTHOR
+Tof

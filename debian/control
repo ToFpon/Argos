@@ -1,0 +1,29 @@
+Source: argos-viewer
+Section: graphics
+Priority: optional
+Maintainer: Tof <nourpon@gmail.com>
+Build-Depends: debhelper-compat (= 13), dh-python, python3:any
+Standards-Version: 4.6.2
+Homepage: https://github.com/ToFpon/Argos
+Vcs-Browser: https://github.com/ToFpon/Argos
+Vcs-Git: https://github.com/ToFpon/Argos.git
+Rules-Requires-Root: no
+
+Package: argos-viewer
+Architecture: all
+Depends: ${misc:Depends}, ${python3:Depends}, python3 (>= 3.10), python3-gi,
+ gir1.2-gtk-4.0 (>= 4.14), gir1.2-adw-1 (>= 1.5), gir1.2-glib-2.0, gir1.2-gdkpixbuf-2.0, gir1.2-pango-1.0
+Recommends: imagemagick, gir1.2-gexiv2-0.10, webp-pixbuf-loader, heif-gdk-pixbuf, librsvg2-common
+Description: simple and fast photo viewer for GNOME
+ Argos shows the photos of a folder as a grid of thumbnails, with a folder
+ tree on the side, and opens them in a viewer laid out like gThumb: header
+ bar, thumbnail strip with an adjustable height, status bar, properties
+ (EXIF) panel.
+ .
+ The mouse wheel goes to the next or previous photo, Ctrl + wheel zooms
+ around the pointer, dragging moves a zoomed photo and a double click shows
+ it full screen. Neighbouring photos are read in advance.
+ .
+ Simple editing: rotate, crop and save in another format (ImageMagick).
+ Formats are those of GdkPixbuf: JPEG, PNG, GIF (animated), WebP, TIFF,
+ BMP, SVG, HEIC and AVIF. It follows the desktop theme.

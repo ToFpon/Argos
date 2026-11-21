@@ -116,6 +116,6 @@ def main(argv=None) -> int:
     if "--version" in (argv or sys.argv[1:]):
         print(f"{APP_NAME} {VERSION}")
         return 0
-    _process_name("argos")
+    _process_name("argos-viewer")
     GLib.set_prgname(APP_ID)
     return ArgosApp().run(argv if argv is not None else sys.argv)

@@ -108,9 +108,14 @@ tools/screenshot.py SORTIE.png CHEMIN [--dark] [--size=LxH] [--zoom=F] [--info] 
 1. FAIT : grille, visionneuse, bande, barre d'état, propriétés, plein écran, retouche, tests.
 2. FAIT : traductions en / de (128 textes), application par défaut pour les images (`defaultapp.py` de Calypso,
    TYPES = images du .desktop ; `test_defaultapp`).
-3. README, paquet (debian/, workflow release-deb, tools/ppa.sh, tools/site.sh), site (tons dorés), captures.
-   PPA : `ppa:nourpon/argos` (créé par Tof). NOM DU PAQUET : « argos » est PRIS dans Debian forky (client GTK de
-   Mopidy, 1.19.5 ; pas encore dans Ubuntu 26.04, vérifié le 21/11/2026) → paquet, commande et processus
-   `argos-photos` (comme calypso-pdf), code privé dans /usr/share/argos-photos ; l'application reste « Argos »,
-   identifiant io.github.argos.Argos. À confirmer par Tof.
+3. FAIT (0.1.0, à publier sur « on publie ») : README, paquet `argos-viewer` (nom choisi par Tof ; « argos » est
+   PRIS dans Debian forky : client GTK de Mopidy ; argos-viewer libre chez Debian et Ubuntu, vérifié le 21/11/2026),
+   commande et processus `argos-viewer` (l'Exec du .desktop et le nom du processus doivent concorder : icône du
+   Moniteur système), code privé dans /usr/share/argos-viewer, identifiant io.github.argos.Argos inchangé. Repris de
+   Calypso : debian/ (rules, bin, install, manpages), `.github/workflows/release-deb.yml` (commit « Version… »),
+   `tools/ppa.sh` (ppa:nourpon/argos, noble puis resolute), `tools/site.sh` (dossier Argos des pages perso Free).
+   Recommends : imagemagick, gir1.2-gexiv2-0.10, webp-pixbuf-loader, heif-gdk-pixbuf, librsvg2-common. Vérifié :
+   dpkg-buildpackage, lintian sans remarque, appstreamcli, installé puis lancé (python3.12).
+   RESTE : le site (`site/index.html`, tons dorés) et ses captures — il faut de vraies photos de démonstration
+   (libres de droits) ; tools/ppa.sh appelle tools/site.sh à la fin.
 4. Essai chez Tof.

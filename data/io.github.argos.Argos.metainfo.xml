@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>io.github.argos.Argos</id>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>GPL-3.0-or-later</project_license>
+  <name>Argos</name>
+  <summary>Browse and view your photos</summary>
+  <summary xml:lang="fr">Parcourir et regarder vos photos</summary>
+  <summary xml:lang="de">Fotos durchsuchen und ansehen</summary>
+  <developer id="io.github.argos">
+    <name>Tof</name>
+  </developer>
+  <description>
+    <p>
+      Argos is a simple and fast photo viewer for GNOME. It shows the photos of a folder as a grid, with a
+      folder tree on the side, and opens them in a viewer laid out like gThumb. It follows the desktop theme.
+    </p>
+    <p xml:lang="fr">
+      Argos est une visionneuse de photos simple et rapide pour GNOME. Elle montre les photos d'un dossier en
+      grille, avec l'arbre des dossiers à côté, et les ouvre dans une visionneuse disposée comme gThumb. Elle
+      suit le thème du bureau.
+    </p>
+    <p xml:lang="de">
+      Argos ist ein einfacher, schneller Fotobetrachter für GNOME. Er zeigt die Fotos eines Ordners als Raster
+      mit dem Ordnerbaum daneben und öffnet sie in einem Betrachter im Stil von gThumb. Er folgt dem Thema der
+      Arbeitsumgebung.
+    </p>
+    <ul>
+      <li>Mouse wheel: next or previous photo; Ctrl + wheel: zoom around the pointer; double click: full screen</li>
+      <li>Thumbnail strip with an adjustable height, status bar, properties and shooting details (EXIF)</li>
+      <li>Rotate, crop and save in another format; the original can be restored right after saving</li>
+      <li>JPEG, PNG, animated GIF, WebP, TIFF, BMP, SVG, HEIC and AVIF</li>
+    </ul>
+    <ul xml:lang="fr">
+      <li>Molette : photo suivante ou précédente ; Ctrl + molette : zoom autour du pointeur ; double-clic : plein écran</li>
+      <li>Bande de vignettes réglable en hauteur, barre d'état, propriétés et prise de vue (EXIF)</li>
+      <li>Pivoter, recadrer et enregistrer sous un autre format ; l'original peut être rétabli juste après</li>
+      <li>JPEG, PNG, GIF animé, WebP, TIFF, BMP, SVG, HEIC et AVIF</li>
+    </ul>
+    <ul xml:lang="de">
+      <li>Mausrad: nächstes oder vorheriges Foto; Strg + Mausrad: um den Zeiger zoomen; Doppelklick: Vollbild</li>
+      <li>Vorschauleiste mit einstellbarer Höhe, Statusleiste, Eigenschaften und Aufnahmedaten (EXIF)</li>
+      <li>Drehen, zuschneiden und in einem anderen Format speichern; das Original lässt sich gleich danach wiederherstellen</li>
+      <li>JPEG, PNG, animiertes GIF, WebP, TIFF, BMP, SVG, HEIC und AVIF</li>
+    </ul>
+  </description>
+  <url type="homepage">https://github.com/ToFpon/Argos</url>
+  <url type="vcs-browser">https://github.com/ToFpon/Argos</url>
+  <url type="bugtracker">https://github.com/ToFpon/Argos/issues</url>
+  <launchable type="desktop-id">io.github.argos.Argos.desktop</launchable>
+  <categories>
+    <category>Graphics</category>
+    <category>Viewer</category>
+  </categories>
+  <keywords>
+    <keyword>photo</keyword>
+    <keyword>image</keyword>
+    <keyword>viewer</keyword>
+    <keyword>gallery</keyword>
+  </keywords>
+  <provides>
+    <binary>argos-viewer</binary>
+    <mediatype>image/jpeg</mediatype>
+    <mediatype>image/png</mediatype>
+    <mediatype>image/webp</mediatype>
+  </provides>
+  <requires>
+    <display_length compare="ge">360</display_length>
+  </requires>
+  <content_rating type="oars-1.1"/>
+  <releases>
+    <release version="0.1.0" date="2026-11-21">
+      <description>
+        <ul>
+          <li>First version: photo grid with the folder tree and properties, viewer, adjustable thumbnail strip, simple editing</li>
+        </ul>
+      </description>
+    </release>
+  </releases>
+</component>
