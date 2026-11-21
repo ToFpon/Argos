@@ -56,7 +56,10 @@ class _Cell(Gtk.Box):
         self.forget()
         self.path = entry.path
         if self.label is not None:
+            # nom sous les DOSSIERS seulement (demande de Tof : la place pour les photos ; leur nom est dans
+            # l'infobulle, la barre d'état et les propriétés)
             self.label.set_label(shown(entry.name))
+            self.label.set_visible(entry.is_dir)
         self.set_tooltip_text(shown(entry.name))
         self.picture.set_paintable(None)
         if entry.is_dir:
