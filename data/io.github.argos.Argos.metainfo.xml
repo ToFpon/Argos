@@ -69,6 +69,13 @@
   </requires>
   <content_rating type="oars-1.1"/>
   <releases>
+    <release version="0.1.2" date="2026-11-21">
+      <description>
+        <ul>
+          <li>Right-click menu on a photo, in the viewer and the grid: full screen, set as background, print, open with, copy image, copy to, move to, rename, move to trash, delete</li>
+        </ul>
+      </description>
+    </release>
     <release version="0.1.1" date="2026-11-21">
       <description>
         <ul>

@@ -1,3 +1,12 @@
+argos-viewer (0.1.2~noble1) noble; urgency=medium
+
+  * Menu du clic droit sur une photo, dans la visionneuse et la grille :
+    plein écran, définir comme arrière-plan, imprimer, ouvrir avec,
+    copier l'image, copier vers, déplacer vers, renommer, mettre à la
+    corbeille, supprimer.
+
+ -- Tof <nourpon@gmail.com>  Sat, 21 Nov 2026 10:37:35 +0000
+
 argos-viewer (0.1.1~noble1) noble; urgency=medium
 
   * Les dossiers déjà vus s'affichent tout de suite (gardés en mémoire,
