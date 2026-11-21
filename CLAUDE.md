@@ -66,6 +66,13 @@ Nom : Argos le géant aux cent yeux (et le chien d'Ulysse, le seul à le reconna
   Enregistrer sous…, Annuler les modifications), `guard(then)` = question « Enregistrer les modifications ? »
   avant de changer de photo, revenir à la grille ou fermer. Clavier en capture (`_on_key`) : ← → Espace Retour
   arrière Page↑↓ Début Fin, Échap (recadrage → plein écran → grille), Entrée applique le recadrage.
+- Grille et bande « moteur d'Odysseus » (demande de Tof) : modèle VIRTUEL `gallery.EntryList` (Gio.ListModel, `Item`
+  créés à la demande, pour les cases affichées seulement), `max_columns` = vrai nombre de colonnes d'après la largeur
+  (`columns_for` dans `do_size_allocate` — déclaré dans CHAQUE classe, pas dans le mixin `_SizedGrid`), modèle branché
+  seulement une fois la grille dimensionnée (`set_model` → `_attach_pending`). Mesuré sur 8 000 images : grille en
+  1,1 s au lieu de 9,4, 129 cases au lieu de 1 281, retour par le cache 0,02 s au lieu de 8. Miniatures du cache
+  décodées UNE fois (`ThumbLoader._cached`, date vérifiée sur le même pixbuf), 3 fils. Nom des dossiers : taille
+  normale, deux lignes au plus (demande de Tof).
 - SVG (vu chez Tof : icône 48 × 48 minuscule puis pixelisée au zoom) : `ImageView.vector` = chemin du SVG →
   ajusté À la fenêtre (agrandi, comme gThumb), et redessiné net à la taille affichée (`_hires` :
   `Pixbuf.new_from_file_at_scale` dans un fil, 150 ms après le dernier changement de zoom, 6000 px au plus) ; en

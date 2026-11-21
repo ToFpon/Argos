@@ -4,6 +4,7 @@ fait défiler vite), une demande devenue inutile (case recyclée) est abandonné
 
 from __future__ import annotations
 
+import os
 import threading
 from collections import OrderedDict
 from typing import Callable
@@ -11,11 +12,12 @@ from typing import Callable
 import gi
 
 gi.require_version("Gdk", "4.0")
-from gi.repository import Gdk, GLib  # noqa: E402
+gi.require_version("GdkPixbuf", "2.0")
+from gi.repository import Gdk, GdkPixbuf, GLib  # noqa: E402
 
 from ..backend import thumbnails  # noqa: E402
 
-WORKERS = 2
+WORKERS = 3
 KEEP = 600                           # textures gardées en mémoire (≈ 600 × 256² × 4 = 150 Mo au pire)
 
 
@@ -69,15 +71,36 @@ class ThumbLoader:
                 GLib.idle_add(lambda cb=cb, tex=tex: (cb(tex), False)[1])
 
     def _make(self, path: str, mtime: float):
-        png = thumbnails.lookup(path, mtime, self.pixels)
-        if png is None and not thumbnails.failed(path, mtime):
-            png = thumbnails.generate(path, "image/", mtime, self.pixels)
+        """Miniature du cache lue UNE fois (avant : décodée pour vérifier sa date, puis encore pour la texture),
+        sinon fabriquée."""
+        tex = self._cached(path, mtime)
+        if tex is not None:
+            return tex
+        if thumbnails.failed(path, mtime):
+            return None
+        png = thumbnails.generate(path, "image/", mtime, self.pixels)
         if png is None:
             return None
         try:
             return Gdk.Texture.new_from_filename(png)
         except GLib.Error:
             return None
+
+    def _cached(self, path: str, mtime: float):
+        name = thumbnails._md5(path) + ".png"
+        wanted = thumbnails.size_class(self.pixels)
+        order = list(thumbnails.SIZES)
+        for cls in order[order.index(wanted):] + order[:order.index(wanted)][::-1]:
+            png = os.path.join(thumbnails.CACHE, cls, name)
+            try:
+                pb = GdkPixbuf.Pixbuf.new_from_file(png)
+            except GLib.Error:
+                continue
+            m = pb.get_option("tEXt::Thumb::MTime")
+            if m is not None and m.isdigit() and int(m) != int(mtime):
+                continue                                   # périmée : l'image a changé depuis
+            return Gdk.Texture.new_for_pixbuf(pb)
+        return None
 
 
 _shared = None

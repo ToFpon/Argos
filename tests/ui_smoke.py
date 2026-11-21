@@ -248,6 +248,7 @@ def steps(app):
     win.open_folder(PHOTOS)
     check(win.browser_stack.get_visible_child_name() == "grid" and len(win.images) > 3,
           "dossier déjà vu : grille tout de suite")
+    yield lambda: win.grid.selection.get_model() is not None
     model = win.grid.selection.get_model()
     yield 600
     check(win.grid.selection.get_model() is model, "relecture identique : grille inchangée")
@@ -310,6 +311,14 @@ def steps(app):
     win._ctx = None
     win.copy_image()
     yield 100
+
+    # grille : vrai nombre de colonnes (leçon d'Odysseus : sinon GTK crée des milliers de cases d'un coup)
+    from argos.ui.gallery import columns_for
+    win.show_browser()
+    yield lambda: win.grid.get_width() > 0 and win.grid.selection.get_model() is not None
+    yield 100
+    check(win.grid.view.get_max_columns() == columns_for(win.grid.get_width(), win.grid._cell),
+          f"grille : {win.grid.view.get_max_columns()} colonnes d'après la largeur")
 
     # SVG : agrandi à la fenêtre et redessiné net au zoom (vu chez Tof : icône minuscule, puis pixelisée)
     icons = os.path.join(TMP, "Icônes")

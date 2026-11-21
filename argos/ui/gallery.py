@@ -9,7 +9,7 @@ from __future__ import annotations
 import gi
 
 gi.require_version("Gtk", "4.0")
-from gi.repository import Gio, GObject, Gtk, Pango  # noqa: E402
+from gi.repository import Gio, GLib, GObject, Gtk, Pango  # noqa: E402
 
 from ..backend.folder import Entry  # noqa: E402
 from .common import shown  # noqa: E402
@@ -24,10 +24,95 @@ class Item(GObject.Object):
         self.entry = entry
 
 
-def store_of(entries: list[Entry]) -> Gio.ListStore:
-    store = Gio.ListStore(item_type=Item)
-    store.splice(0, 0, [Item(e) for e in entries])
-    return store
+class EntryList(GObject.Object, Gio.ListModel):
+    """Modèle VIRTUEL (repris d'Odysseus) : les `Item` ne sont créés que pour les cases affichées — avec un
+    Gio.ListStore, 7 685 icônes = 7 685 objets GObject faits d'un coup, deux fois (grille + bande)."""
+    __gtype_name__ = "ArgosEntryList"
+
+    def __init__(self, entries: list[Entry]):
+        super().__init__()
+        self.entries = entries
+        self._items: dict[int, Item] = {}
+
+    def do_get_item_type(self):
+        return Item.__gtype__
+
+    def do_get_n_items(self):
+        return len(self.entries)
+
+    def do_get_item(self, i):
+        if not 0 <= i < len(self.entries):
+            return None
+        it = self._items.get(i)
+        if it is None:
+            it = self._items[i] = Item(self.entries[i])
+        return it
+
+
+def store_of(entries: list[Entry]) -> EntryList:
+    return EntryList(list(entries))
+
+
+def columns_for(width: int, cell: int) -> int:
+    """Vrai nombre de colonnes : sans lui, Gtk.GridView remplit d'abord « max_columns » colonnes sans connaître
+    la largeur des cases (leçon d'Odysseus : ~2 000 cases créées d'un coup, secondes figées)."""
+    return max(1, min(64, width // max(1, cell)))
+
+
+class _SizedGrid:
+    """Grille branchée sur son modèle seulement une fois dimensionnée, colonnes d'après la largeur réelle."""
+
+    def _init_sizing(self, cell: int):
+        self._cell = cell
+        self._pending = None
+        self._pending_id = 0
+        self._cols_id = 0
+
+    def _sized(self) -> bool:
+        return self.get_mapped() and self.get_width() > 0 and self.get_height() > 0
+
+    def set_model(self, model):
+        if model is None or self._sized():
+            self._pending = None
+            self._apply_cols(columns_for(self.get_width(), self._cell)) if self._sized() else None
+            self.selection.set_model(model)
+            return
+        self._pending = model
+        self.selection.set_model(None)
+        if not self._pending_id:
+            self._pending_id = GLib.timeout_add(30, self._attach_pending)
+
+    def _attach_pending(self):
+        if self._pending is None or self.get_root() is None:
+            self._pending_id = 0
+            return False
+        if not self._sized():
+            return True
+        self._pending_id = 0
+        model, self._pending = self._pending, None
+        self._apply_cols(columns_for(self.get_width(), self._cell))
+        self.selection.set_model(model)
+        self._attached()
+        return False
+
+    def _attached(self):
+        pass
+
+    def _size_allocated(self, width, height, baseline):
+        Gtk.ScrolledWindow.do_size_allocate(self, width, height, baseline)
+        cols = columns_for(width, self._cell)
+        if cols != self.view.get_max_columns() and not self._cols_id:
+            self._cols_id = GLib.idle_add(self._apply_cols_idle, cols)
+
+    def _apply_cols_idle(self, cols):
+        self._cols_id = 0
+        if self.get_root() is not None:
+            self.view.set_max_columns(cols)
+        return False
+
+    def _apply_cols(self, cols):
+        if cols != self.view.get_max_columns():
+            self.view.set_max_columns(cols)
 
 
 class _Cell(Gtk.Box):
@@ -45,9 +130,11 @@ class _Cell(Gtk.Box):
         self.append(self.frame)
         self.label = None
         if with_name:
-            self.label = Gtk.Label(ellipsize=Pango.EllipsizeMode.MIDDLE, max_width_chars=1, width_request=size,
-                                   lines=1)
-            self.label.add_css_class("caption")
+            # nom des dossiers en taille normale, sur deux lignes au plus (demande de Tof : plus lisible)
+            self.label = Gtk.Label(ellipsize=Pango.EllipsizeMode.END, max_width_chars=1, width_request=size,
+                                   lines=2, wrap=True, wrap_mode=Pango.WrapMode.WORD_CHAR,
+                                   justify=Gtk.Justification.CENTER)
+            self.label.add_css_class("argos-folder-name")
             self.append(self.label)
         self.path = None
         self._cb = None
@@ -98,7 +185,7 @@ def _factory(size: int, with_name: bool) -> Gtk.SignalListItemFactory:
     return f
 
 
-class Grid(Gtk.ScrolledWindow):
+class Grid(_SizedGrid, Gtk.ScrolledWindow):
     """Grille du dossier. Signal « activate » (position) : ouvrir le dossier ou la photo."""
 
     __gsignals__ = {"open": (GObject.SignalFlags.RUN_FIRST, None, (object,)),
@@ -106,8 +193,9 @@ class Grid(Gtk.ScrolledWindow):
 
     def __init__(self, size: int = 160):
         super().__init__(hexpand=True, vexpand=True, hscrollbar_policy=Gtk.PolicyType.NEVER)
+        self._init_sizing(size + 20 + 6)                # case + padding (base.css) + espacement
         self.selection = Gtk.SingleSelection(autoselect=False, can_unselect=True)
-        self.view = Gtk.GridView(model=self.selection, factory=_factory(size, True), max_columns=40,
+        self.view = Gtk.GridView(model=self.selection, factory=_factory(size, True), max_columns=4,
                                  single_click_activate=False, enable_rubberband=False)
         self.view.add_css_class("argos-grid")
         self.view.connect("activate", self._on_activate)
@@ -116,8 +204,8 @@ class Grid(Gtk.ScrolledWindow):
         right.connect("pressed", self._on_right)
         self.view.add_controller(right)
 
-    def set_model(self, store: Gio.ListStore):
-        self.selection.set_model(store)
+    def do_size_allocate(self, width, height, baseline):
+        self._size_allocated(width, height, baseline)
 
     def _on_right(self, _g, _n, x, y):
         """Clic droit sur une vignette : elle est sélectionnée, puis le menu (photos seulement)."""
@@ -151,7 +239,7 @@ class Grid(Gtk.ScrolledWindow):
                 return
 
 
-class Filmstrip(Gtk.ScrolledWindow):
+class Filmstrip(_SizedGrid, Gtk.ScrolledWindow):
     """Vignettes sous la photo (photos seulement), comme gThumb : une GRILLE qui passe à la ligne, dans un séparateur
     réglable (demande de Tof) — une rangée par défaut, plus en la montant. Signal « picked » (index) au clic."""
 
@@ -160,17 +248,23 @@ class Filmstrip(Gtk.ScrolledWindow):
 
     def __init__(self):
         super().__init__(hscrollbar_policy=Gtk.PolicyType.NEVER, vscrollbar_policy=Gtk.PolicyType.AUTOMATIC)
+        self._init_sizing(self.SIZE + 8 + 6)
         self.selection = Gtk.SingleSelection(autoselect=False, can_unselect=False)
-        self.view = Gtk.GridView(model=self.selection, factory=_factory(self.SIZE, False), max_columns=200,
+        self.view = Gtk.GridView(model=self.selection, factory=_factory(self.SIZE, False), max_columns=8,
                                  single_click_activate=True)
         self.view.add_css_class("argos-filmstrip")
         self.view.connect("activate", lambda _v, pos: self.emit("picked", pos))
         self.set_child(self.view)
 
-    def set_model(self, store: Gio.ListStore):
-        self.selection.set_model(store)
+    def do_size_allocate(self, width, height, baseline):
+        self._size_allocated(width, height, baseline)
+
+    def _attached(self):
+        if getattr(self, "_want", None) is not None:
+            self.show_index(self._want)
 
     def show_index(self, index: int):
+        self._want = index
         model = self.selection.get_model()
         if model is None or not 0 <= index < model.get_n_items():
             return
