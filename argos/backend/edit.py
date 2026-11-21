@@ -134,3 +134,42 @@ def _umask() -> int:
     m = os.umask(0)
     os.umask(m)
     return m
+
+
+UNDO_DIR = os.path.join(os.environ.get("XDG_CACHE_HOME") or os.path.expanduser("~/.cache"), "argos", "undo")
+
+
+def backup(path: str) -> str:
+    """Copie de l'original avant de le remplacer (« Annuler » du toast) ; balayée au démarrage suivant."""
+    os.makedirs(UNDO_DIR, mode=0o700, exist_ok=True)
+    fd, copy = tempfile.mkstemp(dir=UNDO_DIR, suffix=os.path.splitext(path)[1])
+    os.close(fd)
+    shutil.copy2(path, copy)
+    return copy
+
+
+def restore(copy: str, path: str):
+    """Remet l'original (copie cachée à côté, fsync, échange) puis efface la sauvegarde."""
+    folder = os.path.dirname(os.path.abspath(path))
+    fd, tmp = tempfile.mkstemp(dir=folder, prefix=".argos-", suffix=os.path.splitext(path)[1])
+    os.close(fd)
+    try:
+        shutil.copy2(copy, tmp)
+        with open(tmp, "rb") as fh:
+            os.fsync(fh.fileno())
+        os.replace(tmp, path)
+    finally:
+        if os.path.exists(tmp):
+            os.remove(tmp)
+    os.remove(copy)
+
+
+def sweep_backups(max_age_s: float = 86400):
+    import time
+    try:
+        for name in os.listdir(UNDO_DIR):
+            p = os.path.join(UNDO_DIR, name)
+            if time.time() - os.path.getmtime(p) > max_age_s:
+                os.remove(p)
+    except OSError:
+        pass

@@ -4,7 +4,7 @@
     xvfb-run -a -s "-screen 0 1400x1000x24" python3.12 tools/screenshot.py SORTIE.png CHEMIN [options]
 
 CHEMIN : une photo (visionneuse) ou un dossier (grille).
-Options : --dark --size=LxH --delay=ms --zoom=FACTEUR --info --fullscreen --no-strip --prefs=PAGE --keys=a,b
+Options : --dark --size=LxH --delay=ms --zoom=FACTEUR --info --fullscreen --no-strip --prefs=PAGE --crop --rotate
 """
 import os
 import sys
@@ -32,7 +32,7 @@ import gi  # noqa: E402
 
 gi.require_version("Gtk", "4.0")
 gi.require_version("Gdk", "4.0")
-from gi.repository import Gdk, GLib, Gtk  # noqa: E402
+from gi.repository import GLib, Gtk  # noqa: E402
 
 from argos.app import ArgosApp  # noqa: E402
 
@@ -51,10 +51,20 @@ def snap(widget, path):
 
 def stage():
     win = app.get_active_window()
+    if os.path.isfile(target) and (win.picture is None or win.picture.path != os.path.abspath(target)):
+        GLib.timeout_add(100, stage)            # photo pas encore lue
+        return False
     if opts.get("zoom"):
         win.view.set_zoom(float(opts["zoom"]))
     if opts.get("info"):
         win.info_button.set_active(True)
+    if opts.get("crop"):
+        win.start_crop()
+        fw, fh = win.view.full_size()
+        win.view.sel = [fw * 0.2, fh * 0.15, fw * 0.55, fh * 0.6]
+        win.view.queue_draw()
+    if opts.get("rotate"):
+        win.rotate(1)
     if opts.get("fullscreen"):
         win.fullscreen()
     if opts.get("prefs"):

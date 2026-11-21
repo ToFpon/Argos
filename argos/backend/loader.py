@@ -121,7 +121,7 @@ class Loader:
         """Demande la photo (callback dans la boucle GLib), puis les voisines. Remplace les demandes en attente."""
         pic = self.cached(path)
         if pic is not None and callback is not None:
-            GLib.idle_add(lambda: (callback(pic), False)[1])
+            GLib.idle_add(lambda cb=callback: (cb(pic), False)[1])     # cb lié tout de suite : callback est remis à None
             callback = None
         with self._lock:
             if callback is not None:

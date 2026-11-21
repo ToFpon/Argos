@@ -140,6 +140,16 @@ class MainWindow(Adw.ApplicationWindow):
         rot.append(Gtk.Button(icon_name="object-rotate-right-symbolic", tooltip_text=tr("Pivoter à droite (R)"),
                               action_name="win.rotate-right"))
         header.pack_start(rot)
+        self.crop_button = Gtk.Button(icon_name="argos-crop-symbolic", tooltip_text=tr("Recadrer (C)"),
+                                      action_name="win.crop")
+        header.pack_start(self.crop_button)
+        save_menu = Gio.Menu()
+        save_menu.append(tr("Enregistrer sous…"), "win.save-as")
+        save_menu.append(tr("Annuler les modifications"), "win.revert")
+        self.save_button = Adw.SplitButton(label=tr("Enregistrer"), menu_model=save_menu, visible=False,
+                                           tooltip_text=tr("Remplacer la photo (Ctrl+S)"), action_name="win.save")
+        self.save_button.add_css_class("suggested-action")
+        header.pack_end(self.save_button)
 
         self.view = ImageView()
         self.view.connect("navigate", lambda _v, step: self.go(step))
@@ -164,7 +174,7 @@ class MainWindow(Adw.ApplicationWindow):
         self.split.connect("notify::show-sidebar", lambda *_: self._sync_info())
 
         self.filmstrip = Filmstrip()
-        self.filmstrip.connect("picked", lambda _f, i: self.show_index(i))
+        self.filmstrip.connect("picked", lambda _f, i: i == self.index or self.guard(lambda: self.show_index(i)))
         self.strip_revealer = Gtk.Revealer(child=self.filmstrip, reveal_child=settings["filmstrip"],
                                            transition_type=Gtk.RevealerTransitionType.SLIDE_UP)
         status = Gtk.Box(spacing=6, margin_start=12, margin_end=6, margin_top=2, margin_bottom=2)
@@ -178,6 +188,7 @@ class MainWindow(Adw.ApplicationWindow):
         self.strip_button.connect("toggled", lambda b: self.set_filmstrip(b.get_active()))
         status.append(self.strip_button)
         bottom = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+        bottom.append(self._build_crop_bar())
         bottom.append(self.strip_revealer)
         bottom.append(status)
 
@@ -186,6 +197,37 @@ class MainWindow(Adw.ApplicationWindow):
         self.viewer.add_top_bar(header)
         self.viewer.add_bottom_bar(bottom)
         return self.viewer
+
+    RATIOS = (("free", None), ("original", "original"), ("1:1", 1.0), ("4:3", 4 / 3), ("3:2", 3 / 2),
+              ("16:9", 16 / 9), ("3:4", 3 / 4), ("2:3", 2 / 3), ("9:16", 9 / 16))
+
+    def _build_crop_bar(self) -> Gtk.Widget:
+        bar = Gtk.Box(spacing=12, margin_start=12, margin_end=12, margin_top=8, margin_bottom=8)
+        bar.append(Gtk.Label(label=tr("Proportions")))
+        labels = [tr("Libre"), tr("Comme l'original")] + [r for r, _v in self.RATIOS[2:]]
+        self.ratio_drop = Gtk.DropDown.new_from_strings(labels)
+        self.ratio_drop.connect("notify::selected", lambda *_: self._ratio_changed())
+        bar.append(self.ratio_drop)
+        hint = Gtk.Label(label=tr("Glissez pour tracer le cadre, ses bords et ses coins pour l'ajuster"), xalign=0,
+                         hexpand=True, ellipsize=Pango.EllipsizeMode.END)
+        hint.add_css_class("dim-label")
+        bar.append(hint)
+        cancel = Gtk.Button(label=tr("Annuler"))
+        cancel.connect("clicked", lambda *_: self.end_crop(False))
+        bar.append(cancel)
+        ok = Gtk.Button(label=tr("Recadrer"), css_classes=["suggested-action"])
+        ok.connect("clicked", lambda *_: self.end_crop(True))
+        bar.append(ok)
+        self.crop_revealer = Gtk.Revealer(child=bar, reveal_child=False,
+                                          transition_type=Gtk.RevealerTransitionType.SLIDE_UP)
+        return self.crop_revealer
+
+    def _ratio_changed(self):
+        value = self.RATIOS[self.ratio_drop.get_selected()][1]
+        if value == "original":
+            w, h = self.view.full_size()
+            value = w / h if h else None
+        self.view.set_ratio(value)
 
     def _actions(self):
         def add(name, cb, accels=(), param=None):
@@ -205,11 +247,15 @@ class MainWindow(Adw.ApplicationWindow):
         add("zoom-fit", self.view.set_fit, ["0", "KP_0", "<Control>0"])
         add("zoom-100", lambda: self.view.set_zoom(1.0), ["1", "KP_1"])
         add("zoom-toggle", self.zoom_toggle)
-        add("rotate-right", lambda: self.view.rotate(1) or self._sync_status(), ["r"])
-        add("rotate-left", lambda: self.view.rotate(3) or self._sync_status(), ["<Shift>r"])
+        add("rotate-right", lambda: self.rotate(1), ["r"])
+        add("rotate-left", lambda: self.rotate(3), ["<Shift>r"])
         add("filmstrip", lambda: self.strip_button.set_active(not self.strip_button.get_active()), ["F9"])
         add("info", lambda: self.info_button.set_active(not self.info_button.get_active()), ["i"])
         add("trash", self.trash, ["Delete"])
+        add("crop", self.start_crop, ["c"])
+        add("save", self.save, ["<Control>s"])
+        add("save-as", self.save_as, ["<Control><Shift>s"])
+        add("revert", self.revert)
         sort = Gio.SimpleAction.new_stateful("sort", GLib.VariantType.new("s"), GLib.Variant("s", settings["sort_key"]))
         sort.connect("activate", lambda a, v: (a.set_state(v), self._set_sort(v.get_string())))
         self.add_action(sort)
@@ -219,7 +265,8 @@ class MainWindow(Adw.ApplicationWindow):
                                                           self._set_option(key, a.get_state().get_boolean())))
             self.add_action(a)
         self._viewer_actions = ("back", "fullscreen", "zoom-in", "zoom-out", "zoom-fit", "zoom-100", "zoom-toggle",
-                                "rotate-right", "rotate-left", "filmstrip", "info", "trash")
+                                "rotate-right", "rotate-left", "filmstrip", "info", "trash", "crop", "save", "save-as",
+                                "revert")
         self._sync_actions()
 
     # ------------------------------------------------------------------ dossier
@@ -419,10 +466,12 @@ class MainWindow(Adw.ApplicationWindow):
         self._sync_actions()
 
     def back(self):
-        if self.is_fullscreen():
+        if self.view.cropping:
+            self.end_crop(False)
+        elif self.is_fullscreen():
             self.unfullscreen()
         else:
-            self.show_browser()
+            self.guard(self.show_browser)
 
     def _sync_actions(self):
         viewing = self.stack.get_visible_child_name() == "viewer"
@@ -430,8 +479,15 @@ class MainWindow(Adw.ApplicationWindow):
             a = self.lookup_action(name)
             if a is not None:
                 a.set_enabled(viewing)
+        self._sync_edit()
 
     def go(self, step: int):
+        if self.pending() or self.view.cropping:
+            self.guard(lambda: self._go(step))
+            return
+        self._go(step)
+
+    def _go(self, step: int):
         n = len(self.images)
         if not n:
             return
@@ -473,6 +529,179 @@ class MainWindow(Adw.ApplicationWindow):
             self.view.set_picture(pic.texture, pic.animation, keep_view)
         self._sync_status()
         self._sync_info()
+        self._sync_edit()
+
+    # ------------------------------------------------------------------ retouche
+
+    def editable(self) -> bool:
+        """La photo affichée peut-elle être retouchée et enregistrée ? (pas une animation ni un SVG)"""
+        pic = self.picture
+        return (features.enabled("edit") and not features.blocked("edit") and pic is not None and not pic.error
+                and pic.animation is None and pic.format not in ("SVG",)
+                and 0 <= self.index < len(self.images) and pic.path == self.images[self.index].path)
+
+    def pending(self) -> bool:
+        return self.editable() and (self.view.rotation % 4 != 0 or self.view.crop is not None)
+
+    def _sync_edit(self):
+        self.save_button.set_visible(self.pending())
+        ok = self.editable()
+        for name in ("crop", "save-as"):
+            a = self.lookup_action(name)
+            if a is not None:
+                a.set_enabled(ok and self.stack.get_visible_child_name() == "viewer")
+
+    def rotate(self, quarter: int):
+        if self.view.cropping:
+            return
+        self.view.rotate(quarter)
+        self._sync_status()
+        self._sync_edit()
+
+    def start_crop(self):
+        if not self.editable() or self.view.cropping:
+            return
+        self.view.start_crop()
+        self._ratio_changed()
+        self.crop_revealer.set_reveal_child(True)
+        self.view.grab_focus()
+
+    def end_crop(self, apply: bool):
+        if not self.view.cropping:
+            return
+        self.view.finish_crop(apply)
+        self.crop_revealer.set_reveal_child(False)
+        self._sync_status()
+        self._sync_edit()
+
+    def revert(self):
+        if self.view.cropping:
+            self.end_crop(False)
+        self.view.crop = None
+        self.view.rotation = 0
+        self.view.set_fit()
+        self._sync_status()
+        self._sync_edit()
+
+    def guard(self, then):
+        """Modifications en attente : « Enregistrer ? » avant de quitter la photo (comme Papers / Calypso)."""
+        if self.view.cropping:
+            self.end_crop(False)
+        if not self.pending():
+            then()
+            return
+        name = os.path.basename(self.picture.path)
+
+        def answer(r):
+            if r == "save":
+                self.save(after=then)
+            elif r == "discard":
+                self.revert()
+                then()
+        alert(self, tr("Enregistrer les modifications ?"),
+              tr("« {0} » a été pivotée ou recadrée.").format(shown(name)),
+              (("cancel", tr("Annuler")), ("discard", tr("Abandonner")), ("save", tr("Enregistrer"))),
+              default="save", destructive="discard", suggested="save", callback=answer)
+
+    def _edit_params(self):
+        return self.view.rotation % 4, self.view.crop
+
+    def save(self, after=None):
+        """Remplace la photo par sa version pivotée / recadrée ; l'original est gardé pour « Annuler »."""
+        if not self.pending():
+            return
+        path = self.picture.path
+        rotation, crop = self._edit_params()
+
+        def work():
+            from ..backend import edit
+            try:
+                copy = edit.backup(path)
+                edit.apply(path, path, rotation, crop, replace=True)
+                GLib.idle_add(lambda: (self._saved(path, path, copy, after), False)[1])
+            except (edit.EditError, OSError) as e:
+                msg = str(e)
+                GLib.idle_add(lambda: (alert(self, tr("Enregistrement impossible"), shown(msg)), False)[1])
+        threading.Thread(target=work, daemon=True).start()
+
+    def _saved(self, src: str, target: str, copy: Optional[str], after=None):
+        self.loader.forget(target)
+        shared_thumbs().forget(target)
+        if copy:
+            def undo():
+                from ..backend import edit
+                try:
+                    edit.restore(copy, target)
+                except OSError as e:
+                    alert(self, tr("Impossible d'annuler"), shown(e.strerror or str(e)))
+                    return
+                self.loader.forget(target)
+                shared_thumbs().forget(target)
+                self._reload_current()
+            toast(self, tr("« {0} » enregistrée").format(shown(os.path.basename(target))), tr("Annuler"), undo, 8)
+        else:
+            toast(self, tr("Enregistrée sous « {0} »").format(shown(os.path.basename(target))))
+        if src == target:
+            self.view.crop = None
+            self.view.rotation = 0
+            self._reload_current()
+        self._sync_edit()
+        if after is not None:
+            after()
+
+    def _reload_current(self):
+        if 0 <= self.index < len(self.images):
+            path = self.images[self.index].path
+            self.loader.forget(path)
+            self.show_index(self.index)
+
+    def save_as(self):
+        if not self.editable():
+            return
+        from ..backend import edit
+        path = self.picture.path
+        stem, ext = os.path.splitext(os.path.basename(path))
+        d = Gtk.FileDialog(title=tr("Enregistrer sous"), modal=True,
+                           initial_folder=Gio.File.new_for_path(os.path.dirname(path)),
+                           initial_name=f"{stem} ({tr('modifiée')}){ext}" if self.pending() else f"{stem}.png"
+                           if ext.lower() != ".png" else f"{stem}.jpg")
+        store = Gio.ListStore(item_type=Gtk.FileFilter)
+        for e, label in edit.SAVE_FORMATS.items():
+            f = Gtk.FileFilter(name=label)
+            f.add_suffix(e)
+            if e == "jpg":
+                f.add_suffix("jpeg")
+            if e == "tif":
+                f.add_suffix("tiff")
+            store.append(f)
+        d.set_filters(store)
+        rotation, crop = self._edit_params()
+
+        def done(dlg, res):
+            try:
+                f = dlg.save_finish(res)
+            except GLib.Error:
+                return
+            target = f.get_path() if f is not None else None
+            if not target:
+                return
+            out_ext = os.path.splitext(target)[1].lower().lstrip(".")
+            if out_ext not in edit.SAVE_FORMATS and out_ext not in ("jpeg", "tiff"):
+                alert(self, tr("Format inconnu"),
+                      tr("Terminez le nom par l'extension du format voulu : {0}").format(
+                          ", ".join("." + e for e in edit.SAVE_FORMATS)))
+                return
+
+            def work():
+                try:
+                    # le sélecteur a déjà demandé « Remplacer ? » si le nom existait
+                    written = edit.apply(path, target, rotation, crop, replace=True)
+                    GLib.idle_add(lambda: (self._saved(path, written, None), False)[1])
+                except (edit.EditError, OSError) as e:
+                    msg = str(e)
+                    GLib.idle_add(lambda: (alert(self, tr("Enregistrement impossible"), shown(msg)), False)[1])
+            threading.Thread(target=work, daemon=True).start()
+        d.save(self, None, done)
 
     def zoom_toggle(self):
         if self.view.fit:
@@ -577,9 +806,18 @@ class MainWindow(Adw.ApplicationWindow):
         if keyval == Gdk.KEY_Escape:
             self.back()
             return True
+        if self.view.cropping and keyval in (Gdk.KEY_Return, Gdk.KEY_KP_Enter):
+            self.end_crop(True)
+            return True
         return False
 
     def _on_close(self, *_):
+        if self.pending() and not getattr(self, "_closing", False):
+            def go():
+                self._closing = True
+                self.close()
+            self.guard(go)
+            return True
         settings["window_maximized"] = self.is_maximized()
         if not self.is_maximized() and not self.is_fullscreen():
             w, h = self.get_default_size()

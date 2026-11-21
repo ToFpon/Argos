@@ -10,6 +10,7 @@ from __future__ import annotations
 import os
 import signal
 import sys
+import threading
 
 import gi
 
@@ -41,6 +42,8 @@ class ArgosApp(Adw.Application):
             Gtk.Window.set_default_icon_name(APP_ID)
         from .ui.preferences import apply_theme
         apply_theme()
+        from .backend import edit
+        threading.Thread(target=edit.sweep_backups, daemon=True).start()
         for sig in (signal.SIGINT, signal.SIGTERM, signal.SIGHUP):
             GLib.unix_signal_add(GLib.PRIORITY_DEFAULT, sig, lambda: (self.quit(), False)[1])
         for name, cb, accels in (("preferences", self._prefs, ["<Control>comma"]),
