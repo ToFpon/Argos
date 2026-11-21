@@ -1,3 +1,13 @@
+argos-viewer (0.1.1~noble1) noble; urgency=medium
+
+  * Les dossiers déjà vus s'affichent tout de suite (gardés en mémoire,
+    relus en arrière-plan).
+  * Une photo ouverte depuis le gestionnaire de fichiers montre
+    directement la visionneuse.
+  * Grille : plus de nom sous les photos, roue de chargement plus petite.
+
+ -- Tof <nourpon@gmail.com>  Sat, 21 Nov 2026 10:05:14 +0000
+
 argos-viewer (0.1.0~noble1) noble; urgency=medium
 
   * Première version : grille des photos avec l'arbre des dossiers et les

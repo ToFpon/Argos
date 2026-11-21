@@ -69,6 +69,15 @@
   </requires>
   <content_rating type="oars-1.1"/>
   <releases>
+    <release version="0.1.1" date="2026-11-21">
+      <description>
+        <ul>
+          <li>Folders already visited show up instantly (kept in memory, refreshed in the background)</li>
+          <li>A photo opened from a file manager goes straight to the viewer</li>
+          <li>Grid: no more names under the photos, more room for them; smaller loading spinner</li>
+        </ul>
+      </description>
+    </release>
     <release version="0.1.0" date="2026-11-21">
       <description>
         <ul>
