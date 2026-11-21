@@ -13,7 +13,7 @@ import gi
 
 gi.require_version("Gtk", "4.0")
 gi.require_version("GdkPixbuf", "2.0")
-from gi.repository import GdkPixbuf, GLib, Gtk  # noqa: E402
+from gi.repository import GdkPixbuf, GLib, Gtk, Pango  # noqa: E402
 
 from ..backend.folder import human_size  # noqa: E402
 from ..i18n import LANGUAGE, decimal, tr  # noqa: E402
@@ -110,26 +110,30 @@ class InfoPanel(Gtk.ScrolledWindow):
     def __init__(self):
         super().__init__(hscrollbar_policy=Gtk.PolicyType.NEVER, width_request=240)
         self.add_css_class("argos-info")
-        self.box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=18, margin_top=18, margin_bottom=18,
-                           margin_start=18, margin_end=18)
+        self.box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=6, margin_top=10, margin_bottom=10,
+                           margin_start=12, margin_end=12)
         self.set_child(self.box)
         self._path = None
 
     def _group(self, title: str, rows: list[tuple[str, str]]):
+        """Titre puis lignes « libellé   valeur » serrées, comme gThumb (demande de Tof) ; valeur trop longue
+        coupée au milieu, entière dans l'infobulle."""
         if not rows:
             return
-        head = Gtk.Label(label=title, xalign=0)
+        head = Gtk.Label(label=title, xalign=0, margin_top=4)
         head.add_css_class("heading")
         self.box.append(head)
-        for k, v in rows:
-            key = Gtk.Label(label=k, xalign=0)
+        grid = Gtk.Grid(column_spacing=12, row_spacing=2)
+        for i, (k, v) in enumerate(rows):
+            key = Gtk.Label(label=k, xalign=0, yalign=0)
             key.add_css_class("caption")
             key.add_css_class("dim-label")
-            val = Gtk.Label(label=shown(v), xalign=0, wrap=True, wrap_mode=2, selectable=True)
-            col = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=2)
-            col.append(key)
-            col.append(val)
-            self.box.append(col)
+            val = Gtk.Label(label=shown(v), xalign=0, hexpand=True, selectable=True, max_width_chars=1,
+                            ellipsize=Pango.EllipsizeMode.MIDDLE, tooltip_text=shown(v))
+            val.add_css_class("caption")
+            grid.attach(key, 0, i, 1, 1)
+            grid.attach(val, 1, i, 1, 1)
+        self.box.append(grid)
 
     def show_picture(self, pic):
         clear_box(self.box)
