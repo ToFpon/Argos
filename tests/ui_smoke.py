@@ -241,6 +241,24 @@ def steps(app):
     yield lambda: win.folder == PHOTOS and win.browser_stack.get_visible_child_name() == "grid"
     check(settings["last_folder"] == PHOTOS, "dernier dossier retenu")
 
+    # dossier déjà vu : affiché tout de suite, sans roue (cache), même modèle gardé si rien n'a changé
+    win.open_folder(os.path.join(PHOTOS, "Sous-dossier"))
+    yield lambda: win.browser_stack.get_visible_child_name() == "empty"
+    win.open_folder(PHOTOS)
+    check(win.browser_stack.get_visible_child_name() == "grid" and len(win.images) > 3,
+          "dossier déjà vu : grille tout de suite")
+    model = win.grid.selection.get_model()
+    yield 600
+    check(win.grid.selection.get_model() is model, "relecture identique : grille inchangée")
+
+    # photo ouverte de l'extérieur : visionneuse immédiatement, jamais la grille avant
+    win.show_browser()
+    target = win.images[2].path
+    win.open_path(target)
+    check(win.stack.get_visible_child_name() == "viewer", "photo ouverte : visionneuse tout de suite")
+    yield lambda: win.picture is not None and win.picture.path == target and len(win.images) > 3
+    check(win.images[win.index].path == target, "puis le dossier autour de la photo")
+
     # préférences
     from argos.ui.preferences import PreferencesWindow
     pw = PreferencesWindow(win)

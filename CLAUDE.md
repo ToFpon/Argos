@@ -66,6 +66,12 @@ Nom : Argos le géant aux cent yeux (et le chien d'Ulysse, le seul à le reconna
   Enregistrer sous…, Annuler les modifications), `guard(then)` = question « Enregistrer les modifications ? »
   avant de changer de photo, revenir à la grille ou fermer. Clavier en capture (`_on_key`) : ← → Espace Retour
   arrière Page↑↓ Début Fin, Échap (recadrage → plein écran → grille), Entrée applique le recadrage.
+- Cache des dossiers (demande de Tof : revenir sur un dossier rechargeait tout) : `_folder_cache` (30 dossiers,
+  clé = chemin, avec les options de tri / cachés) → grille affichée tout de suite, relue en arrière-plan ; relecture
+  identique (`_signature` : chemins, tailles, dates) → modèle gardé tel quel (défilement, vignettes).
+- Photo ouverte de l'extérieur (Odysseus, « Ouvrir avec ») : visionneuse TOUT DE SUITE, sans transition, photo lue
+  en même temps que le dossier (liste provisoire d'une photo) — vu chez Tof : la grille passait une fraction de
+  seconde avant. Roue de chargement de la grille : Gtk.Spinner 32 px centré (étirée, elle remplissait tout).
 - `ui/sidebar.py` (demande de Tof, comme gThumb) : arbre des dossiers à gauche de la grille (Adw.OverlaySplitView,
   F9 / bouton, réglage `sidebar`, repliée sous 600 sp). Racines : Dossier personnel, Images, Bureau,
   Téléchargements, disques montés (Gio.VolumeMonitor, suivis), Ordinateur (/). Gtk.TreeListModel : GTK demande les

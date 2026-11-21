@@ -50,6 +50,8 @@ class MainWindow(Adw.ApplicationWindow):
         self._monitor = None
         self._refresh_id = 0
         self._want_path: Optional[str] = None      # photo à montrer une fois le dossier lu
+        from collections import OrderedDict
+        self._folder_cache: "OrderedDict[str, tuple]" = OrderedDict()   # dossier → (options, (dossiers, photos))
 
         self.stack = Gtk.Stack(transition_type=Gtk.StackTransitionType.CROSSFADE, transition_duration=150)
         self.stack.add_named(self._build_browser(), "browser")
@@ -108,7 +110,9 @@ class MainWindow(Adw.ApplicationWindow):
         self.browser_stack = Gtk.Stack()
         self.browser_stack.add_named(self.grid, "grid")
         self.browser_stack.add_named(self.empty, "empty")
-        self.browser_stack.add_named(Adw.Spinner() if hasattr(Adw, "Spinner") else Gtk.Spinner(spinning=True),
+        # roue de taille normale, centrée (vu chez Tof : étirée, elle remplissait toute la grille)
+        self.browser_stack.add_named(Gtk.Spinner(spinning=True, width_request=32, height_request=32,
+                                                 halign=Gtk.Align.CENTER, valign=Gtk.Align.CENTER),
                                      "loading")
         from .sidebar import FolderTree
         self.tree = FolderTree()
@@ -333,21 +337,50 @@ class MainWindow(Adw.ApplicationWindow):
         self.tree.reveal(path)
         if show is None:
             self.show_browser()
+        else:
+            # photo demandée (Odysseus, Nautilus, « Ouvrir avec ») : visionneuse TOUT DE SUITE, la photo lue en même
+            # temps que le dossier (vu chez Tof : la grille passait une fraction de seconde avant)
+            self.images = [fold.Entry(show, os.path.basename(show), False)]
+            self.index = -1
+            self.filmstrip.set_model(store_of([]))
+            self.stack.set_transition_type(Gtk.StackTransitionType.NONE)
+            self.show_index(0)
+            self.show_viewer()
+            self.stack.set_transition_type(Gtk.StackTransitionType.CROSSFADE)
         self._watch(path)
-        self._rescan()
+        cached = self._folder_cache.get(path)
+        if cached is not None and cached[0] == self._scan_options():
+            self._folder_cache.move_to_end(path)
+            self._scan_seq += 1
+            self._scanned(self._scan_seq, cached[1], "")       # tout de suite, puis relu en arrière-plan
+            self._rescan(quiet=True)
+        else:
+            self._rescan()
 
     @staticmethod
     def _pretty(path: str) -> str:
         home = os.path.expanduser("~")
         return "~" + path[len(home):] if path == home or path.startswith(home + os.sep) else path
 
+    FOLDER_CACHE = 30
+
+    @staticmethod
+    def _scan_options():
+        return settings["show_hidden"], settings["sort_key"], settings["sort_reverse"]
+
+    @staticmethod
+    def _signature(result):
+        dirs, images = result
+        return [d.path for d in dirs], [(e.path, e.size, e.mtime) for e in images]
+
     def _rescan(self, quiet: bool = False):
         self._scan_seq += 1
         seq = self._scan_seq
         folder = self.folder
-        if not quiet and not self.images:
+        if not quiet:
             self.browser_stack.set_visible_child_name("loading")
-        hidden, key, rev = settings["show_hidden"], settings["sort_key"], settings["sort_reverse"]
+        opts = self._scan_options()
+        hidden, key, rev = opts
 
         def work():
             try:
@@ -355,12 +388,26 @@ class MainWindow(Adw.ApplicationWindow):
                 err = ""
             except OSError as e:
                 result, err = ([], []), e.strerror or str(e)
-            GLib.idle_add(lambda: (self._scanned(seq, result, err), False)[1])
+            GLib.idle_add(lambda: (self._scanned(seq, result, err, folder, opts), False)[1])
         threading.Thread(target=work, daemon=True).start()
 
-    def _scanned(self, seq: int, result, err: str):
+    def _scanned(self, seq: int, result, err: str, folder: str = "", opts=None):
         if seq != self._scan_seq:
             return
+        if folder and not err:
+            # dossiers déjà vus gardés (demande de Tof : revenir sur un dossier ne recharge plus)
+            old = self._folder_cache.get(folder)
+            self._folder_cache[folder] = (opts, result)
+            self._folder_cache.move_to_end(folder)
+            while len(self._folder_cache) > self.FOLDER_CACHE:
+                self._folder_cache.popitem(last=False)
+            # relecture en arrière-plan identique à ce qui est affiché : rien ne bouge (défilement, vignettes)
+            if old is not None and self._want_path is None and self.dirs is old[1][0] and \
+                    self._signature(old[1]) == self._signature(result):
+                self._folder_cache[folder] = (opts, old[1])
+                if self.browser_stack.get_visible_child_name() == "loading":
+                    self.browser_stack.set_visible_child_name("grid")
+                return
         dirs, images = result
         current = self.images[self.index].path if 0 <= self.index < len(self.images) else None
         self.dirs, self.images = dirs, images
