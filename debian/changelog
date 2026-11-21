@@ -1,3 +1,10 @@
+argos-viewer (0.1.3~noble1) noble; urgency=medium
+
+  * Les images SVG remplissent la fenêtre et restent nettes au zoom.
+  * « Définir comme arrière-plan » s'applique tout de suite.
+
+ -- Tof <nourpon@gmail.com>  Sat, 21 Nov 2026 11:16:31 +0000
+
 argos-viewer (0.1.2~noble1) noble; urgency=medium
 
   * Menu du clic droit sur une photo, dans la visionneuse et la grille :

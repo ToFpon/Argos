@@ -69,6 +69,14 @@
   </requires>
   <content_rating type="oars-1.1"/>
   <releases>
+    <release version="0.1.3" date="2026-11-21">
+      <description>
+        <ul>
+          <li>SVG images fill the window and stay sharp when zooming</li>
+          <li>Set as background now applies right away</li>
+        </ul>
+      </description>
+    </release>
     <release version="0.1.2" date="2026-11-21">
       <description>
         <ul>
