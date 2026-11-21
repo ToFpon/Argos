@@ -146,7 +146,7 @@ class FileMenu:
             return
         uri = GLib.filename_to_uri(dest, None)
         gs.set_string("picture-uri", uri)
-        if gs.settings_schema.has_key("picture-uri-dark"):
+        if gs.props.settings_schema.has_key("picture-uri-dark"):
             gs.set_string("picture-uri-dark", uri)
         gs.set_string("picture-options", "zoom")
         toast(self, tr("« {0} » est maintenant l'arrière-plan").format(shown(os.path.basename(path))))

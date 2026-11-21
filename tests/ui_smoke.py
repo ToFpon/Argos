@@ -19,6 +19,7 @@ TMP = tempfile.mkdtemp(prefix="argos-ui-")
 for var in ("XDG_CONFIG_HOME", "XDG_CACHE_HOME", "XDG_DATA_HOME"):
     os.environ[var] = os.path.join(TMP, var.lower())
 os.environ["GTK_A11Y"] = "none"
+os.environ["GSETTINGS_BACKEND"] = "memory"      # « Définir comme arrière-plan » : jamais le vrai bureau
 
 import gi  # noqa: E402
 
@@ -288,6 +289,18 @@ def steps(app):
     os.remove(new)
     win._removed(new)
     check(len(win.images) == n - 1 and win.images[win.index].path != new, "supprimée : la voisine s'affiche")
+    # définir comme arrière-plan (bug vu chez Tof : gs.settings_schema n'existe pas en Python)
+    from argos.ui.filemenu import background_settings
+    gs = background_settings()
+    if gs is not None:
+        win._ctx = win.images[0].path
+        win.set_wallpaper()
+        uri = gs.get_string("picture-uri")
+        check(uri.endswith(os.path.basename(win.images[0].path).replace(" ", "%20")) and
+              gs.get_string("picture-uri-dark") == uri and "/backgrounds/" in uri,
+              "arrière-plan : copie posée, clair et sombre")
+    else:
+        print("(schéma org.gnome.desktop.background absent : arrière-plan non testé)")
     win._ctx = None
     win.copy_image()
     yield 100
