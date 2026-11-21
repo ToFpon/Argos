@@ -119,8 +119,13 @@ class MainWindow(Adw.ApplicationWindow):
         side = Gtk.Paned(orientation=Gtk.Orientation.VERTICAL, start_child=self.tree, end_child=self.browser_info,
                          resize_end_child=False, shrink_end_child=False, shrink_start_child=False, wide_handle=True)
         self.side_paned = side
-        side.connect("map", lambda *_: GLib.idle_add(
-            lambda: (self.browser_info.get_visible() and side.set_position(int(side.get_height() * 0.55)), False)[1]))
+        # vu chez Tof : posé au « map », le séparateur n'avait pas encore de taille (position 0, arbre écrasé) →
+        # posé quand il en a une, proportion retenue (`info_ratio`, au glisser seulement)
+        self.tree.set_size_request(-1, 120)
+        self._side_pending = True
+        self._side_placing = False
+        side.connect("notify::max-position", lambda *_: self._side_pending and self._place_side())
+        side.connect("notify::position", self._side_moved)
         bar = Gtk.Box(spacing=6, margin_start=12, margin_end=6, margin_top=2, margin_bottom=2)
         bar.add_css_class("argos-status")
         self.browser_status = Gtk.Label(xalign=0, hexpand=True, ellipsize=Pango.EllipsizeMode.END)
@@ -489,10 +494,26 @@ class MainWindow(Adw.ApplicationWindow):
         settings["browser_info"] = on
         self.browser_info.set_visible(on)
         if on:
-            h = self.side_paned.get_height()
-            if h > 0:
-                self.side_paned.set_position(int(h * 0.55))
+            self._side_pending = True
+            GLib.idle_add(lambda: (self._place_side(), False)[1])
             self._grid_selected()
+
+    def _place_side(self):
+        h = self.side_paned.get_height()
+        if h < 200 or not self.browser_info.get_visible():
+            return
+        self._side_pending = False
+        ratio = min(0.85, max(0.25, settings["info_ratio"]))
+        self._side_placing = True
+        self.side_paned.set_position(int(h * ratio))
+        self._side_placing = False
+
+    def _side_moved(self, *_):
+        if self._side_placing or self._side_pending or not self.browser_info.get_visible():
+            return
+        h = self.side_paned.get_height()
+        if h >= 200 and self.side_paned.get_mapped():
+            settings["info_ratio"] = round(self.side_paned.get_position() / h, 3)
 
     def _grid_selected(self):
         item = self.grid.selection.get_selected_item()
@@ -505,7 +526,7 @@ class MainWindow(Adw.ApplicationWindow):
                          tr("« {0} » sélectionnée ({1})").format(shown(entry.name), fold.human_size(entry.size)))
         self.browser_status.set_label("  ·  ".join(parts))
         if self.browser_info.get_visible():
-            self.browser_info.show_path(entry.path if entry is not None else None)
+            self.browser_info.show_path(entry.path if entry is not None else (self.folder or None))
 
     def _sidebar_toggled(self, *_):
         if not self.browser_split.get_collapsed():       # repliée par la largeur : pas un choix

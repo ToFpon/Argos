@@ -82,6 +82,9 @@ Nom : Argos le géant aux cent yeux (et le chien d'Ulysse, le seul à le reconna
 - Grille : barre d'état en bas (« 14 photos (3,4 Mo) · « x » sélectionnée (1,7 Mo) ») et bouton (i) / touche I =
   propriétés de l'élément sélectionné SOUS l'arbre des dossiers (Gtk.Paned, réglage `browser_info`), comme gThumb
   (demande de Tof) ; `InfoPanel.show_path` lit dimensions et format dans un fil.
+  Rien de sélectionné : le dossier ouvert. PIÈGE vu chez Tof (arbre écrasé par le panneau) : posé au « map », le
+  séparateur n'avait pas de taille (position 0) → posé sur « notify::max-position » (`_place_side`), proportion
+  retenue au glisser (`info_ratio`), arbre de 120 px au moins.
 - `ui/info.py` : propriétés (fichier) + prise de vue par GExiv2 (date, appareil, objectif, exposition, ouverture,
   ISO, focale, flash, position), dans un fil.
 - `app.py` : instance unique ; `argos PHOTO` → son dossier, photo affichée ; `argos DOSSIER` → grille ; seul →

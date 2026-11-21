@@ -26,7 +26,8 @@ import json  # noqa: E402
 os.makedirs(os.path.join(cfg, "argos"))
 with open(os.path.join(cfg, "argos", "settings.json"), "w") as fh:
     json.dump({"window_width": int(w), "window_height": int(h), "theme": "dark" if opts.get("dark") else "light",
-               "filmstrip": not opts.get("no-strip"), "strip_height": int(opts.get("strip", 110))}, fh)
+               "filmstrip": not opts.get("no-strip"), "strip_height": int(opts.get("strip", 110)),
+               "browser_info": bool(opts.get("info"))}, fh)
 
 import gi  # noqa: E402
 

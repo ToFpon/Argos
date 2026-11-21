@@ -107,6 +107,9 @@ def steps(app):
             c = c.get_next_sibling()
     walk(win.browser_info.box)
     check("photo 1.jpg" in texts and len(texts) > 6, "propriétés de la photo sélectionnée sous l'arbre")
+    yield lambda: not win._side_pending
+    tree_h = win.side_paned.get_position()
+    check(tree_h > win.side_paned.get_height() * 0.4, f"l'arbre garde sa place ({tree_h} px)")
     win.browser_info_button.set_active(False)
 
     # ouvrir une photo depuis la grille
