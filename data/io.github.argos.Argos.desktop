@@ -1,0 +1,16 @@
+[Desktop Entry]
+Type=Application
+Name=Argos
+GenericName=Image Viewer
+GenericName[fr]=Visionneuse de photos
+GenericName[de]=Bildbetrachter
+Comment=Browse and view your photos
+Comment[fr]=Parcourir et regarder vos photos
+Comment[de]=Fotos durchsuchen und ansehen
+Exec=argos %U
+Icon=io.github.argos.Argos
+Terminal=false
+Categories=GTK;GNOME;Graphics;Viewer;Photography;
+Keywords=photo;picture;image;viewer;gallery;jpeg;png;
+MimeType=image/jpeg;image/png;image/gif;image/webp;image/bmp;image/tiff;image/svg+xml;image/heic;image/heif;image/avif;image/jxl;image/x-tga;image/x-portable-anymap;image/vnd.microsoft.icon;
+StartupNotify=true
