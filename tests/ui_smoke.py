@@ -296,9 +296,15 @@ def steps(app):
         win._ctx = win.images[0].path
         win.set_wallpaper()
         uri = gs.get_string("picture-uri")
-        check(uri.endswith(os.path.basename(win.images[0].path).replace(" ", "%20")) and
-              gs.get_string("picture-uri-dark") == uri and "/backgrounds/" in uri,
-              "arrière-plan : copie posée, clair et sombre")
+        check("/backgrounds/argos-" in uri and gs.get_string("picture-uri-dark") == uri and
+              gs.get_string("picture-options") == "zoom", "arrière-plan : copie posée, clair et sombre")
+        yield 20
+        win._ctx = win.images[1].path
+        win.set_wallpaper()
+        uri2 = gs.get_string("picture-uri")
+        bg = os.path.dirname(GLib.filename_from_uri(uri2)[0])
+        check(uri2 != uri and len([n for n in os.listdir(bg) if n.startswith("argos-")]) == 1,
+              "arrière-plan suivant : nouvelle adresse, ancienne copie retirée")
     else:
         print("(schéma org.gnome.desktop.background absent : arrière-plan non testé)")
     win._ctx = None

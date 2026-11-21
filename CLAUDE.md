@@ -75,7 +75,9 @@ Nom : Argos le géant aux cent yeux (et le chien d'Ulysse, le seul à le reconna
   l'infobulle, la barre d'état, les propriétés). Roue de chargement de la grille : Gtk.Spinner 32 px centré (étirée, elle remplissait tout).
 - Clic droit sur une photo, visionneuse ET grille (`ui/filemenu.py`, mixin `FileMenu` ; menu de gThumb demandé par
   Tof, sans commentaire / étiquettes / catalogue) : plein écran, définir comme arrière-plan (copie dans
-  ~/.local/share/backgrounds, `org.gnome.desktop.background` picture-uri + -dark, « zoom » ; caché sans le schéma),
+  ~/.local/share/backgrounds sous un nom UNIQUE « argos-NOM-ms.ext » — vu chez Tof : même nom = même adresse, GNOME
+  ne rechargeait rien ; ordre options / uri / uri-dark puis `Gio.Settings.sync()`, ancienne copie argos- retirée ;
+  PyGObject : `gs.props.settings_schema` (pas gs.settings_schema) ; caché sans le schéma ; testé en mémoire),
   imprimer (Gtk.PrintOperation, page tournée d'après la photo, Ctrl+P), ouvrir avec (applications du type, notre
   lanceur exclu, « Autre application… » = Gtk.AppChooserDialog), copier l'image (texture + fichier, Ctrl+C), copier /
   déplacer vers (Gtk.FileDialog, GIO dans un fil, jamais d'écrasement : `edit.free_name`), renommer (F2, boîte à la

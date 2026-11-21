@@ -7,6 +7,7 @@ from __future__ import annotations
 import os
 import shutil
 import threading
+import time
 
 import gi
 
@@ -129,26 +130,41 @@ class FileMenu:
             self.fullscreen()
 
     def set_wallpaper(self):
-        """Copie dans ~/.local/share/backgrounds (la photo peut être déplacée ou supprimée ensuite), puis le
-        réglage de GNOME, thème clair et sombre (comme « Définir comme arrière-plan » de Nautilus / Eye of GNOME)."""
+        """Copie dans ~/.local/share/backgrounds (la photo peut être déplacée ou supprimée ensuite) sous un nom UNIQUE,
+        puis les réglages de GNOME dans l'ordre du script de Tof : options, clair, sombre. Vu chez Tof : image
+        visible dans les Paramètres mais pas appliquée — même nom de copie = même adresse, GNOME ne voit aucun
+        changement et ne recharge rien (et le thème sombre lit picture-uri-dark). Ancienne copie d'Argos retirée."""
         path, gs = self._target(), background_settings()
         if path is None or gs is None:
             return
         folder = os.path.join(GLib.get_user_data_dir(), "backgrounds")
+        stem, ext = os.path.splitext(os.path.basename(path))
         try:
             os.makedirs(folder, exist_ok=True)
-            dest = os.path.join(folder, os.path.basename(path))
-            if os.path.abspath(dest) != os.path.abspath(path):
-                shutil.copyfile(path, dest + ".part")
-                os.replace(dest + ".part", dest)
+            dest = os.path.join(folder, f"argos-{stem}-{int(time.time() * 1000)}{ext.lower()}")
+            shutil.copyfile(path, dest + ".part")
+            os.replace(dest + ".part", dest)
         except OSError as e:
             alert(self, tr("Impossible de définir l'arrière-plan"), shown(e.strerror or str(e)))
             return
         uri = GLib.filename_to_uri(dest, None)
+        old = [gs.get_string("picture-uri")]
+        gs.set_string("picture-options", "zoom")
         gs.set_string("picture-uri", uri)
         if gs.props.settings_schema.has_key("picture-uri-dark"):
+            old.append(gs.get_string("picture-uri-dark"))
             gs.set_string("picture-uri-dark", uri)
-        gs.set_string("picture-options", "zoom")
+        Gio.Settings.sync()                       # écrit tout de suite (dconf), comme gsettings set
+        for u in old:                             # nos anciennes copies, plus utilisées
+            try:
+                p = GLib.filename_from_uri(u)[0] if u.startswith("file://") else ""
+            except GLib.Error:
+                p = ""
+            if p and p != dest and os.path.dirname(p) == folder and os.path.basename(p).startswith("argos-"):
+                try:
+                    os.remove(p)
+                except OSError:
+                    pass
         toast(self, tr("« {0} » est maintenant l'arrière-plan").format(shown(os.path.basename(path))))
 
     def print_photo(self):
