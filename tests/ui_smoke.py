@@ -97,11 +97,16 @@ def steps(app):
     yield lambda: win.browser_info.box.get_first_child() is not None
     check("photo 1.jpg" in win.browser_status.get_label(), "barre d'état de la grille : photo sélectionnée")
     texts = []
-    c = win.browser_info.box.get_first_child()
-    while c is not None:
-        texts.append(c.get_label() if isinstance(c, Gtk.Label) else "")
-        c = c.get_next_sibling()
-    check(len(texts) > 3, "propriétés de la photo sélectionnée sous l'arbre")
+
+    def walk(w):
+        if isinstance(w, Gtk.Label):
+            texts.append(w.get_label())
+        c = w.get_first_child()
+        while c is not None:
+            walk(c)
+            c = c.get_next_sibling()
+    walk(win.browser_info.box)
+    check("photo 1.jpg" in texts and len(texts) > 6, "propriétés de la photo sélectionnée sous l'arbre")
     win.browser_info_button.set_active(False)
 
     # ouvrir une photo depuis la grille
