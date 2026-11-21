@@ -2,5 +2,5 @@
 
 APP_ID = "io.github.argos.Argos"
 APP_NAME = "Argos"
-VERSION = "0.1.3"
+VERSION = "0.1.4"
 __version__ = VERSION
