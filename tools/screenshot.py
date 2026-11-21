@@ -61,7 +61,8 @@ def stage():
         win.info_button.set_active(True)
         win.browser_info_button.set_active(True)
         if win.images:
-            win.grid.select_path(win.images[0].path)
+            pick = opts.get("select") or win.images[0].name
+            GLib.timeout_add(800, lambda: (win.grid.select_path(os.path.join(win.folder, pick)), False)[1])
     if opts.get("crop"):
         win.start_crop()
         fw, fh = win.view.full_size()

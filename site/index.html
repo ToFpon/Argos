@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Argos — a simple, fast photo viewer for GNOME</title>
+<meta name="description" content="Argos, a simple and fast photo viewer for GNOME: grid with folder tree, wheel to browse, Ctrl + wheel to zoom, rotate and crop. GTK4 / libadwaita, .deb and PPA.">
+<link rel="icon" href="img/icon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#14100a;
+    --surface:#1d170d;
+    --surface-2:#2a2112;
+    --line:rgba(255,255,255,.08);
+    --line-strong:rgba(255,255,255,.14);
+    --text:#fbf6ea;
+    --text-dim:rgba(238,248,247,.64);
+    --text-faint:rgba(238,248,247,.40);
+    --teal:#f5c211;
+    --teal-bright:#f8e45c;
+    --teal-deep:#c88800;
+    --sea:#9c6e03;
+    --green:#4ade80;
+    --display:'Space Grotesk',sans-serif;
+    --body:'Inter',sans-serif;
+    --mono:'JetBrains Mono',monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{font-family:var(--body);background:var(--bg);color:var(--text);line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+  a{color:inherit;text-decoration:none}
+  img{max-width:100%;display:block}
+  ::selection{background:var(--teal);color:#241a00}
+  .wrap{max-width:1160px;margin:0 auto;padding:0 24px}
+
+  nav{position:fixed;top:0;left:0;right:0;z-index:100;backdrop-filter:blur(14px);background:rgba(7,19,20,.75);border-bottom:1px solid var(--line)}
+  nav .wrap{display:flex;align-items:center;justify-content:space-between;height:64px}
+  .brand{display:flex;align-items:center;gap:11px;font-family:var(--display);font-weight:600;font-size:1.05rem}
+  .brand img{width:30px;height:30px}
+  .nav-links{display:flex;gap:26px;font-size:.92rem}
+  .nav-links a{color:var(--text-dim);transition:color .2s}
+  .nav-links a:hover{color:var(--text)}
+  .get-pill{font-family:var(--mono);font-size:.74rem;color:var(--green);border:1px solid rgba(74,222,128,.35);background:rgba(74,222,128,.08);padding:6px 14px;border-radius:999px;white-space:nowrap}
+  @media (max-width:720px){.nav-links{display:none}}
+
+  header.hero{padding:150px 0 70px;text-align:center;background:
+      radial-gradient(900px 420px at 50% -10%,rgba(245,194,17,.22),transparent 70%),
+      linear-gradient(180deg,#1a140a,var(--bg) 70%)}
+  .eyebrow{display:inline-flex;align-items:center;gap:8px;font-family:var(--mono);font-size:.78rem;color:var(--teal-bright);border:1px solid rgba(126,232,221,.3);background:rgba(245,194,17,.08);padding:6px 14px;border-radius:999px;margin-bottom:28px}
+  .eyebrow .dot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green)}
+  h1{font-family:var(--display);font-weight:700;font-size:clamp(2.4rem,6vw,4.4rem);line-height:1.03;letter-spacing:-.03em;margin-bottom:22px}
+  h1 .accent{background:linear-gradient(120deg,var(--teal-bright),var(--teal) 55%,#e66100);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .lede{font-size:clamp(1.05rem,2vw,1.24rem);color:var(--text-dim);max-width:700px;margin:0 auto 36px}
+  .cta{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-bottom:56px}
+  .btn{font-weight:600;font-size:.96rem;padding:13px 26px;border-radius:12px;display:inline-flex;align-items:center;gap:9px;border:1px solid transparent;transition:all .2s}
+  .btn-primary{background:linear-gradient(120deg,var(--teal-bright),var(--teal));color:#241a00;box-shadow:0 10px 30px -10px rgba(245,194,17,.7)}
+  .btn-primary:hover{transform:translateY(-1px)}
+  .btn-ghost{border-color:var(--line-strong)}
+  .btn-ghost:hover{border-color:var(--teal);background:rgba(245,194,17,.1)}
+  .shot{border-radius:14px;overflow:hidden;border:1px solid var(--line-strong);box-shadow:0 40px 90px -30px rgba(0,0,0,.8),0 0 0 1px rgba(245,194,17,.08)}
+  .hero .shot{max-width:980px;margin:0 auto}
+
+  section{padding:90px 0}
+  .kicker{font-family:var(--mono);font-size:.78rem;letter-spacing:.08em;text-transform:uppercase;color:var(--teal)}
+  h2{font-family:var(--display);font-weight:700;font-size:clamp(1.8rem,4vw,2.6rem);letter-spacing:-.02em;margin:10px 0 14px}
+  .sub{color:var(--text-dim);max-width:640px;margin-bottom:44px}
+
+  .row{display:grid;grid-template-columns:1fr 1.25fr;gap:48px;align-items:center;margin-bottom:80px}
+  .row.flip{grid-template-columns:1.25fr 1fr}
+  .row.flip .text{order:2}
+  .row h3{font-family:var(--display);font-size:1.5rem;margin-bottom:12px}
+  .row p{color:var(--text-dim);margin-bottom:14px}
+  .row ul{list-style:none;color:var(--text-dim)}
+  .row li{padding-left:22px;position:relative;margin:6px 0}
+  .row li::before{content:"";position:absolute;left:0;top:.62em;width:8px;height:8px;border-radius:2px;background:var(--teal)}
+  @media (max-width:860px){.row,.row.flip{grid-template-columns:1fr}.row.flip .text{order:0}}
+
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:18px}
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:24px}
+  .card h4{font-family:var(--display);font-size:1.08rem;margin-bottom:8px}
+  .card p{color:var(--text-dim);font-size:.93rem}
+  .card .ico{width:38px;height:38px;border-radius:10px;background:rgba(245,194,17,.12);color:var(--teal-bright);display:grid;place-items:center;margin-bottom:14px;font-family:var(--mono);font-weight:600}
+
+  .install{background:linear-gradient(180deg,var(--bg),#1a140a)}
+  .install .head{text-align:center;max-width:680px;margin:0 auto 44px}
+  .install .head .sub{margin:0 auto}
+  .icard{max-width:760px;margin:0 auto;background:#0b0804;border:1px solid var(--line-strong);border-radius:16px;overflow:hidden;box-shadow:0 24px 60px -24px rgba(0,0,0,.7)}
+  .icard+.icard{margin-top:22px}
+  .itop{position:relative;display:flex;align-items:center;justify-content:center;padding:11px 12px;border-bottom:1px solid var(--line);background:var(--surface-2);font-weight:600;font-size:.84rem}
+  .copy{position:absolute;top:50%;right:10px;transform:translateY(-50%);font-family:var(--mono);font-size:.72rem;cursor:pointer;color:var(--text-dim);background:var(--surface);border:1px solid var(--line-strong);border-radius:8px;padding:5px 10px}
+  .copy:hover{color:var(--text);border-color:var(--teal)}
+  .cmd{margin:0;padding:18px 22px;font-family:var(--mono);font-size:.86rem;line-height:1.9;color:var(--text);overflow-x:auto;white-space:pre}
+  .cmd .p{color:var(--teal);user-select:none}
+  .cmd .c{color:var(--text-faint)}
+  .ibody{padding:8px 22px;background:var(--surface)}
+  .irow{display:flex;align-items:center;gap:14px;padding:16px 0;border-bottom:1px solid var(--line)}
+  .irow:last-child{border-bottom:0}
+  .irow .ri{font-size:20px;width:28px;text-align:center}
+  .irow .rt{flex:1;min-width:0}
+  .irow .rt b{display:block;font-weight:600}
+  .irow .rt span{font-size:.86rem;color:var(--text-dim)}
+  .irow a{color:var(--teal-bright)}
+  .irow a:hover{text-decoration:underline}
+  .irow .row-cmd{display:block;width:fit-content;max-width:100%;margin-top:6px;font-family:var(--mono);font-size:.8rem;color:var(--teal-bright);background:rgba(245,194,17,.1);padding:3px 8px;border-radius:6px;white-space:nowrap;overflow-x:auto}
+  .badge{font-family:var(--mono);font-size:.7rem;padding:4px 10px;border-radius:999px;white-space:nowrap;color:var(--green);background:rgba(74,222,128,.08);border:1px solid rgba(74,222,128,.3)}
+  .reqs{max-width:760px;margin:30px auto 0;font-size:.9rem;color:var(--text-dim);text-align:center}
+  .reqs code{font-family:var(--mono);color:var(--teal-bright);font-size:.84rem}
+  @media (max-width:560px){.irow{flex-wrap:wrap}.irow .rt{flex:1 1 calc(100% - 42px)}.irow .badge{margin-left:42px}}
+
+  footer{border-top:1px solid var(--line);padding:40px 0;color:var(--text-faint);font-size:.88rem}
+  footer .wrap{display:flex;justify-content:space-between;gap:18px;flex-wrap:wrap}
+  footer a{color:var(--text-dim)}
+  footer a:hover{color:var(--text)}
+</style>
+</head>
+<body>
+<nav>
+  <div class="wrap">
+    <a class="brand" href="#"><img src="img/icon.svg" alt="">Argos</a>
+    <div class="nav-links">
+      <a href="#browse">Browse</a>
+      <a href="#view">View</a>
+      <a href="#edit">Edit</a>
+      <a href="#install">Install</a>
+      <a href="https://github.com/ToFpon/Argos">GitHub</a>
+    </div>
+    <span class="get-pill">v0.1.0 · GPL-3.0</span>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="wrap">
+    <span class="eyebrow"><span class="dot"></span>Version 0.1.0 — for Ubuntu 24.04, Zorin OS 18, Debian 13</span>
+    <h1>Look at your photos.<br><span class="accent">Nothing in the way.</span></h1>
+    <p class="lede">Argos shows a folder as a grid of thumbnails, with the folder tree on the side, and opens your
+      photos in a viewer laid out like gThumb. The mouse wheel goes to the next photo, Ctrl + wheel zooms right where
+      you point. Native GTK4 and libadwaita, following your desktop theme.</p>
+    <div class="cta">
+      <a class="btn btn-primary" href="#install">Install Argos</a>
+      <a class="btn btn-ghost" href="https://github.com/ToFpon/Argos">Source code</a>
+    </div>
+    <div class="shot"><img src="img/dark.png" alt="Argos showing a photo with the thumbnail strip, dark theme" width="1190" height="770"></div>
+  </div>
+</header>
+
+<section id="browse">
+  <div class="wrap">
+    <span class="kicker">Browse</span>
+    <h2>A folder at a glance</h2>
+    <p class="sub">Subfolders first, then photos in natural order (2 before 10). Thumbnails are shared with Nautilus:
+      what your file manager already made shows up instantly.</p>
+    <div class="row">
+      <div class="text">
+        <h3>Folder tree and properties</h3>
+        <ul>
+          <li>Home, Pictures, Desktop, Downloads, every mounted disk</li>
+          <li>The tree unfolds by itself to the folder you are in</li>
+          <li>Properties of the selected photo under the tree (I)</li>
+          <li>Sort by name, date or size; the folder is watched, new photos appear</li>
+        </ul>
+      </div>
+      <div class="shot"><img src="img/grid.png" alt="Grid of photos with the folder tree" loading="lazy"></div>
+    </div>
+  </div>
+</section>
+
+<section id="view" style="background:var(--surface)">
+  <div class="wrap">
+    <span class="kicker">View</span>
+    <h2>The FastStone way of moving around</h2>
+    <p class="sub">Wheel = next or previous photo. Ctrl + wheel = zoom around the pointer. Drag to move a zoomed photo,
+      double click for a plain full screen. Neighbouring photos are read in advance: the next one is already there.</p>
+    <div class="row">
+      <div class="text">
+        <h3>Everything about the shot</h3>
+        <ul>
+          <li>Thumbnail strip with an adjustable height — one row or many</li>
+          <li>Status bar: 3 / 13 · 1280 × 1271 · 439.7 kB · JPEG · 45%</li>
+          <li>Camera, lens, exposure, aperture, ISO, focal length, location (EXIF)</li>
+          <li>JPEG, PNG, animated GIF, WebP, TIFF, BMP, SVG, HEIC, AVIF</li>
+        </ul>
+      </div>
+      <div class="shot"><img src="img/info.png" alt="Photo with its properties panel" loading="lazy"></div>
+    </div>
+    <div class="row flip">
+      <div class="text">
+        <h3>Your theme, light or dark</h3>
+        <p>No colours of its own: Argos follows Adwaita, your accent colour and your GTK4 theme. Only the full screen
+          is black around the photo.</p>
+      </div>
+      <div class="shot"><img src="img/light.png" alt="Argos in the light theme" loading="lazy"></div>
+    </div>
+  </div>
+</section>
+
+<section id="edit">
+  <div class="wrap">
+    <span class="kicker">Edit</span>
+    <h2>Just what a photo needs</h2>
+    <p class="sub">Rotate, crop, save — or save as another format. The original is kept for a moment: Undo puts it
+      back right after saving.</p>
+    <div class="row">
+      <div class="text">
+        <h3>Crop</h3>
+        <p>Draw the frame, drag its edges and corners, keep the rule of thirds in sight. Free, original or fixed
+          ratios: 1:1, 4:3, 3:2, 16:9 and their portrait versions.</p>
+      </div>
+      <div class="shot"><img src="img/crop.png" alt="Crop frame with handles and rule of thirds" loading="lazy"></div>
+    </div>
+    <div class="grid">
+      <div class="card"><div class="ico">↻</div><h4>Rotate</h4><p>R and Shift+R. The photo is saved the way you see it, EXIF orientation included.</p></div>
+      <div class="card"><div class="ico">⇄</div><h4>Save as</h4><p>JPEG, PNG, WebP, TIFF, BMP, GIF — the extension decides. JPEG quality kept.</p></div>
+      <div class="card"><div class="ico">⟲</div><h4>Undo</h4><p>The original is kept after saving, one click brings it back.</p></div>
+      <div class="card"><div class="ico">🗑</div><h4>Trash</h4><p>Delete moves the photo to the trash, the next one shows up.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="install" class="install">
+  <div class="wrap">
+    <div class="head">
+      <span class="kicker">Install</span>
+      <h2>Ready to look.</h2>
+      <p class="sub">Argos is available for <b>Ubuntu 24.04 “Noble”</b> and <b>26.04 “Resolute”</b> and their derivatives — Zorin OS 18, Linux Mint 22 — from a PPA, under X11 or Wayland. The package is called <code>argos-viewer</code>.</p>
+    </div>
+    <div class="icard">
+      <div class="itop">Terminal<button class="copy" type="button" title="Copy the two install commands" data-copy="sudo add-apt-repository ppa:nourpon/argos&#10;sudo apt update &amp;&amp; sudo apt install argos-viewer">Copy</button></div>
+      <pre class="cmd"><span class="p">$ </span>sudo add-apt-repository ppa:nourpon/argos
+<span class="p">$ </span>sudo apt update &amp;&amp; sudo apt install argos-viewer
+<span class="c"># optional: make it your default photo viewer (also a switch in the Preferences)</span>
+<span class="p">$ </span>xdg-mime default io.github.argos.Argos.desktop image/jpeg image/png</pre>
+    </div>
+    <div class="icard">
+      <div class="ibody">
+        <div class="irow"><span class="ri">📦</span><div class="rt"><b>Debian package &amp; PPA</b><span>Signed packages, updated through apt · <a href="https://launchpad.net/~nourpon/+archive/ubuntu/argos">ppa:nourpon/argos</a></span></div><span class="badge">Available</span></div>
+        <div class="irow"><span class="ri">🧩</span><div class="rt"><b>Other Debian-based distributions</b><span>Debian 13… · download the .deb from <a href="https://github.com/ToFpon/Argos/releases">GitHub Releases</a> and open it, or in a terminal:<code class="row-cmd">sudo apt install ./argos-viewer_*_all.deb</code></span></div><span class="badge">Available</span></div>
+        <div class="irow"><span class="ri">💻</span><div class="rt"><b>Source code</b><span>GPL-3.0 · <a href="https://github.com/ToFpon/Argos">github.com/ToFpon/Argos</a></span></div><span class="badge">Available</span></div>
+        <div class="irow"><span class="ri">🐞</span><div class="rt"><b>Found a bug? An idea?</b><span><a href="https://github.com/ToFpon/Argos/issues">Open an issue on GitHub</a></span></div><span class="badge">Welcome</span></div>
+      </div>
+    </div>
+    <p class="reqs">Requirements: Python 3.10+, PyGObject, GTK ≥ 4.14, libadwaita ≥ 1.5 — all installed by the package. Recommended, and installed along: <code>imagemagick</code> (editing), <code>gir1.2-gexiv2-0.10</code> (shooting details), <code>webp-pixbuf-loader</code>, <code>heif-gdk-pixbuf</code> (WebP, HEIC, AVIF).</p>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <span>Argos — free software, GPL-3.0 · by Tof · Screenshot photos: NASA (public domain)</span>
+    <span><a href="https://github.com/ToFpon/Argos">GitHub</a> · <a href="https://launchpad.net/~nourpon/+archive/ubuntu/argos">Launchpad</a> · also <a href="https://tofmicro.pages-perso.free.fr/Odysseus/">Odysseus</a>, <a href="https://tofmicro.pages-perso.free.fr/Calypso/">Calypso</a>, <a href="https://tofmicro.pages-perso.free.fr/Nausicaa/">Nausicaa</a></span>
+  </div>
+</footer>
+
+<script>
+  document.querySelectorAll(".copy").forEach(b => b.addEventListener("click", () => {
+    navigator.clipboard.writeText(b.dataset.copy).then(() => {
+      const t = b.textContent; b.textContent = "Copied ✓"; setTimeout(() => b.textContent = t, 1600);
+    });
+  }));
+</script>
+</body>
+</html>

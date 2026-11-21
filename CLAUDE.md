@@ -116,6 +116,12 @@ tools/screenshot.py SORTIE.png CHEMIN [--dark] [--size=LxH] [--zoom=F] [--info] 
    `tools/ppa.sh` (ppa:nourpon/argos, noble puis resolute), `tools/site.sh` (dossier Argos des pages perso Free).
    Recommends : imagemagick, gir1.2-gexiv2-0.10, webp-pixbuf-loader, heif-gdk-pixbuf, librsvg2-common. Vérifié :
    dpkg-buildpackage, lintian sans remarque, appstreamcli, installé puis lancé (python3.12).
-   RESTE : le site (`site/index.html`, tons dorés) et ses captures — il faut de vraies photos de démonstration
-   (libres de droits) ; tools/ppa.sh appelle tools/site.sh à la fin.
+   Site (`site/index.html`, anglais, tons dorés ; Odysseus bleu, Ithaca violet, Nausicaa orange, Calypso turquoise,
+   Télémaque vert, Sirène corail), https://tofmicro.pages-perso.free.fr/Argos/ ; version dans la pastille et
+   l'accroche, à tenir à jour. Captures de `site/img/` en anglais, sombre sauf light.png, sur des photos de la NASA
+   (domaine public, crédit en bas du site et du README ; Wikimedia refusait nos requêtes : 429) copiées dans
+   /home/tof/Photos (chemin court dans les propriétés) : `HOME=/home/tof LANGUAGE=en xvfb-run -a -s "-screen 0
+   1400x1000x24" python3.12 tools/screenshot.py site/img/NOM.png CHEMIN --size=1200x780 --delay=3000 [options]` —
+   dark (Mount Everest.jpg --dark), light (Andes and the Pacific.jpg), grid (dossier --dark --info), crop (Lake
+   Powell, Utah.jpg --dark --crop), info (Antennae galaxies.jpg --dark --info). Photos : images-api.nasa.gov.
 4. Essai chez Tof.

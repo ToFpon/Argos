@@ -3,7 +3,9 @@
 **A simple and fast photo viewer for GNOME — GTK4 / libadwaita.**
 **Une visionneuse de photos simple et rapide pour GNOME — GTK4 / libadwaita.**
 
-[English](#english) · [Français](#français)
+[English](#english) · [Français](#français) · Site : https://tofmicro.pages-perso.free.fr/Argos/
+
+![Argos](site/img/dark.png)
 
 ---
 
@@ -73,4 +75,4 @@ Le paquet s'appelle `argos-viewer` (Debian a déjà un paquet `argos`, un client
 
 ## Licence
 
-GPL-3.0-or-later.
+GPL-3.0-or-later. Photos des captures / screenshot photos : NASA (domaine public / public domain).
