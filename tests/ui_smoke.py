@@ -259,6 +259,39 @@ def steps(app):
     yield lambda: win.picture is not None and win.picture.path == target and len(win.images) > 3
     check(win.images[win.index].path == target, "puis le dossier autour de la photo")
 
+    # menu du clic droit (photo) : contenu, renommer, copier vers (sans écrasement), supprimer définitivement
+    win.show_index(0)
+    yield lambda: win.picture is not None and win.picture.path == win.images[0].path
+    path = win.images[0].path
+    menu = win.file_menu(path)
+    labels = []
+    for i in range(menu.get_n_items()):
+        sec = menu.get_item_link(i, "section")
+        for j in range(sec.get_n_items()):
+            labels.append(sec.get_item_attribute_value(j, "label").get_string())
+    check(tr("Ouvrir avec") in labels and tr("Renommer…") in labels and tr("Imprimer…") in labels,
+          "menu du clic droit")
+    win._renamed(path, path)            # sans effet de bord
+    new = os.path.join(PHOTOS, "renommée.jpg")
+    os.rename(path, new)
+    win._renamed(path, new)
+    check(win.images[win.index].path == new, "renommer : la photo affichée suit")
+    yield lambda: win.picture is not None and win.picture.path == new
+    other = os.path.join(TMP, "ailleurs")
+    os.makedirs(other)
+    win._ctx = new
+    from argos.backend import edit as _edit
+    dest = _edit.free_name(os.path.join(other, "renommée.jpg"))
+    shutil.copyfile(new, dest)
+    check(_edit.free_name(os.path.join(other, "renommée.jpg")).endswith("renommée (2).jpg"), "copier vers : jamais d'écrasement")
+    n = len(win.images)
+    os.remove(new)
+    win._removed(new)
+    check(len(win.images) == n - 1 and win.images[win.index].path != new, "supprimée : la voisine s'affiche")
+    win._ctx = None
+    win.copy_image()
+    yield 100
+
     # préférences
     from argos.ui.preferences import PreferencesWindow
     pw = PreferencesWindow(win)

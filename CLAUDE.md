@@ -73,6 +73,18 @@ Nom : Argos le géant aux cent yeux (et le chien d'Ulysse, le seul à le reconna
   en même temps que le dossier (liste provisoire d'une photo) — vu chez Tof : la grille passait une fraction de
   seconde avant. Grille : nom sous les DOSSIERS seulement (demande de Tof : place pour les photos ; nom dans
   l'infobulle, la barre d'état, les propriétés). Roue de chargement de la grille : Gtk.Spinner 32 px centré (étirée, elle remplissait tout).
+- Clic droit sur une photo, visionneuse ET grille (`ui/filemenu.py`, mixin `FileMenu` ; menu de gThumb demandé par
+  Tof, sans commentaire / étiquettes / catalogue) : plein écran, définir comme arrière-plan (copie dans
+  ~/.local/share/backgrounds, `org.gnome.desktop.background` picture-uri + -dark, « zoom » ; caché sans le schéma),
+  imprimer (Gtk.PrintOperation, page tournée d'après la photo, Ctrl+P), ouvrir avec (applications du type, notre
+  lanceur exclu, « Autre application… » = Gtk.AppChooserDialog), copier l'image (texture + fichier, Ctrl+C), copier /
+  déplacer vers (Gtk.FileDialog, GIO dans un fil, jamais d'écrasement : `edit.free_name`), renommer (F2, boîte à la
+  largeur du nom, extension non sélectionnée), corbeille, supprimer (Maj+Suppr, question de Nautilus). Cible = `_ctx`
+  (oubliée 300 ms après la fermeture du menu : l'action part après), sinon la photo affichée / sélectionnée ;
+  `_removed` / `_renamed` tiennent listes, cache des dossiers et photo affichée à jour.
+  PIÈGE GTK 4.14 (Nausicaa) vu ici : menu accroché à la vue ou au Gtk.GridView = tronqué avec barre de défilement ;
+  accroché à un Gtk.Overlay (`view.get_parent()`, `grid_overlay`) = entier. `translate_coordinates` : (x, y) ou
+  (ok, x, y) selon PyGObject.
 - `ui/sidebar.py` (demande de Tof, comme gThumb) : arbre des dossiers à gauche de la grille (Adw.OverlaySplitView,
   F9 / bouton, réglage `sidebar`, repliée sous 600 sp). Racines : Dossier personnel, Images, Bureau,
   Téléchargements, disques montés (Gio.VolumeMonitor, suivis), Ordinateur (/). Gtk.TreeListModel : GTK demande les

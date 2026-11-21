@@ -61,6 +61,111 @@ msgstr "Drehen, zuschneiden und in einem anderen Format speichern"
 msgid "Demande ImageMagick (paquet imagemagick)"
 msgstr "Benötigt ImageMagick (Paket imagemagick)"
 
+msgid "Plein écran"
+msgstr "Vollbild"
+
+msgid "Imprimer…"
+msgstr "Drucken …"
+
+msgid "Autre application…"
+msgstr "Andere Anwendung …"
+
+msgid "Ouvrir avec"
+msgstr "Öffnen mit"
+
+msgid "Copier l'image"
+msgstr "Bild kopieren"
+
+msgid "Copier vers…"
+msgstr "Kopieren nach …"
+
+msgid "Déplacer vers…"
+msgstr "Verschieben nach …"
+
+msgid "Renommer…"
+msgstr "Umbenennen …"
+
+msgid "Mettre à la corbeille"
+msgstr "In den Papierkorb verschieben"
+
+msgid "Supprimer…"
+msgstr "Löschen …"
+
+msgid "Image copiée"
+msgstr "Bild kopiert"
+
+msgid "Renommer"
+msgstr "Umbenennen"
+
+msgid "Annuler"
+msgstr "Abbrechen"
+
+msgid "Si vous supprimez un élément, il sera définitivement perdu."
+msgstr "Wenn Sie ein Objekt löschen, geht es dauerhaft verloren."
+
+msgid "Définir comme arrière-plan"
+msgstr "Als Hintergrund festlegen"
+
+msgid "Nom"
+msgstr "Name"
+
+msgid "Nom impossible"
+msgstr "Ungültiger Name"
+
+msgid "Impossible de définir l'arrière-plan"
+msgstr "Hintergrund kann nicht festgelegt werden"
+
+msgid "« {0} » est maintenant l'arrière-plan"
+msgstr "„{0}“ ist jetzt der Hintergrund"
+
+msgid "Impression impossible"
+msgstr "Drucken nicht möglich"
+
+msgid "Ouverture impossible"
+msgstr "Öffnen nicht möglich"
+
+msgid "Déplacer vers"
+msgstr "Verschieben nach"
+
+msgid "Copier vers"
+msgstr "Kopieren nach"
+
+msgid "Déplacement impossible"
+msgstr "Verschieben nicht möglich"
+
+msgid "Copie impossible"
+msgstr "Kopieren nicht möglich"
+
+msgid "Supprimer définitivement « {0} » ?"
+msgstr "„{0}“ dauerhaft löschen?"
+
+msgid "Supprimer"
+msgstr "Löschen"
+
+msgid "Impossible de mettre à la corbeille"
+msgstr "Verschieben in den Papierkorb nicht möglich"
+
+msgid "« {0} » mis à la corbeille"
+msgstr "„{0}“ in den Papierkorb verschoben"
+
+msgid "« {0} » déplacée dans {1}"
+msgstr "„{0}“ nach {1} verschoben"
+
+msgid "« {0} » copiée dans {1}"
+msgstr "„{0}“ nach {1} kopiert"
+
+msgid "« {0} » existe déjà"
+msgstr "„{0}“ existiert bereits"
+
+msgid "Renommage impossible"
+msgstr "Umbenennen nicht möglich"
+
+msgid "Suppression impossible"
+msgstr "Löschen nicht möglich"
+
+msgid "« {0} » supprimée"
+msgstr "„{0}“ gelöscht"
+
 msgid "Fichier"
 msgstr "Datei"
 
@@ -90,9 +195,6 @@ msgstr "Blitz"
 
 msgid "Position"
 msgstr "Standort"
-
-msgid "Nom"
-msgstr "Name"
 
 msgid "Dossier"
 msgstr "Ordner"
@@ -184,9 +286,6 @@ msgstr "Nächstes / vorheriges Foto"
 msgid "Première / dernière photo"
 msgstr "Erstes / letztes Foto"
 
-msgid "Mettre à la corbeille"
-msgstr "In den Papierkorb verschieben"
-
 msgid "Pivoter à droite / à gauche"
 msgstr "Nach rechts / links drehen"
 
@@ -201,9 +300,6 @@ msgstr "An Fenster anpassen"
 
 msgid "Taille réelle (100 %)"
 msgstr "Originalgröße (100 %)"
-
-msgid "Plein écran"
-msgstr "Vollbild"
 
 msgid "Quitter le plein écran, puis revenir au dossier"
 msgstr "Vollbild verlassen, dann zurück zum Ordner"
@@ -313,9 +409,6 @@ msgstr "Wie das Original"
 msgid "Glissez pour tracer le cadre, ses bords et ses coins pour l'ajuster"
 msgstr "Ziehen, um den Rahmen zu zeichnen; Kanten und Ecken ziehen, um ihn anzupassen"
 
-msgid "Annuler"
-msgstr "Abbrechen"
-
 msgid "Recadrer"
 msgstr "Zuschneiden"
 
@@ -371,12 +464,6 @@ msgstr "Verwerfen"
 
 msgid "Format inconnu"
 msgstr "Unbekanntes Format"
-
-msgid "Impossible de mettre à la corbeille"
-msgstr "Verschieben in den Papierkorb nicht möglich"
-
-msgid "« {0} » mis à la corbeille"
-msgstr "„{0}“ in den Papierkorb verschoben"
 
 msgid "Photo précédente"
 msgstr "Vorheriges Foto"

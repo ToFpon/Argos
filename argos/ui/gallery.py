@@ -101,7 +101,8 @@ def _factory(size: int, with_name: bool) -> Gtk.SignalListItemFactory:
 class Grid(Gtk.ScrolledWindow):
     """Grille du dossier. Signal « activate » (position) : ouvrir le dossier ou la photo."""
 
-    __gsignals__ = {"open": (GObject.SignalFlags.RUN_FIRST, None, (object,))}
+    __gsignals__ = {"open": (GObject.SignalFlags.RUN_FIRST, None, (object,)),
+                    "context-menu": (GObject.SignalFlags.RUN_FIRST, None, (object, float, float))}
 
     def __init__(self, size: int = 160):
         super().__init__(hexpand=True, vexpand=True, hscrollbar_policy=Gtk.PolicyType.NEVER)
@@ -111,9 +112,28 @@ class Grid(Gtk.ScrolledWindow):
         self.view.add_css_class("argos-grid")
         self.view.connect("activate", self._on_activate)
         self.set_child(self.view)
+        right = Gtk.GestureClick(button=3)
+        right.connect("pressed", self._on_right)
+        self.view.add_controller(right)
 
     def set_model(self, store: Gio.ListStore):
         self.selection.set_model(store)
+
+    def _on_right(self, _g, _n, x, y):
+        """Clic droit sur une vignette : elle est sélectionnée, puis le menu (photos seulement)."""
+        w = self.view.pick(x, y, Gtk.PickFlags.DEFAULT)
+        while w is not None and not isinstance(w, _Cell):
+            w = w.get_parent()
+        if w is None or not w.path:
+            return
+        model = self.selection.get_model()
+        for i in range(model.get_n_items()):
+            entry = model.get_item(i).entry
+            if entry.path == w.path:
+                self.selection.set_selected(i)
+                if not entry.is_dir:
+                    self.emit("context-menu", entry, x, y)
+                return
 
     def _on_activate(self, _view, pos):
         item = self.selection.get_model().get_item(pos)

@@ -32,6 +32,7 @@ class ImageView(Gtk.Widget):
         "navigate": (GObject.SignalFlags.RUN_FIRST, None, (int,)),      # +1 suivante, -1 précédente
         "zoom-changed": (GObject.SignalFlags.RUN_FIRST, None, ()),
         "double-click": (GObject.SignalFlags.RUN_FIRST, None, ()),
+        "context-menu": (GObject.SignalFlags.RUN_FIRST, None, (float, float)),
     }
 
     def __init__(self):
@@ -72,6 +73,9 @@ class ImageView(Gtk.Widget):
         click = Gtk.GestureClick()
         click.connect("pressed", self._on_pressed)
         self.add_controller(click)
+        right = Gtk.GestureClick(button=Gdk.BUTTON_SECONDARY)
+        right.connect("pressed", lambda _g, _n, x, y: not self.cropping and self.emit("context-menu", x, y))
+        self.add_controller(right)
         zoom = Gtk.GestureZoom()
         zoom.connect("begin", lambda *_: setattr(self, "_pinch_from", self.zoom))
         zoom.connect("scale-changed", self._on_pinch)

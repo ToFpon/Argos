@@ -61,6 +61,111 @@ msgstr "Rotate, crop and save in another format"
 msgid "Demande ImageMagick (paquet imagemagick)"
 msgstr "Requires ImageMagick (imagemagick package)"
 
+msgid "Plein écran"
+msgstr "Fullscreen"
+
+msgid "Imprimer…"
+msgstr "Print…"
+
+msgid "Autre application…"
+msgstr "Other Application…"
+
+msgid "Ouvrir avec"
+msgstr "Open With"
+
+msgid "Copier l'image"
+msgstr "Copy Image"
+
+msgid "Copier vers…"
+msgstr "Copy To…"
+
+msgid "Déplacer vers…"
+msgstr "Move To…"
+
+msgid "Renommer…"
+msgstr "Rename…"
+
+msgid "Mettre à la corbeille"
+msgstr "Move to trash"
+
+msgid "Supprimer…"
+msgstr "Delete…"
+
+msgid "Image copiée"
+msgstr "Image copied"
+
+msgid "Renommer"
+msgstr "Rename"
+
+msgid "Annuler"
+msgstr "Cancel"
+
+msgid "Si vous supprimez un élément, il sera définitivement perdu."
+msgstr "If you delete an item, it will be permanently lost."
+
+msgid "Définir comme arrière-plan"
+msgstr "Set as Background"
+
+msgid "Nom"
+msgstr "Name"
+
+msgid "Nom impossible"
+msgstr "Invalid name"
+
+msgid "Impossible de définir l'arrière-plan"
+msgstr "Cannot set the background"
+
+msgid "« {0} » est maintenant l'arrière-plan"
+msgstr "“{0}” is now the background"
+
+msgid "Impression impossible"
+msgstr "Cannot print"
+
+msgid "Ouverture impossible"
+msgstr "Cannot open"
+
+msgid "Déplacer vers"
+msgstr "Move To"
+
+msgid "Copier vers"
+msgstr "Copy To"
+
+msgid "Déplacement impossible"
+msgstr "Cannot move"
+
+msgid "Copie impossible"
+msgstr "Cannot copy"
+
+msgid "Supprimer définitivement « {0} » ?"
+msgstr "Permanently delete “{0}”?"
+
+msgid "Supprimer"
+msgstr "Delete"
+
+msgid "Impossible de mettre à la corbeille"
+msgstr "Cannot move to trash"
+
+msgid "« {0} » mis à la corbeille"
+msgstr "“{0}” moved to trash"
+
+msgid "« {0} » déplacée dans {1}"
+msgstr "“{0}” moved to {1}"
+
+msgid "« {0} » copiée dans {1}"
+msgstr "“{0}” copied to {1}"
+
+msgid "« {0} » existe déjà"
+msgstr "“{0}” already exists"
+
+msgid "Renommage impossible"
+msgstr "Cannot rename"
+
+msgid "Suppression impossible"
+msgstr "Cannot delete"
+
+msgid "« {0} » supprimée"
+msgstr "“{0}” deleted"
+
 msgid "Fichier"
 msgstr "File"
 
@@ -90,9 +195,6 @@ msgstr "Flash"
 
 msgid "Position"
 msgstr "Location"
-
-msgid "Nom"
-msgstr "Name"
 
 msgid "Dossier"
 msgstr "Folder"
@@ -184,9 +286,6 @@ msgstr "Next / previous photo"
 msgid "Première / dernière photo"
 msgstr "First / last photo"
 
-msgid "Mettre à la corbeille"
-msgstr "Move to trash"
-
 msgid "Pivoter à droite / à gauche"
 msgstr "Rotate right / left"
 
@@ -201,9 +300,6 @@ msgstr "Fit to window"
 
 msgid "Taille réelle (100 %)"
 msgstr "Actual size (100%)"
-
-msgid "Plein écran"
-msgstr "Fullscreen"
 
 msgid "Quitter le plein écran, puis revenir au dossier"
 msgstr "Leave fullscreen, then back to the folder"
@@ -313,9 +409,6 @@ msgstr "Original"
 msgid "Glissez pour tracer le cadre, ses bords et ses coins pour l'ajuster"
 msgstr "Drag to draw the frame, drag its edges and corners to adjust it"
 
-msgid "Annuler"
-msgstr "Cancel"
-
 msgid "Recadrer"
 msgstr "Crop"
 
@@ -371,12 +464,6 @@ msgstr "Discard"
 
 msgid "Format inconnu"
 msgstr "Unknown format"
-
-msgid "Impossible de mettre à la corbeille"
-msgstr "Cannot move to trash"
-
-msgid "« {0} » mis à la corbeille"
-msgstr "“{0}” moved to trash"
 
 msgid "Photo précédente"
 msgstr "Previous photo"

@@ -23,6 +23,7 @@ from ..i18n import LANGUAGE, decimal, ntr, tr  # noqa: E402
 from ..settings import settings  # noqa: E402
 from .common import alert, shown, toast  # noqa: E402
 from .gallery import Filmstrip, Grid, store_of  # noqa: E402
+from .filemenu import FileMenu  # noqa: E402
 from .info import InfoPanel  # noqa: E402
 from .thumbs import shared as shared_thumbs  # noqa: E402
 from .viewer import ImageView  # noqa: E402
@@ -33,7 +34,7 @@ def percent(zoom: float) -> str:
     return decimal(p, 0 if p >= 10 else 1) + ("%" if LANGUAGE == "en" else " %")
 
 
-class MainWindow(Adw.ApplicationWindow):
+class MainWindow(FileMenu, Adw.ApplicationWindow):
     def __init__(self, app):
         super().__init__(application=app, title=APP_NAME)
         self.set_size_request(360, 360)
@@ -105,10 +106,12 @@ class MainWindow(Adw.ApplicationWindow):
         header.pack_end(self._menu())
         self.grid = Grid(settings["grid_size"])
         self.grid.connect("open", lambda _g, e: self.open_entry(e))
+        self.grid.connect("context-menu", self._grid_menu)
         self.empty = Adw.StatusPage(icon_name="image-x-generic-symbolic", title=tr("Aucune photo"),
                                     description=tr("Ce dossier ne contient ni photo ni sous-dossier"))
         self.browser_stack = Gtk.Stack()
-        self.browser_stack.add_named(self.grid, "grid")
+        self.grid_overlay = Gtk.Overlay(child=self.grid)      # porte le menu du clic droit (voir show_file_menu)
+        self.browser_stack.add_named(self.grid_overlay, "grid")
         self.browser_stack.add_named(self.empty, "empty")
         # roue de taille normale, centrée (vu chez Tof : étirée, elle remplissait toute la grille)
         self.browser_stack.add_named(Gtk.Spinner(spinning=True, width_request=32, height_request=32,
@@ -200,6 +203,10 @@ class MainWindow(Adw.ApplicationWindow):
         self.view.connect("navigate", lambda _v, step: self.go(step))
         self.view.connect("zoom-changed", lambda *_: self._sync_status())
         self.view.connect("double-click", lambda *_: self.toggle_fullscreen())
+        # menu accroché à l'OVERLAY (piège de GTK 4.14 vu dans Nausicaa : accroché ailleurs, un menu recevait une
+        # hauteur trop petite et se tronquait avec une barre de défilement ; même coordonnées : la vue le remplit)
+        self.view.connect("context-menu", lambda v, x, y: 0 <= self.index < len(self.images) and
+                          self.show_file_menu(v.get_parent(), self.images[self.index].path, x, y))
         self.error_page = Adw.StatusPage(icon_name="image-missing-symbolic", visible=False)
         overlay = Gtk.Overlay(child=self.view)
         overlay.add_overlay(self.error_page)
@@ -319,6 +326,7 @@ class MainWindow(Adw.ApplicationWindow):
         self._viewer_actions = ("back", "fullscreen", "zoom-in", "zoom-out", "zoom-fit", "zoom-100", "zoom-toggle",
                                 "rotate-right", "rotate-left", "info", "trash", "crop", "save", "save-as",
                                 "revert")
+        self._setup_file_menu()
         self._sync_actions()
 
     # ------------------------------------------------------------------ dossier
@@ -536,6 +544,15 @@ class MainWindow(Adw.ApplicationWindow):
             if f is not None and f.get_path():
                 self.open_path(f.get_path())
         d.open(self, None, done)
+
+    def _grid_menu(self, grid, entry, x, y):
+        # translate_coordinates : (x, y) dans le PyGObject de Zorin, (ok, x, y) ailleurs (vu dans Nausicaa)
+        r = grid.view.translate_coordinates(self.grid_overlay, x, y)
+        if isinstance(r, tuple) and len(r) == 3:
+            x, y = (r[1], r[2]) if r[0] else (x, y)
+        elif isinstance(r, tuple) and len(r) == 2:
+            x, y = r
+        self.show_file_menu(self.grid_overlay, entry.path, x, y)
 
     def _set_browser_info(self, on: bool):
         settings["browser_info"] = on
@@ -932,23 +949,8 @@ class MainWindow(Adw.ApplicationWindow):
         GLib.idle_add(lambda: (self.view.set_fit() if self.view.fit else None, False)[1])
 
     def trash(self):
-        if not 0 <= self.index < len(self.images):
-            return
-        entry = self.images[self.index]
-        try:
-            Gio.File.new_for_path(entry.path).trash(None)
-        except GLib.Error as e:
-            alert(self, tr("Impossible de mettre à la corbeille"), shown(e.message))
-            return
-        self.loader.forget(entry.path)
-        del self.images[self.index]
-        self.filmstrip.set_model(store_of(self.images))
-        self.grid.set_model(store_of(self.dirs + self.images))
-        toast(self, tr("« {0} » mis à la corbeille").format(shown(entry.name)))
-        if not self.images:
-            self.show_browser()
-        else:
-            self.show_index(min(self.index, len(self.images) - 1))
+        if 0 <= self.index < len(self.images):
+            self.trash_path(self.images[self.index].path)
 
     # ------------------------------------------------------------------ clavier, fermeture
 
