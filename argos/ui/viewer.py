@@ -9,6 +9,7 @@ TRILINEAR de GSK en réduction (mipmaps : une photo de 24 Mpx réduite reste net
 from __future__ import annotations
 
 import math
+import threading
 from typing import Optional
 
 import gi
@@ -39,6 +40,10 @@ class ImageView(Gtk.Widget):
         super().__init__(hexpand=True, vexpand=True, focusable=True, overflow=Gtk.Overflow.HIDDEN)
         self.add_css_class("argos-view")
         self.texture: Optional[Gdk.Texture] = None
+        self.vector: Optional[str] = None     # SVG : redessiné à la taille affichée (_hires)
+        self._hires = None
+        self._hires_seq = 0
+        self._hires_timer = 0
         self.fit = True                  # ajustée à la fenêtre (suit les redimensionnements)
         self.zoom = 1.0                  # échelle de l'image affichée (1 = 100 %)
         self.rotation = 0                # quarts de tour (affichage)
@@ -83,9 +88,15 @@ class ImageView(Gtk.Widget):
 
     # --- image ---
 
-    def set_picture(self, texture: Optional[Gdk.Texture], animation=None, keep_view: bool = False):
+    def set_picture(self, texture: Optional[Gdk.Texture], animation=None, keep_view: bool = False,
+                    vector: Optional[str] = None):
+        """vector : chemin d'un SVG — agrandi à la fenêtre comme gThumb, et redessiné net à la taille affichée
+        (vu chez Tof : une icône 48 × 48 restait minuscule, puis pixelisait au zoom)."""
         self._stop_animation()
         self.texture = texture
+        self.vector = vector
+        self._hires = None
+        self._hires_seq = getattr(self, "_hires_seq", 0) + 1
         if not keep_view:
             self.rotation = 0
             self.crop = None
@@ -98,6 +109,49 @@ class ImageView(Gtk.Widget):
         self._sync_zoom()
         self.set_cursor_from_name(self._idle_cursor())
         self.queue_draw()
+
+    HIRES_MAX = 6000                 # côté le plus long d'un rendu vectoriel (au-delà, mémoire)
+
+    def _want_hires(self):
+        """SVG : rendu à la taille affichée, 150 ms après le dernier changement de zoom, dans un fil."""
+        if not getattr(self, "vector", None) or self.texture is None:
+            return
+        if getattr(self, "_hires_timer", 0):
+            GLib.source_remove(self._hires_timer)
+        self._hires_timer = GLib.timeout_add(150, self._render_hires)
+
+    def _render_hires(self):
+        self._hires_timer = 0
+        path = self.vector
+        if not path or self.texture is None:
+            return False
+        w0, h0 = self.texture.get_width(), self.texture.get_height()
+        scale = self.zoom * (self.get_scale_factor() or 1)
+        w, h = round(w0 * scale), round(h0 * scale)
+        k = min(1.0, self.HIRES_MAX / max(w, h, 1))
+        w, h = max(1, round(w * k)), max(1, round(h * k))
+        cur = self._hires
+        if cur is not None and abs(cur.get_width() - w) <= 2:
+            return False
+        if w <= w0 and h <= h0 and cur is None:
+            return False                              # plus petit que l'original : l'original suffit
+        self._hires_seq += 1
+        seq = self._hires_seq
+
+        def work():
+            try:
+                pb = GdkPixbuf.Pixbuf.new_from_file_at_scale(path, w, h, False)
+                tex = Gdk.Texture.new_for_pixbuf(pb)
+            except GLib.Error:
+                return
+            GLib.idle_add(lambda: (self._got_hires(seq, path, tex), False)[1])
+        threading.Thread(target=work, daemon=True).start()
+        return False
+
+    def _got_hires(self, seq, path, tex):
+        if seq == self._hires_seq and path == self.vector:
+            self._hires = tex
+            self.queue_draw()
 
     def _stop_animation(self):
         if self._anim_id:
@@ -145,6 +199,8 @@ class ImageView(Gtk.Widget):
         vw, vh = self.get_width(), self.get_height()
         if not iw or not ih or vw <= 0 or vh <= 0:
             return 1.0
+        if getattr(self, "vector", None):
+            return min(vw / iw, vh / ih)              # dessin vectoriel : à la taille de la fenêtre
         return min(vw / iw, vh / ih, 1.0)            # une petite image n'est pas agrandie
 
     def _sync_zoom(self):
@@ -153,6 +209,7 @@ class ImageView(Gtk.Widget):
             self.cx = self.cy = 0.5
         self._clamp_center()
         self.emit("zoom-changed")
+        self._want_hires()
 
     def _clamp_center(self):
         iw, ih = self.image_size()
@@ -197,7 +254,14 @@ class ImageView(Gtk.Widget):
         if self.rotation:
             snapshot.rotate(90 * self.rotation)
         tw, th = (dh, dw) if self.rotation % 2 else (dw, dh)
-        snapshot.append_scaled_texture(self.texture, filt, Graphene.Rect().init(-tw / 2, -th / 2, tw, th))
+        tex = self.texture
+        hires = getattr(self, "_hires", None)
+        if hires is not None:
+            tex = hires
+            filt = Gsk.ScalingFilter.LINEAR if hires.get_width() < tw * 1.5 else Gsk.ScalingFilter.TRILINEAR
+        elif getattr(self, "vector", None):
+            filt = Gsk.ScalingFilter.LINEAR              # en attendant le rendu net : flou plutôt que pixels
+        snapshot.append_scaled_texture(tex, filt, Graphene.Rect().init(-tw / 2, -th / 2, tw, th))
         snapshot.restore()
         if clipped:
             snapshot.pop()
@@ -388,6 +452,7 @@ class ImageView(Gtk.Widget):
         self._clamp_center()
         self.set_cursor_from_name(self._idle_cursor())
         self.emit("zoom-changed")
+        self._want_hires()
         self.queue_draw()
 
     def zoom_step(self, direction: int, at=None):

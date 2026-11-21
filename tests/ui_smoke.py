@@ -311,6 +311,20 @@ def steps(app):
     win.copy_image()
     yield 100
 
+    # SVG : agrandi à la fenêtre et redessiné net au zoom (vu chez Tof : icône minuscule, puis pixelisée)
+    icons = os.path.join(TMP, "Icônes")
+    os.makedirs(icons)
+    with open(os.path.join(icons, "icone.svg"), "w") as fh:
+        fh.write('<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48"><circle cx="24" cy="24" r="20" '
+                 'fill="#e01b24"/></svg>')
+    win.open_path(os.path.join(icons, "icone.svg"))
+    yield lambda: win.picture is not None and win.picture.path.endswith("icone.svg") and win.view._hires is not None
+    check(win.view.zoom > 3 and win.view.fit, "SVG : agrandi à la fenêtre")
+    check(abs(win.view._hires.get_width() - 48 * win.view.zoom) < 4, "SVG : rendu net à la taille affichée")
+    win.view.set_zoom(win.view.zoom * 2)
+    yield lambda: abs(win.view._hires.get_width() - 48 * win.view.zoom) < 4
+    check(abs(win.view._hires.get_width() - 48 * win.view.zoom) < 4, "SVG : redessiné après un zoom")
+
     # préférences
     from argos.ui.preferences import PreferencesWindow
     pw = PreferencesWindow(win)

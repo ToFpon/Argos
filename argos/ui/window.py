@@ -689,7 +689,8 @@ class MainWindow(FileMenu, Adw.ApplicationWindow):
             self.error_page.set_visible(True)
         else:
             self.error_page.set_visible(False)
-            self.view.set_picture(pic.texture, pic.animation, keep_view)
+            self.view.set_picture(pic.texture, pic.animation, keep_view,
+                                  vector=pic.path if pic.format in ("SVG", "SVGZ") else None)
         self._sync_status()
         self._sync_info()
         self._sync_edit()

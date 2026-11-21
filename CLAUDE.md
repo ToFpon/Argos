@@ -66,6 +66,10 @@ Nom : Argos le géant aux cent yeux (et le chien d'Ulysse, le seul à le reconna
   Enregistrer sous…, Annuler les modifications), `guard(then)` = question « Enregistrer les modifications ? »
   avant de changer de photo, revenir à la grille ou fermer. Clavier en capture (`_on_key`) : ← → Espace Retour
   arrière Page↑↓ Début Fin, Échap (recadrage → plein écran → grille), Entrée applique le recadrage.
+- SVG (vu chez Tof : icône 48 × 48 minuscule puis pixelisée au zoom) : `ImageView.vector` = chemin du SVG →
+  ajusté À la fenêtre (agrandi, comme gThumb), et redessiné net à la taille affichée (`_hires` :
+  `Pixbuf.new_from_file_at_scale` dans un fil, 150 ms après le dernier changement de zoom, 6000 px au plus) ; en
+  attendant, filtre LINEAR (flou plutôt que pixels). Testé dans ui_smoke.
 - Cache des dossiers (demande de Tof : revenir sur un dossier rechargeait tout) : `_folder_cache` (30 dossiers,
   clé = chemin, avec les options de tri / cachés) → grille affichée tout de suite, relue en arrière-plan ; relecture
   identique (`_signature` : chemins, tailles, dates) → modèle gardé tel quel (défilement, vignettes).
