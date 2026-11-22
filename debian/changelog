@@ -1,8 +1,8 @@
 argos-viewer (0.1.5~noble1) noble; urgency=medium
 
   * Présentation plus proche de gThumb : grille de photos seulement (les
-    dossiers sont dans l'arbre), photos encadrées de blanc, icônes à
-    leur taille réelle ; même style pour la bande sous la photo.
+    dossiers sont dans l'arbre), photos encadrées de blanc, icônes
+    à leur taille réelle ; même style pour la bande sous la photo.
   * Arbre des dossiers : le dossier affiché reste sélectionné, et un clic
     déplie aussi ses sous-dossiers.
 
