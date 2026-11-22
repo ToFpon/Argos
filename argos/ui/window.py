@@ -143,7 +143,7 @@ class MainWindow(FileMenu, Adw.ApplicationWindow):
                                                     tooltip_text=tr("Propriétés (I)"))
         self.browser_info_button.connect("toggled", lambda b: self._set_browser_info(b.get_active()))
         bar.append(self.browser_info_button)
-        self.grid.selection.connect("notify::selected", lambda *_: self._grid_selected())
+        self.grid.selection.connect("selection-changed", lambda *_: self._grid_selected())
         self.browser_split = Adw.OverlaySplitView(sidebar=side, content=self.browser_stack,
                                                   show_sidebar=settings["sidebar"], min_sidebar_width=230,
                                                   max_sidebar_width=320, sidebar_width_fraction=0.25)
@@ -323,7 +323,7 @@ class MainWindow(FileMenu, Adw.ApplicationWindow):
                                                           self._set_option(key, a.get_state().get_boolean())))
             self.add_action(a)
         self._viewer_actions = ("back", "fullscreen", "zoom-in", "zoom-out", "zoom-fit", "zoom-100", "zoom-toggle",
-                                "rotate-right", "rotate-left", "info", "trash", "crop", "save", "save-as",
+                                "rotate-right", "rotate-left", "info", "crop", "save", "save-as",
                                 "revert")
         self._setup_file_menu()
         self._sync_actions()
@@ -579,12 +579,16 @@ class MainWindow(FileMenu, Adw.ApplicationWindow):
             settings["info_ratio"] = round(self.side_paned.get_position() / h, 3)
 
     def _grid_selected(self):
-        item = self.grid.selection.get_selected_item()
-        entry = item.entry if item is not None else None
+        chosen = self.grid.selected_entries()
+        entry = chosen[0] if len(chosen) == 1 else None
         n = len(self.images)
         total = sum(e.size for e in self.images)
         parts = [ntr("{0} photo ({1})", "{0} photos ({1})", n).format(n, fold.human_size(total))]
-        if entry is not None:
+        if len(chosen) > 1:
+            parts.append(ntr("{0} sélectionnée ({1})", "{0} sélectionnées ({1})", len(chosen)).format(
+                len(chosen), fold.human_size(sum(e.size for e in chosen))))
+            entry = chosen[-1]
+        elif entry is not None:
             parts.append(tr("« {0} » sélectionné").format(shown(entry.name)) if entry.is_dir else
                          tr("« {0} » sélectionnée ({1})").format(shown(entry.name), fold.human_size(entry.size)))
         self.browser_status.set_label("  ·  ".join(parts))
@@ -949,8 +953,8 @@ class MainWindow(FileMenu, Adw.ApplicationWindow):
         GLib.idle_add(lambda: (self.view.set_fit() if self.view.fit else None, False)[1])
 
     def trash(self):
-        if 0 <= self.index < len(self.images):
-            self.trash_path(self.images[self.index].path)
+        """Suppr : la photo affichée, ou les photos sélectionnées dans la grille."""
+        self.trash_paths(self._targets())
 
     # ------------------------------------------------------------------ clavier, fermeture
 

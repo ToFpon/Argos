@@ -81,6 +81,11 @@ Nom : Argos le géant aux cent yeux (et le chien d'Ulysse, le seul à le reconna
   sans cadre. Arbre : PAS `single_click_activate` (il sélectionnait la ligne sous le pointeur : la sélection
   suivait la souris) — choisir une ligne (`notify::selected-item`) ouvre le dossier, `reveal` sélectionne sans
   rouvrir (`_select` en silence, `_current`) ; un clic déplie aussi la branche (demande de Tof, comme gThumb).
+- Sélection MULTIPLE dans la grille (demande de Tof) : Gtk.MultiSelection + cadre à la souris (Ctrl / Maj + clic,
+  Ctrl+A fournis par GTK) ; `Grid.selected_entries()` (Gtk.BitsetIter : (ok, iter, pos) puis iter.next() → (ok, pos)).
+  `FileMenu._targets()` : la sélection de la grille (clic droit hors sélection = elle seule), la photo affichée dans
+  la visionneuse ; plusieurs → menu réduit (`_multi_menu` : copier / déplacer vers, corbeille, supprimer) ; Suppr /
+  Maj+Suppr marchent dans la grille ; `_removed_many` tient tout à jour ; barre d'état « N sélectionnées (X Mo) ».
 - SVG (vu chez Tof : icône 48 × 48 minuscule puis pixelisée au zoom) : `ImageView.vector` = chemin du SVG →
   ajusté À la fenêtre (agrandi, comme gThumb), et redessiné net à la taille affichée (`_hires` :
   `Pixbuf.new_from_file_at_scale` dans un fil, 150 ms après le dernier changement de zoom, 6000 px au plus) ; en

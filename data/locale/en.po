@@ -112,6 +112,9 @@ msgstr "Name"
 msgid "Nom impossible"
 msgstr "Invalid name"
 
+msgid "Impossible de mettre à la corbeille"
+msgstr "Cannot move to trash"
+
 msgid "Impossible de définir l'arrière-plan"
 msgstr "Cannot set the background"
 
@@ -139,11 +142,22 @@ msgstr "Cannot copy"
 msgid "Supprimer définitivement « {0} » ?"
 msgstr "Permanently delete “{0}”?"
 
+msgid "Supprimer définitivement l'élément sélectionné ?"
+msgid_plural "Supprimer définitivement les {0} éléments sélectionnés ?"
+msgstr[0] "Permanently delete the selected item?"
+msgstr[1] "Permanently delete the {0} selected items?"
+
+msgid "Suppression impossible"
+msgstr "Cannot delete"
+
 msgid "Supprimer"
 msgstr "Delete"
 
-msgid "Impossible de mettre à la corbeille"
-msgstr "Cannot move to trash"
+msgid "« {0} » existe déjà"
+msgstr "“{0}” already exists"
+
+msgid "Renommage impossible"
+msgstr "Cannot rename"
 
 msgid "« {0} » mis à la corbeille"
 msgstr "“{0}” moved to trash"
@@ -154,17 +168,28 @@ msgstr "“{0}” moved to {1}"
 msgid "« {0} » copiée dans {1}"
 msgstr "“{0}” copied to {1}"
 
-msgid "« {0} » existe déjà"
-msgstr "“{0}” already exists"
+msgid "{0} photo déplacée dans {1}"
+msgid_plural "{0} photos déplacées dans {1}"
+msgstr[0] "{0} photo moved to {1}"
+msgstr[1] "{0} photos moved to {1}"
 
-msgid "Renommage impossible"
-msgstr "Cannot rename"
-
-msgid "Suppression impossible"
-msgstr "Cannot delete"
+msgid "{0} photo copiée dans {1}"
+msgid_plural "{0} photos copiées dans {1}"
+msgstr[0] "{0} photo copied to {1}"
+msgstr[1] "{0} photos copied to {1}"
 
 msgid "« {0} » supprimée"
 msgstr "“{0}” deleted"
+
+msgid "{0} photo mise à la corbeille"
+msgid_plural "{0} photos mises à la corbeille"
+msgstr[0] "{0} photo moved to trash"
+msgstr[1] "{0} photos moved to trash"
+
+msgid "{0} photo supprimée"
+msgid_plural "{0} photos supprimées"
+msgstr[0] "{0} photo deleted"
+msgstr[1] "{0} photos deleted"
 
 msgid "Fichier"
 msgstr "File"
@@ -468,6 +493,11 @@ msgstr "Previous photo"
 msgid "Photo suivante"
 msgstr "Next photo"
 
+msgid "{0} sélectionnée ({1})"
+msgid_plural "{0} sélectionnées ({1})"
+msgstr[0] "{0} selected ({1})"
+msgstr[1] "{0} selected ({1})"
+
 msgid "« {0} » enregistrée"
 msgstr "“{0}” saved"
 
@@ -479,12 +509,6 @@ msgid_plural "{0} sur {1} photos"
 msgstr[0] "{0} of {1} photo"
 msgstr[1] "{0} of {1} photos"
 
-msgid "« {0} » sélectionné"
-msgstr "“{0}” selected"
-
-msgid "« {0} » sélectionnée ({1})"
-msgstr "“{0}” selected ({1})"
-
 msgid "Impossible d'annuler"
 msgstr "Cannot undo"
 
@@ -493,6 +517,12 @@ msgstr "edited"
 
 msgid "Terminez le nom par l'extension du format voulu : {0}"
 msgstr "End the name with the extension of the wanted format: {0}"
+
+msgid "« {0} » sélectionné"
+msgstr "“{0}” selected"
+
+msgid "« {0} » sélectionnée ({1})"
+msgstr "“{0}” selected ({1})"
 
 msgid "Enregistrement impossible"
 msgstr "Cannot save"

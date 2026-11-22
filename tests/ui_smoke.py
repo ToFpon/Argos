@@ -338,6 +338,25 @@ def steps(app):
     check(win.grid.view.get_max_columns() == columns_for(win.grid.get_width(), win.grid._cell),
           f"grille : {win.grid.view.get_max_columns()} colonnes d'après la largeur")
 
+    # sélection multiple dans la grille (demande de Tof) : barre d'état, menu réduit, corbeille pour toutes
+    win.show_browser()
+    yield lambda: win.grid.selection.get_model() is not None
+    two = [win.images[0].path, win.images[1].path]
+    win.grid.selection.select_range(0, 2, True)
+    yield 50
+    check(len(win.grid.selected_entries()) == 2 and "2 " in win.browser_status.get_label(),
+          "sélection multiple : 2 photos, barre d'état")
+    labels = []
+    menu = win.file_menu(two[0])
+    for i in range(menu.get_n_items()):
+        sec = menu.get_item_link(i, "section")
+        labels += [sec.get_item_attribute_value(j, "label").get_string() for j in range(sec.get_n_items())]
+    check(tr("Renommer…") not in labels and tr("Mettre à la corbeille") in labels, "menu de plusieurs photos")
+    n = len(win.images)
+    win.trash()
+    yield 100
+    check(len(win.images) == n - 2 and not any(os.path.exists(p) for p in two), "Suppr : les deux à la corbeille")
+
     # SVG : agrandi à la fenêtre et redessiné net au zoom (vu chez Tof : icône minuscule, puis pixelisée)
     icons = os.path.join(TMP, "Icônes")
     os.makedirs(icons)

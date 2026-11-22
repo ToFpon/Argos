@@ -18,7 +18,7 @@ from gi.repository import Adw, Gdk, GdkPixbuf, Gio, GLib, Gtk  # noqa: E402
 
 from ..backend import edit  # noqa: E402
 from ..backend import folder as fold  # noqa: E402
-from ..i18n import tr  # noqa: E402
+from ..i18n import ntr, tr  # noqa: E402
 from .common import AlertDialog, alert, popup_menu, shown, toast  # noqa: E402
 from .thumbs import forget_everywhere  # noqa: E402
 
@@ -55,7 +55,7 @@ class FileMenu:
         add("move-to", lambda: self.transfer(True))
         add("rename", self.rename, accels=["F2"])
         add("delete", self.delete_for_good, accels=["<Shift>Delete"])
-        add("ctx-trash", lambda: self.trash_path(self._target()))
+        add("ctx-trash", lambda: self.trash_paths(self._targets()))
 
     # --- cible ---
 
@@ -65,12 +65,23 @@ class FileMenu:
             return self._ctx
         if self.stack.get_visible_child_name() == "viewer" and 0 <= self.index < len(self.images):
             return self.images[self.index].path
-        item = self.grid.selection.get_selected_item()
-        if item is not None and not item.entry.is_dir:
-            return item.entry.path
-        return None
+        chosen = [e for e in self.grid.selected_entries() if not e.is_dir]
+        return chosen[-1].path if chosen else None
+
+    def _targets(self) -> list:
+        """Photos visées par une action qui en accepte plusieurs : dans la grille, la sélection (le clic droit
+        sélectionne la vignette s'il tombe hors de la sélection) ; dans la visionneuse, la photo affichée."""
+        if self.stack.get_visible_child_name() == "viewer":
+            t = self._target()
+            return [t] if t else []
+        chosen = [e.path for e in self.grid.selected_entries() if not e.is_dir]
+        if self._ctx and self._ctx not in chosen:
+            return [self._ctx]
+        return chosen
 
     def file_menu(self, path: str) -> Gio.Menu:
+        if len(self._targets()) > 1:
+            return self._multi_menu()
         menu = Gio.Menu()
         s1 = Gio.Menu()
         s1.append(tr("Plein écran"), "win.ctx-fullscreen")
@@ -104,6 +115,19 @@ class FileMenu:
         s5.append(tr("Mettre à la corbeille"), "win.ctx-trash")
         s5.append(tr("Supprimer…"), "win.delete")
         menu.append_section(None, s5)
+        return menu
+
+    def _multi_menu(self) -> Gio.Menu:
+        """Plusieurs photos : seulement ce qui a un sens pour toutes."""
+        menu = Gio.Menu()
+        s1 = Gio.Menu()
+        s1.append(tr("Copier vers…"), "win.copy-to")
+        s1.append(tr("Déplacer vers…"), "win.move-to")
+        menu.append_section(None, s1)
+        s2 = Gio.Menu()
+        s2.append(tr("Mettre à la corbeille"), "win.ctx-trash")
+        s2.append(tr("Supprimer…"), "win.delete")
+        menu.append_section(None, s2)
         return menu
 
     def show_file_menu(self, widget: Gtk.Widget, path: str, x: float, y: float):
@@ -245,11 +269,12 @@ class FileMenu:
         toast(self, tr("Image copiée"))
 
     def transfer(self, move: bool):
-        path = self._target()
-        if path is None:
+        paths = self._targets()
+        if not paths:
             return
+        here = os.path.dirname(os.path.abspath(paths[0]))
         d = Gtk.FileDialog(title=tr("Déplacer vers") if move else tr("Copier vers"), modal=True,
-                           initial_folder=Gio.File.new_for_path(os.path.dirname(path)))
+                           initial_folder=Gio.File.new_for_path(here))
 
         def done(dlg, res):
             try:
@@ -257,36 +282,41 @@ class FileMenu:
             except GLib.Error:
                 return
             dest_dir = f.get_path() if f is not None else None
-            if not dest_dir or os.path.abspath(dest_dir) == os.path.dirname(os.path.abspath(path)):
+            if not dest_dir or os.path.abspath(dest_dir) == here:
                 return
-            dest = edit.free_name(os.path.join(dest_dir, os.path.basename(path)))      # jamais d'écrasement
 
             def work():
-                err = ""
-                try:
-                    src, dst = Gio.File.new_for_path(path), Gio.File.new_for_path(dest)
-                    flags = Gio.FileCopyFlags.NOFOLLOW_SYMLINKS | Gio.FileCopyFlags.ALL_METADATA
-                    if move:
-                        src.move(dst, flags, None, None, None)
-                    else:
-                        src.copy(dst, flags, None, None, None)
-                except GLib.Error as e:
-                    err = e.message
-                GLib.idle_add(lambda: (self._transferred(path, dest, move, err), False)[1])
+                ok, errors = [], []
+                for path in paths:
+                    dest = edit.free_name(os.path.join(dest_dir, os.path.basename(path)))   # jamais d'écrasement
+                    try:
+                        src, dst = Gio.File.new_for_path(path), Gio.File.new_for_path(dest)
+                        flags = Gio.FileCopyFlags.NOFOLLOW_SYMLINKS | Gio.FileCopyFlags.ALL_METADATA
+                        if move:
+                            src.move(dst, flags, None, None, None)
+                        else:
+                            src.copy(dst, flags, None, None, None)
+                        ok.append((path, dest))
+                    except GLib.Error as e:
+                        errors.append(f"{os.path.basename(path)} : {e.message}")
+                GLib.idle_add(lambda: (self._transferred(ok, errors, move, dest_dir), False)[1])
             threading.Thread(target=work, daemon=True).start()
         d.select_folder(self, None, done)
 
-    def _transferred(self, path, dest, move, err):
-        if err:
-            alert(self, tr("Déplacement impossible") if move else tr("Copie impossible"), shown(err))
+    def _transferred(self, ok, errors, move, dest_dir):
+        if move and ok:
+            self._removed_many([p for p, _d in ok])
+        if errors:
+            alert(self, tr("Déplacement impossible") if move else tr("Copie impossible"), shown("\n".join(errors)))
+        if not ok:
             return
-        where = shown(os.path.dirname(dest))
-        name = shown(os.path.basename(dest))
-        if move:
-            self._removed(path)
-            toast(self, tr("« {0} » déplacée dans {1}").format(name, where))
+        where = shown(dest_dir)
+        if len(ok) == 1:
+            name = shown(os.path.basename(ok[0][1]))
+            toast(self, (tr("« {0} » déplacée dans {1}") if move else tr("« {0} » copiée dans {1}")).format(name, where))
         else:
-            toast(self, tr("« {0} » copiée dans {1}").format(name, where))
+            toast(self, (ntr("{0} photo déplacée dans {1}", "{0} photos déplacées dans {1}", len(ok)) if move else
+                         ntr("{0} photo copiée dans {1}", "{0} photos copiées dans {1}", len(ok))).format(len(ok), where))
 
     def rename(self):
         path = self._target()
@@ -371,58 +401,89 @@ class FileMenu:
         self._rescan(quiet=True)
 
     def delete_for_good(self):
-        path = self._target()
-        if path is None:
+        paths = self._targets()
+        if not paths:
             return
-        name = shown(os.path.basename(path))
+        if len(paths) == 1:
+            heading = tr("Supprimer définitivement « {0} » ?").format(shown(os.path.basename(paths[0])))
+        else:
+            heading = ntr("Supprimer définitivement l'élément sélectionné ?",
+                          "Supprimer définitivement les {0} éléments sélectionnés ?", len(paths)).format(len(paths))
 
         def answer(r):
             if r != "delete":
                 return
-            try:
-                os.remove(path)
-            except OSError as e:
-                alert(self, tr("Suppression impossible"), shown(e.strerror or str(e)))
-                return
-            self._removed(path)
-            toast(self, tr("« {0} » supprimée").format(name))
-        alert(self, tr("Supprimer définitivement « {0} » ?").format(name),
-              tr("Si vous supprimez un élément, il sera définitivement perdu."),
+            gone, errors = [], []
+            for p in paths:
+                try:
+                    os.remove(p)
+                    gone.append(p)
+                except OSError as e:
+                    errors.append(f"{os.path.basename(p)} : {e.strerror or e}")
+            self._removed_many(gone)
+            if errors:
+                alert(self, tr("Suppression impossible"), shown("\n".join(errors)))
+            if len(gone) == 1:
+                toast(self, tr("« {0} » supprimée").format(shown(os.path.basename(gone[0]))))
+            elif gone:
+                toast(self, ntr("{0} photo supprimée", "{0} photos supprimées", len(gone)).format(len(gone)))
+        alert(self, heading, tr("Si vous supprimez un élément, il sera définitivement perdu."),
               (("cancel", tr("Annuler")), ("delete", tr("Supprimer"))), default="cancel", destructive="delete",
               callback=answer)
 
     def trash_path(self, path):
-        if path is None:
+        if path is not None:
+            self.trash_paths([path])
+
+    def trash_paths(self, paths):
+        if not paths:
             return
-        try:
-            Gio.File.new_for_path(path).trash(None)
-        except GLib.Error as e:
-            alert(self, tr("Impossible de mettre à la corbeille"), shown(e.message))
-            return
-        self._removed(path)
-        toast(self, tr("« {0} » mis à la corbeille").format(shown(os.path.basename(path))))
+        gone, errors = [], []
+        for p in paths:
+            try:
+                Gio.File.new_for_path(p).trash(None)
+                gone.append(p)
+            except GLib.Error as e:
+                errors.append(f"{os.path.basename(p)} : {e.message}")
+        self._removed_many(gone)
+        if errors:
+            alert(self, tr("Impossible de mettre à la corbeille"), shown("\n".join(errors)))
+        if len(gone) == 1:
+            toast(self, tr("« {0} » mis à la corbeille").format(shown(os.path.basename(gone[0]))))
+        elif gone:
+            toast(self, ntr("{0} photo mise à la corbeille", "{0} photos mises à la corbeille", len(gone))
+                  .format(len(gone)))
 
     def _removed(self, path):
-        """Photo partie (corbeille, supprimée, déplacée) : retirée des listes ; dans la visionneuse, la voisine."""
-        self.loader.forget(path)
-        forget_everywhere(path)
-        i = self._index_of(path)
-        if i < 0:
+        self._removed_many([path])
+
+    def _removed_many(self, paths):
+        """Photos parties (corbeille, supprimées, déplacées) : retirées des listes ; dans la visionneuse, la voisine."""
+        if not paths:
             return
-        current = i == self.index
-        del self.images[i]
-        if i < self.index:
-            self.index -= 1
+        gone = set(paths)
+        for p in gone:
+            self.loader.forget(p)
+            forget_everywhere(p)
+        cur = self.images[self.index].path if 0 <= self.index < len(self.images) else None
+        first = min((i for i, e in enumerate(self.images) if e.path in gone), default=-1)
+        if first < 0:
+            return
+        self.images = [e for e in self.images if e.path not in gone]
         self._folder_cache.pop(self.folder, None)
         self.filmstrip.set_model(store_of_images(self.images))
         self.grid.set_model(store_of_images(self.images))
-        if self.stack.get_visible_child_name() == "viewer" and current:
+        if cur is not None and cur not in gone:
+            self.index = self._index_of(cur)
+            self.filmstrip.show_index(self.index)
+        elif self.stack.get_visible_child_name() == "viewer":
             if not self.images:
                 self.show_browser()
             else:
-                self.show_index(min(i, len(self.images) - 1))
-        elif 0 <= self.index < len(self.images):
-            self.filmstrip.show_index(self.index)
+                self.show_index(min(first, len(self.images) - 1))
+        else:
+            self.index = min(first, len(self.images) - 1)
+        self._grid_selected()
 
 
 def store_of_images(entries):

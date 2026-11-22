@@ -112,6 +112,9 @@ msgstr "Name"
 msgid "Nom impossible"
 msgstr "Ungültiger Name"
 
+msgid "Impossible de mettre à la corbeille"
+msgstr "Verschieben in den Papierkorb nicht möglich"
+
 msgid "Impossible de définir l'arrière-plan"
 msgstr "Hintergrund kann nicht festgelegt werden"
 
@@ -139,11 +142,22 @@ msgstr "Kopieren nicht möglich"
 msgid "Supprimer définitivement « {0} » ?"
 msgstr "„{0}“ dauerhaft löschen?"
 
+msgid "Supprimer définitivement l'élément sélectionné ?"
+msgid_plural "Supprimer définitivement les {0} éléments sélectionnés ?"
+msgstr[0] "Das ausgewählte Objekt dauerhaft löschen?"
+msgstr[1] "Die {0} ausgewählten Objekte dauerhaft löschen?"
+
+msgid "Suppression impossible"
+msgstr "Löschen nicht möglich"
+
 msgid "Supprimer"
 msgstr "Löschen"
 
-msgid "Impossible de mettre à la corbeille"
-msgstr "Verschieben in den Papierkorb nicht möglich"
+msgid "« {0} » existe déjà"
+msgstr "„{0}“ existiert bereits"
+
+msgid "Renommage impossible"
+msgstr "Umbenennen nicht möglich"
 
 msgid "« {0} » mis à la corbeille"
 msgstr "„{0}“ in den Papierkorb verschoben"
@@ -154,17 +168,28 @@ msgstr "„{0}“ nach {1} verschoben"
 msgid "« {0} » copiée dans {1}"
 msgstr "„{0}“ nach {1} kopiert"
 
-msgid "« {0} » existe déjà"
-msgstr "„{0}“ existiert bereits"
+msgid "{0} photo déplacée dans {1}"
+msgid_plural "{0} photos déplacées dans {1}"
+msgstr[0] "{0} Foto nach {1} verschoben"
+msgstr[1] "{0} Fotos nach {1} verschoben"
 
-msgid "Renommage impossible"
-msgstr "Umbenennen nicht möglich"
-
-msgid "Suppression impossible"
-msgstr "Löschen nicht möglich"
+msgid "{0} photo copiée dans {1}"
+msgid_plural "{0} photos copiées dans {1}"
+msgstr[0] "{0} Foto nach {1} kopiert"
+msgstr[1] "{0} Fotos nach {1} kopiert"
 
 msgid "« {0} » supprimée"
 msgstr "„{0}“ gelöscht"
+
+msgid "{0} photo mise à la corbeille"
+msgid_plural "{0} photos mises à la corbeille"
+msgstr[0] "{0} Foto in den Papierkorb verschoben"
+msgstr[1] "{0} Fotos in den Papierkorb verschoben"
+
+msgid "{0} photo supprimée"
+msgid_plural "{0} photos supprimées"
+msgstr[0] "{0} Foto gelöscht"
+msgstr[1] "{0} Fotos gelöscht"
 
 msgid "Fichier"
 msgstr "Datei"
@@ -468,6 +493,11 @@ msgstr "Vorheriges Foto"
 msgid "Photo suivante"
 msgstr "Nächstes Foto"
 
+msgid "{0} sélectionnée ({1})"
+msgid_plural "{0} sélectionnées ({1})"
+msgstr[0] "{0} ausgewählt ({1})"
+msgstr[1] "{0} ausgewählt ({1})"
+
 msgid "« {0} » enregistrée"
 msgstr "„{0}“ gespeichert"
 
@@ -479,12 +509,6 @@ msgid_plural "{0} sur {1} photos"
 msgstr[0] "{0} von {1} Foto"
 msgstr[1] "{0} von {1} Fotos"
 
-msgid "« {0} » sélectionné"
-msgstr "„{0}“ ausgewählt"
-
-msgid "« {0} » sélectionnée ({1})"
-msgstr "„{0}“ ausgewählt ({1})"
-
 msgid "Impossible d'annuler"
 msgstr "Rückgängig machen nicht möglich"
 
@@ -493,6 +517,12 @@ msgstr "bearbeitet"
 
 msgid "Terminez le nom par l'extension du format voulu : {0}"
 msgstr "Beenden Sie den Namen mit der Endung des gewünschten Formats: {0}"
+
+msgid "« {0} » sélectionné"
+msgstr "„{0}“ ausgewählt"
+
+msgid "« {0} » sélectionnée ({1})"
+msgstr "„{0}“ ausgewählt ({1})"
 
 msgid "Enregistrement impossible"
 msgstr "Speichern nicht möglich"

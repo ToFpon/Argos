@@ -198,9 +198,10 @@ class Grid(_SizedGrid, Gtk.ScrolledWindow):
     def __init__(self, size: int = 128):
         super().__init__(hexpand=True, vexpand=True, hscrollbar_policy=Gtk.PolicyType.NEVER)
         self._init_sizing(size + 16 + 6)                # case + padding (base.css) + espacement
-        self.selection = Gtk.SingleSelection(autoselect=False, can_unselect=True)
+        # sélection MULTIPLE (demande de Tof) : Ctrl / Maj + clic, cadre à la souris, Ctrl+A (fournis par GTK)
+        self.selection = Gtk.MultiSelection()
         self.view = Gtk.GridView(model=self.selection, factory=_factory(size, True), max_columns=4,
-                                 single_click_activate=False, enable_rubberband=False)
+                                 single_click_activate=False, enable_rubberband=True)
         self.view.add_css_class("argos-grid")
         self.view.connect("activate", self._on_activate)
         self.set_child(self.view)
@@ -222,7 +223,8 @@ class Grid(_SizedGrid, Gtk.ScrolledWindow):
         for i in range(model.get_n_items()):
             entry = model.get_item(i).entry
             if entry.path == w.path:
-                self.selection.set_selected(i)
+                if not self.selection.is_selected(i):        # hors de la sélection : elle devient la seule
+                    self.selection.select_item(i, True)
                 if not entry.is_dir:
                     self.emit("context-menu", entry, x, y)
                 return
@@ -238,9 +240,23 @@ class Grid(_SizedGrid, Gtk.ScrolledWindow):
             return
         for i in range(model.get_n_items()):
             if model.get_item(i).entry.path == path:
-                self.selection.set_selected(i)
+                self.selection.select_item(i, True)
                 self.view.scroll_to(i, Gtk.ListScrollFlags.FOCUS | Gtk.ListScrollFlags.SELECT, None)
                 return
+
+    def selected_entries(self) -> list:
+        model = self.selection.get_model()
+        if model is None:
+            return []
+        bits = self.selection.get_selection()
+        out = []
+        ok, it, pos = Gtk.BitsetIter.init_first(bits) if bits.get_size() else (False, None, 0)
+        while ok:
+            item = model.get_item(pos)
+            if item is not None:
+                out.append(item.entry)
+            ok, pos = it.next()
+        return out
 
 
 class Filmstrip(_SizedGrid, Gtk.ScrolledWindow):
