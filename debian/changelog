@@ -1,3 +1,11 @@
+argos-viewer (0.1.6~noble1) noble; urgency=medium
+
+  * Sélection de plusieurs photos dans la grille (Ctrl ou Maj + clic,
+    cadre à la souris, Ctrl+A) : corbeille, suppression, copie et
+    déplacement de toutes les photos sélectionnées.
+
+ -- Tof <nourpon@gmail.com>  Sun, 22 Nov 2026 09:47:23 +0000
+
 argos-viewer (0.1.5~noble1) noble; urgency=medium
 
   * Présentation plus proche de gThumb : grille de photos seulement (les

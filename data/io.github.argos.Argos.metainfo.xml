@@ -69,6 +69,13 @@
   </requires>
   <content_rating type="oars-1.1"/>
   <releases>
+    <release version="0.1.6" date="2026-11-22">
+      <description>
+        <ul>
+          <li>Several photos can be selected in the grid (Ctrl / Shift + click, rubber band, Ctrl+A) and moved to the trash, deleted, copied or moved together</li>
+        </ul>
+      </description>
+    </release>
     <release version="0.1.5" date="2026-11-22">
       <description>
         <ul>
