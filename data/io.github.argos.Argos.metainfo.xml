@@ -69,6 +69,14 @@
   </requires>
   <content_rating type="oars-1.1"/>
   <releases>
+    <release version="0.1.5" date="2026-11-22">
+      <description>
+        <ul>
+          <li>Closer to gThumb: the grid shows photos only (folders are in the tree), photos in a white frame, icons at their real size</li>
+          <li>Folder tree: the folder shown stays selected, and a click also unfolds its subfolders</li>
+        </ul>
+      </description>
+    </release>
     <release version="0.1.4" date="2026-11-21">
       <description>
         <ul>
