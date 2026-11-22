@@ -1,3 +1,11 @@
+argos-viewer (0.1.7~noble1) noble; urgency=medium
+
+  * Convertir / redimensionner (Ctrl+E) : redimensionner, pivoter et
+    convertir une ou plusieurs photos en une fois, avec les outils image
+    du gestionnaire de fichiers Odysseus.
+
+ -- Tof <nourpon@gmail.com>  Sun, 22 Nov 2026 10:04:22 +0000
+
 argos-viewer (0.1.6~noble1) noble; urgency=medium
 
   * Sélection de plusieurs photos dans la grille (Ctrl ou Maj + clic,
