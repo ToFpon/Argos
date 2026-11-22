@@ -94,6 +94,7 @@ def steps(app):
     win.tree.selection.set_selected(pos)
     yield lambda: win.folder == sub
     check(win.tree.selection.get_selected_item().get_item().path == sub, "arbre : dossier choisi ouvert et sélectionné")
+    check(win.tree.selection.get_selected_item().get_expanded(), "arbre : dossier choisi déplié")
     win.open_folder(PHOTOS)
     yield lambda: win.browser_stack.get_visible_child_name() == "grid"
     yield tree_selected

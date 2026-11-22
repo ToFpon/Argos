@@ -169,6 +169,7 @@ class FolderTree(Gtk.ScrolledWindow):
         path = row.get_item().path
         if path != self._current:              # une ligne insérée au-dessus déplace la position, pas le dossier
             self._current = path
+            row.set_expanded(True)             # comme gThumb : un clic ouvre le dossier ET montre ses sous-dossiers
             self.emit("picked", path)
 
     def _select(self, pos):

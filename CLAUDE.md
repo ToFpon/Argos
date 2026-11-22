@@ -80,7 +80,7 @@ Nom : Argos le géant aux cent yeux (et le chien d'Ulysse, le seul à le reconna
   dans un cadre blanc + ombre (`picture.argos-photo`, exception voulue aux couleurs du thème : le « tirage »), icône
   sans cadre. Arbre : PAS `single_click_activate` (il sélectionnait la ligne sous le pointeur : la sélection
   suivait la souris) — choisir une ligne (`notify::selected-item`) ouvre le dossier, `reveal` sélectionne sans
-  rouvrir (`_select` en silence, `_current`).
+  rouvrir (`_select` en silence, `_current`) ; un clic déplie aussi la branche (demande de Tof, comme gThumb).
 - SVG (vu chez Tof : icône 48 × 48 minuscule puis pixelisée au zoom) : `ImageView.vector` = chemin du SVG →
   ajusté À la fenêtre (agrandi, comme gThumb), et redessiné net à la taille affichée (`_hires` :
   `Pixbuf.new_from_file_at_scale` dans un fil, 150 ms après le dernier changement de zoom, 6000 px au plus) ; en
