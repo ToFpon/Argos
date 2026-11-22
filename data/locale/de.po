@@ -376,11 +376,8 @@ msgstr "Übergeordneter Ordner (Alt+↑)"
 msgid "Barre latérale (F9)"
 msgstr "Seitenleiste (F9)"
 
-msgid "Aucune photo"
-msgstr "Keine Fotos"
-
-msgid "Ce dossier ne contient ni photo ni sous-dossier"
-msgstr "Dieser Ordner enthält weder Fotos noch Unterordner"
+msgid "Aucune image"
+msgstr "Keine Bilder"
 
 msgid "Propriétés (I)"
 msgstr "Eigenschaften (I)"

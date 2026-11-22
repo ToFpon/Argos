@@ -79,9 +79,12 @@ class FolderTree(Gtk.ScrolledWindow):
         f = Gtk.SignalListItemFactory()
         f.connect("setup", self._setup)
         f.connect("bind", self._bind)
-        self.view = Gtk.ListView(model=self.selection, factory=f, single_click_activate=True)
+        # PAS single_click_activate : avec lui, GTK sélectionne la ligne SOUS LE POINTEUR (vu chez Tof : la sélection
+        # suivait la souris, le dossier affiché n'était plus repérable). Un clic sélectionne, et choisir = ouvrir.
+        self.view = Gtk.ListView(model=self.selection, factory=f)
         self.view.add_css_class("navigation-sidebar")
-        self.view.connect("activate", self._on_activate)
+        self.selection.connect("notify::selected-item", self._on_selected)
+        self._current = ""
         self.set_child(self.view)
         self._target = ""
         self._reloaded = set()
@@ -159,19 +162,28 @@ class FolderTree(Gtk.ScrolledWindow):
         box._label.set_label(shown(node.label))
         exp.set_tooltip_text(shown(node.path))
 
-    def _on_activate(self, _view, pos):
-        row = self.tree.get_item(pos)
-        if row is None:
+    def _on_selected(self, *_):
+        row = self.selection.get_selected_item()
+        if row is None or self._quiet:
             return
-        node = row.get_item()
-        if not self._quiet:
-            self.emit("picked", node.path)
+        path = row.get_item().path
+        if path != self._current:              # une ligne insérée au-dessus déplace la position, pas le dossier
+            self._current = path
+            self.emit("picked", path)
+
+    def _select(self, pos):
+        self._quiet = True
+        try:
+            self.selection.set_selected(pos)
+        finally:
+            self._quiet = False
 
     # --- dossier affiché ---
 
     def reveal(self, path: str):
         """Déplie jusqu'à `path` et le sélectionne (la racine la plus précise qui le contient)."""
         self._target = os.path.normpath(path)
+        self._current = self._target
         self._reloaded = set()
         self._advance()
 
@@ -182,7 +194,7 @@ class FolderTree(Gtk.ScrolledWindow):
             row = self.tree.get_item(i)
             p = row.get_item().path
             if p == target:
-                self.selection.set_selected(i)
+                self._select(i)
                 self.view.scroll_to(i, Gtk.ListScrollFlags.NONE, None)
                 self._target = ""
                 return
@@ -190,7 +202,7 @@ class FolderTree(Gtk.ScrolledWindow):
             if inside and len(p) > best_len:
                 best, best_len = row, len(p)
         if best is None:
-            self.selection.set_selected(Gtk.INVALID_LIST_POSITION)
+            self._select(Gtk.INVALID_LIST_POSITION)
             self._target = ""
             return
         node = best.get_item()
@@ -205,5 +217,5 @@ class FolderTree(Gtk.ScrolledWindow):
             self._reloaded.add(node.path)
             self._load(node)
             return
-        self.selection.set_selected(Gtk.INVALID_LIST_POSITION)
+        self._select(Gtk.INVALID_LIST_POSITION)
         self._target = ""

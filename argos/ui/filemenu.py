@@ -20,7 +20,7 @@ from ..backend import edit  # noqa: E402
 from ..backend import folder as fold  # noqa: E402
 from ..i18n import tr  # noqa: E402
 from .common import AlertDialog, alert, popup_menu, shown, toast  # noqa: E402
-from .thumbs import shared as shared_thumbs  # noqa: E402
+from .thumbs import forget_everywhere  # noqa: E402
 
 BACKGROUND_SCHEMA = "org.gnome.desktop.background"
 
@@ -359,7 +359,7 @@ class FileMenu:
 
     def _renamed(self, path, target):
         self.loader.forget(path)
-        shared_thumbs().forget(path)
+        forget_everywhere(path)
         for i, e in enumerate(self.images):
             if e.path == path:
                 self.images[i] = fold.Entry(target, os.path.basename(target), False, e.size, e.mtime,
@@ -405,7 +405,7 @@ class FileMenu:
     def _removed(self, path):
         """Photo partie (corbeille, supprimée, déplacée) : retirée des listes ; dans la visionneuse, la voisine."""
         self.loader.forget(path)
-        shared_thumbs().forget(path)
+        forget_everywhere(path)
         i = self._index_of(path)
         if i < 0:
             return
@@ -415,7 +415,7 @@ class FileMenu:
             self.index -= 1
         self._folder_cache.pop(self.folder, None)
         self.filmstrip.set_model(store_of_images(self.images))
-        self.grid.set_model(store_of_images(self.dirs + self.images))
+        self.grid.set_model(store_of_images(self.images))
         if self.stack.get_visible_child_name() == "viewer" and current:
             if not self.images:
                 self.show_browser()

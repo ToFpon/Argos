@@ -25,7 +25,7 @@ from .common import alert, shown, toast  # noqa: E402
 from .gallery import Filmstrip, Grid, store_of  # noqa: E402
 from .filemenu import FileMenu  # noqa: E402
 from .info import InfoPanel  # noqa: E402
-from .thumbs import shared as shared_thumbs  # noqa: E402
+from .thumbs import forget_everywhere  # noqa: E402
 from .viewer import ImageView  # noqa: E402
 
 
@@ -107,8 +107,7 @@ class MainWindow(FileMenu, Adw.ApplicationWindow):
         self.grid = Grid(settings["grid_size"])
         self.grid.connect("open", lambda _g, e: self.open_entry(e))
         self.grid.connect("context-menu", self._grid_menu)
-        self.empty = Adw.StatusPage(icon_name="image-x-generic-symbolic", title=tr("Aucune photo"),
-                                    description=tr("Ce dossier ne contient ni photo ni sous-dossier"))
+        self.empty = Adw.StatusPage(icon_name="image-x-generic-symbolic", title=tr("Aucune image"))
         self.browser_stack = Gtk.Stack()
         self.grid_overlay = Gtk.Overlay(child=self.grid)      # porte le menu du clic droit (voir show_file_menu)
         self.browser_stack.add_named(self.grid_overlay, "grid")
@@ -419,15 +418,15 @@ class MainWindow(FileMenu, Adw.ApplicationWindow):
         dirs, images = result
         current = self.images[self.index].path if 0 <= self.index < len(self.images) else None
         self.dirs, self.images = dirs, images
-        self.grid.set_model(store_of(dirs + images))
+        self.grid.set_model(store_of(images))          # photos seulement : les dossiers sont dans l'arbre (gThumb)
         self.filmstrip.set_model(store_of(images))
         if err:
             self.empty.set_title(tr("Accès impossible"))
             self.empty.set_description(shown(err))
             self.browser_stack.set_visible_child_name("empty")
-        elif not dirs and not images:
-            self.empty.set_title(tr("Aucune photo"))
-            self.empty.set_description(tr("Ce dossier ne contient ni photo ni sous-dossier"))
+        elif not images:
+            self.empty.set_title(tr("Aucune image"))
+            self.empty.set_description("")
             self.browser_stack.set_visible_child_name("empty")
         else:
             self.browser_stack.set_visible_child_name("grid")
@@ -475,7 +474,7 @@ class MainWindow(FileMenu, Adw.ApplicationWindow):
             p = file.get_path()
             if p:
                 self.loader.forget(p)
-                shared_thumbs().forget(p)
+                forget_everywhere(p)
                 if self.picture is not None and self.picture.path == p and event == Gio.FileMonitorEvent.CHANGES_DONE_HINT:
                     GLib.timeout_add(200, lambda: (self.show_index(self.index, keep_view=True), False)[1])
         if self._refresh_id:
@@ -790,7 +789,7 @@ class MainWindow(FileMenu, Adw.ApplicationWindow):
 
     def _saved(self, src: str, target: str, copy: Optional[str], after=None):
         self.loader.forget(target)
-        shared_thumbs().forget(target)
+        forget_everywhere(target)
         if copy:
             def undo():
                 from ..backend import edit
@@ -800,7 +799,7 @@ class MainWindow(FileMenu, Adw.ApplicationWindow):
                     alert(self, tr("Impossible d'annuler"), shown(e.strerror or str(e)))
                     return
                 self.loader.forget(target)
-                shared_thumbs().forget(target)
+                forget_everywhere(target)
                 self._reload_current()
             toast(self, tr("« {0} » enregistrée").format(shown(os.path.basename(target))), tr("Annuler"), undo, 8)
         else:

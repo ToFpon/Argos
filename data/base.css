@@ -1,7 +1,7 @@
 /* Mise en page seulement : les couleurs viennent du thème GTK du système.
    Seule couleur fixe : le noir autour de la photo en plein écran (comme toute visionneuse). */
 .argos-thumb { border-radius: 6px; }
-.argos-grid > child { padding: 10px; border-radius: 10px; }
+.argos-grid > child { padding: 8px; border-radius: 6px; }
 .argos-filmstrip { background: none; }
 .argos-filmstrip > child { padding: 4px; border-radius: 6px; }
 .argos-zoom { min-width: 64px; font-feature-settings: "tnum"; }
@@ -11,3 +11,6 @@ window.argos-fullscreen .argos-view { background-color: black; }
 .argos-status { min-height: 30px; }
 .argos-tree listview.navigation-sidebar > row { min-height: 26px; padding-top: 1px; padding-bottom: 1px; margin-top: 0; margin-bottom: 0; }
 .argos-folder-name { font-size: 1.05em; }
+/* photo dans la grille et la bande : cadre blanc et ombre, comme gThumb (exception voulue aux couleurs du thème :
+   c'est le « tirage » de la photo, pas un élément d'interface ; les icônes transparentes n'en ont pas) */
+picture.argos-photo { border: 3px solid white; box-shadow: 0 1px 4px rgba(0, 0, 0, 0.55); }

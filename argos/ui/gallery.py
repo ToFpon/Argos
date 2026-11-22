@@ -116,21 +116,23 @@ class _SizedGrid:
 
 
 class _Cell(Gtk.Box):
-    """Case : miniature carrée (Gtk.Picture CONTAIN dans une boîte de taille fixe) + nom en dessous (grille)."""
+    """Case comme gThumb : miniature à sa taille réelle (préparée à la taille de la case par `thumbs`, jamais
+    agrandie : une icône de 48 px reste à 48 px), centrée ; photo (sans transparence) dans un cadre blanc avec ombre
+    (`.argos-photo`) ; dossier : icône + nom (la grille n'en montre plus, demande de Tof — reste pour d'autres usages)."""
 
     def __init__(self, size: int, with_name: bool):
         super().__init__(orientation=Gtk.Orientation.VERTICAL, spacing=6)
         self.size = size
         self.frame = Gtk.Box(width_request=size, height_request=size, halign=Gtk.Align.CENTER)
         self.frame.add_css_class("argos-thumb")
-        self.picture = Gtk.Picture(content_fit=Gtk.ContentFit.CONTAIN, can_shrink=True, hexpand=True, vexpand=True)
+        self.picture = Gtk.Picture(content_fit=Gtk.ContentFit.FILL, can_shrink=False, hexpand=True, vexpand=True,
+                                   halign=Gtk.Align.CENTER, valign=Gtk.Align.CENTER)
         self.icon = Gtk.Image(pixel_size=size // 2, hexpand=True, halign=Gtk.Align.CENTER, valign=Gtk.Align.CENTER)
         self.frame.append(self.picture)
         self.frame.append(self.icon)
         self.append(self.frame)
         self.label = None
         if with_name:
-            # nom des dossiers en taille normale, sur deux lignes au plus (demande de Tof : plus lisible)
             self.label = Gtk.Label(ellipsize=Pango.EllipsizeMode.END, max_width_chars=1, width_request=size,
                                    lines=2, wrap=True, wrap_mode=Pango.WrapMode.WORD_CHAR,
                                    justify=Gtk.Justification.CENTER)
@@ -143,12 +145,11 @@ class _Cell(Gtk.Box):
         self.forget()
         self.path = entry.path
         if self.label is not None:
-            # nom sous les DOSSIERS seulement (demande de Tof : la place pour les photos ; leur nom est dans
-            # l'infobulle, la barre d'état et les propriétés)
             self.label.set_label(shown(entry.name))
             self.label.set_visible(entry.is_dir)
         self.set_tooltip_text(shown(entry.name))
         self.picture.set_paintable(None)
+        self.picture.remove_css_class("argos-photo")
         if entry.is_dir:
             self.picture.set_visible(False)
             self.icon.set_visible(True)
@@ -158,21 +159,24 @@ class _Cell(Gtk.Box):
         self.icon.set_visible(False)
         path = entry.path
 
-        def done(tex):
+        def done(result):
             if self.path != path:
                 return
-            if tex is None:
+            if result is None:
                 self.picture.set_visible(False)
                 self.icon.set_visible(True)
                 self.icon.set_from_icon_name("image-missing")
-            else:
-                self.picture.set_paintable(tex)
+                return
+            tex, photo = result
+            self.picture.set_paintable(tex)
+            if photo:
+                self.picture.add_css_class("argos-photo")
         self._cb = done
-        shared().get(path, entry.mtime, done)
+        shared(self.size).get(path, entry.mtime, done)
 
     def forget(self):
         if self.path and self._cb is not None:
-            shared().cancel(self.path, self._cb)
+            shared(self.size).cancel(self.path, self._cb)
         self.path = None
         self._cb = None
 
@@ -191,9 +195,9 @@ class Grid(_SizedGrid, Gtk.ScrolledWindow):
     __gsignals__ = {"open": (GObject.SignalFlags.RUN_FIRST, None, (object,)),
                     "context-menu": (GObject.SignalFlags.RUN_FIRST, None, (object, float, float))}
 
-    def __init__(self, size: int = 160):
+    def __init__(self, size: int = 128):
         super().__init__(hexpand=True, vexpand=True, hscrollbar_policy=Gtk.PolicyType.NEVER)
-        self._init_sizing(size + 20 + 6)                # case + padding (base.css) + espacement
+        self._init_sizing(size + 16 + 6)                # case + padding (base.css) + espacement
         self.selection = Gtk.SingleSelection(autoselect=False, can_unselect=True)
         self.view = Gtk.GridView(model=self.selection, factory=_factory(size, True), max_columns=4,
                                  single_click_activate=False, enable_rubberband=False)
@@ -244,7 +248,7 @@ class Filmstrip(_SizedGrid, Gtk.ScrolledWindow):
     réglable (demande de Tof) — une rangée par défaut, plus en la montant. Signal « picked » (index) au clic."""
 
     __gsignals__ = {"picked": (GObject.SignalFlags.RUN_FIRST, None, (int,))}
-    SIZE = 72
+    SIZE = 96
 
     def __init__(self):
         super().__init__(hscrollbar_policy=Gtk.PolicyType.NEVER, vscrollbar_policy=Gtk.PolicyType.AUTOMATIC)

@@ -82,15 +82,32 @@ def steps(app):
         return item is not None and item.get_item().path == PHOTOS
     yield tree_selected
     check(tree_selected(), "barre latérale : dossier affiché sélectionné")
+    # choisir un autre dossier dans l'arbre l'ouvre (simple clic = sélection), et il reste sélectionné
+    sub = os.path.join(PHOTOS, "Sous-dossier")
+    pos = next(i for i in range(win.tree.tree.get_n_items()) if win.tree.tree.get_item(i).get_item().path == sub) \
+        if any(win.tree.tree.get_item(i).get_item().path == sub for i in range(win.tree.tree.get_n_items())) else None
+    if pos is None:
+        win.tree.tree.get_item(next(i for i in range(win.tree.tree.get_n_items())
+                                    if win.tree.tree.get_item(i).get_item().path == PHOTOS)).set_expanded(True)
+        yield lambda: any(win.tree.tree.get_item(i).get_item().path == sub for i in range(win.tree.tree.get_n_items()))
+        pos = next(i for i in range(win.tree.tree.get_n_items()) if win.tree.tree.get_item(i).get_item().path == sub)
+    win.tree.selection.set_selected(pos)
+    yield lambda: win.folder == sub
+    check(win.tree.selection.get_selected_item().get_item().path == sub, "arbre : dossier choisi ouvert et sélectionné")
+    win.open_folder(PHOTOS)
+    yield lambda: win.browser_stack.get_visible_child_name() == "grid"
+    yield tree_selected
 
     # miniatures : chaque case reçoit SA miniature (bug vu chez Tof : les miniatures se mélangeaient)
     from argos.ui.thumbs import shared
     got = {}
     for e in win.images[:6]:
-        shared().get(e.path, e.mtime, lambda tex, p=e.path: got.__setitem__(p, tex))
+        shared(128).get(e.path, e.mtime, lambda res, p=e.path: got.__setitem__(p, res))
     yield lambda: len(got) == 6
-    sizes = {p: (t.get_width(), t.get_height()) if t else None for p, t in got.items()}
-    check(len({id(t) for t in got.values()}) == 6 and all(sizes.values()), "une miniature distincte par photo")
+    texs = [r[0] for r in got.values() if r]
+    check(len({id(t) for t in texs}) == 6, "une miniature distincte par photo")
+    w, h = texs[0].get_width(), texs[0].get_height()
+    check(max(w, h) <= 128 - 6 and got[win.images[0].path][1], f"miniature à la taille de la case, photo encadrée ({w} × {h})")
 
     # propriétés dans la grille (bouton (i) de la barre d'état)
     win.browser_info_button.set_active(True)
@@ -329,6 +346,11 @@ def steps(app):
     win.open_path(os.path.join(icons, "icone.svg"))
     yield lambda: win.picture is not None and win.picture.path.endswith("icone.svg") and win.view._hires is not None
     check(win.view.zoom > 3 and win.view.fit, "SVG : agrandi à la fenêtre")
+    res = []
+    from argos.ui.thumbs import shared as _sh
+    _sh(128).get(os.path.join(icons, "icone.svg"), os.path.getmtime(os.path.join(icons, "icone.svg")), res.append)
+    yield lambda: res
+    check(res[0] and res[0][0].get_width() == 48 and not res[0][1], "icône : vignette à sa vraie taille, sans cadre")
     check(abs(win.view._hires.get_width() - 48 * win.view.zoom) < 4, "SVG : rendu net à la taille affichée")
     win.view.set_zoom(win.view.zoom * 2)
     yield lambda: abs(win.view._hires.get_width() - 48 * win.view.zoom) < 4

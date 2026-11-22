@@ -23,7 +23,7 @@ DEFAULTS: dict[str, Any] = {
     "browser_info": False,
     "info_ratio": 0.55,             # part de la barre latérale laissée à l'arbre quand les propriétés sont affichées          # propriétés sous l'arbre des dossiers (grille)
     "sidebar": True,                # arbre des dossiers à gauche de la grille              # bande de vignettes sous la photo
-    "grid_size": 160,               # taille des vignettes de la grille (px)
+    "grid_size": 128,               # taille des vignettes de la grille (px), 128 comme gThumb
     "sort_key": "name",             # name, date, size
     "sort_reverse": False,
     "show_hidden": False,

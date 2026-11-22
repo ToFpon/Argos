@@ -18,6 +18,7 @@ from gi.repository import Gdk, GdkPixbuf, GLib  # noqa: E402
 from ..backend import thumbnails  # noqa: E402
 
 WORKERS = 3
+FRAME = 3                           # cadre blanc des photos (base.css, .argos-photo)
 KEEP = 600                           # textures gardées en mémoire (≈ 600 × 256² × 4 = 150 Mo au pire)
 
 
@@ -71,24 +72,35 @@ class ThumbLoader:
                 GLib.idle_add(lambda cb=cb, tex=tex: (cb(tex), False)[1])
 
     def _make(self, path: str, mtime: float):
-        """Miniature du cache lue UNE fois (avant : décodée pour vérifier sa date, puis encore pour la texture),
-        sinon fabriquée."""
-        tex = self._cached(path, mtime)
-        if tex is not None:
-            return tex
-        if thumbnails.failed(path, mtime):
+        """(texture, photo) à la taille de la case, comme gThumb : jamais plus grande que l'image elle-même (une
+        icône de 48 px reste à 48 px), photo = sans transparence (elle aura un cadre). None si impossible."""
+        pb = self._cached(path, mtime)
+        if pb is None and not thumbnails.failed(path, mtime):
+            png = thumbnails.generate(path, "image/", mtime, max(128, self.pixels))
+            if png is not None:
+                try:
+                    pb = GdkPixbuf.Pixbuf.new_from_file(png)
+                except GLib.Error:
+                    pb = None
+        if pb is None:
             return None
-        png = thumbnails.generate(path, "image/", mtime, self.pixels)
-        if png is None:
-            return None
+        w, h = pb.get_width(), pb.get_height()
         try:
-            return Gdk.Texture.new_from_filename(png)
+            info = GdkPixbuf.Pixbuf.get_file_info(path)
+            nat = (info[1], info[2]) if isinstance(info, tuple) and info[0] is not None else (w, h)
         except GLib.Error:
-            return None
+            nat = (w, h)
+        box = self.pixels - (2 * FRAME if not pb.get_has_alpha() else 0)
+        k = min(box / w, box / h)                               # remplit la case…
+        k = min(k, max(nat[0], 1) / w, max(nat[1], 1) / h)       # …sans dépasser la taille de l'image
+        if abs(k - 1) > 0.01:
+            pb = pb.scale_simple(max(1, round(w * k)), max(1, round(h * k)), GdkPixbuf.InterpType.BILINEAR)
+        return Gdk.Texture.new_for_pixbuf(pb), not pb.get_has_alpha()
 
     def _cached(self, path: str, mtime: float):
+        """Miniature du cache lue UNE fois (date vérifiée sur le même pixbuf)."""
         name = thumbnails._md5(path) + ".png"
-        wanted = thumbnails.size_class(self.pixels)
+        wanted = thumbnails.size_class(max(128, self.pixels))
         order = list(thumbnails.SIZES)
         for cls in order[order.index(wanted):] + order[:order.index(wanted)][::-1]:
             png = os.path.join(thumbnails.CACHE, cls, name)
@@ -99,15 +111,20 @@ class ThumbLoader:
             m = pb.get_option("tEXt::Thumb::MTime")
             if m is not None and m.isdigit() and int(m) != int(mtime):
                 continue                                   # périmée : l'image a changé depuis
-            return Gdk.Texture.new_for_pixbuf(pb)
+            return pb
         return None
 
 
-_shared = None
+_shared: dict = {}
 
 
-def shared() -> ThumbLoader:
-    global _shared
-    if _shared is None:
-        _shared = ThumbLoader()
-    return _shared
+def shared(pixels: int = 128) -> ThumbLoader:
+    """Un chargeur par taille de case (grille, bande)."""
+    if pixels not in _shared:
+        _shared[pixels] = ThumbLoader(pixels)
+    return _shared[pixels]
+
+
+def forget_everywhere(path: str):
+    for loader in _shared.values():
+        loader.forget(path)

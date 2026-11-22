@@ -376,11 +376,8 @@ msgstr "Parent folder (Alt+↑)"
 msgid "Barre latérale (F9)"
 msgstr "Sidebar (F9)"
 
-msgid "Aucune photo"
-msgstr "No photos"
-
-msgid "Ce dossier ne contient ni photo ni sous-dossier"
-msgstr "This folder contains no photos and no subfolders"
+msgid "Aucune image"
+msgstr "No images"
 
 msgid "Propriétés (I)"
 msgstr "Properties (I)"

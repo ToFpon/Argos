@@ -73,6 +73,14 @@ Nom : Argos le géant aux cent yeux (et le chien d'Ulysse, le seul à le reconna
   1,1 s au lieu de 9,4, 129 cases au lieu de 1 281, retour par le cache 0,02 s au lieu de 8. Miniatures du cache
   décodées UNE fois (`ThumbLoader._cached`, date vérifiée sur le même pixbuf), 3 fils. Nom des dossiers : taille
   normale, deux lignes au plus (demande de Tof).
+- Présentation de gThumb (captures comparatives de Tof, 22/11/2026) : grille de PHOTOS seulement (les dossiers sont
+  dans l'arbre ; dossier sans image = « Aucune image »), cases de 128 px (`grid_size`, défaut de gThumb), bande de
+  96 px ; vignette préparée à la taille de la case par `thumbs` (un chargeur par taille : `shared(px)`, résultat
+  (texture, photo)), JAMAIS plus grande que l'image (icône de 48 px = 48 px), centrée ; photo (pas de transparence)
+  dans un cadre blanc + ombre (`picture.argos-photo`, exception voulue aux couleurs du thème : le « tirage »), icône
+  sans cadre. Arbre : PAS `single_click_activate` (il sélectionnait la ligne sous le pointeur : la sélection
+  suivait la souris) — choisir une ligne (`notify::selected-item`) ouvre le dossier, `reveal` sélectionne sans
+  rouvrir (`_select` en silence, `_current`).
 - SVG (vu chez Tof : icône 48 × 48 minuscule puis pixelisée au zoom) : `ImageView.vector` = chemin du SVG →
   ajusté À la fenêtre (agrandi, comme gThumb), et redessiné net à la taille affichée (`_hires` :
   `Pixbuf.new_from_file_at_scale` dans un fil, 150 ms après le dernier changement de zoom, 6000 px au plus) ; en
