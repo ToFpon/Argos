@@ -24,6 +24,7 @@ def _groups():
             ("F2", tr("Renommer…")),
             ("<Control>c", tr("Copier l'image")),
             ("<Control>p", tr("Imprimer…")),
+            ("<Control>e", tr("Convertir / redimensionner…")),
             ("r <Shift>r", tr("Pivoter à droite / à gauche")),
             ("i", tr("Propriétés")),
         ]),

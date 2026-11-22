@@ -176,3 +176,42 @@ class EditTest(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class ImageToolsTest(unittest.TestCase):
+    """Outils image repris d'Odysseus : convertir, redimensionner, jamais d'écrasement, remplacer."""
+
+    def setUp(self):
+        from argos.backend import imagetools
+        self.it = imagetools
+        self.d = tempfile.mkdtemp()
+        self.a = os.path.join(self.d, "a.jpg")
+        self.b = os.path.join(self.d, "b.png")
+        make(self.a, "400x200", "red")
+        make(self.b, "100x100", "blue")
+
+    def tearDown(self):
+        shutil.rmtree(self.d)
+
+    def test_convert_and_resize_new_files(self):
+        o = self.it.Options(resize="fit", width=200, height=200, fmt="webp")
+        res = self.it.process(self.it.Job(), [self.a, self.b], o)
+        self.assertEqual(sorted(os.path.basename(p) for p in res.created), ["a.webp", "b.webp"])
+        self.assertEqual(dims(os.path.join(self.d, "a.webp")), (200, 100))
+        self.assertEqual(dims(os.path.join(self.d, "b.webp")), (100, 100))          # pas agrandie
+        self.assertTrue(os.path.exists(self.a) and os.path.exists(self.b))
+        res = self.it.process(self.it.Job(), [self.a], o)                          # nom pris : « (2) »
+        self.assertEqual(os.path.basename(res.created[0]), "a (2).webp")
+        self.assertEqual([n for n in os.listdir(self.d) if n.startswith(".argos-")], [])
+
+    def test_replace_same_format(self):
+        o = self.it.Options(resize="scale", scale=50, replace=True)
+        self.it.process(self.it.Job(), [self.a], o)
+        self.assertEqual(dims(self.a), (200, 100))
+
+    def test_cancel(self):
+        job = self.it.Job()
+        job.cancel()
+        with self.assertRaises(self.it.Cancelled):
+            self.it.process(job, [self.a], self.it.Options(fmt="png"))
+        self.assertFalse(os.path.exists(os.path.join(self.d, "a.png")))

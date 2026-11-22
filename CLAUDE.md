@@ -86,6 +86,12 @@ Nom : Argos le géant aux cent yeux (et le chien d'Ulysse, le seul à le reconna
   `FileMenu._targets()` : la sélection de la grille (clic droit hors sélection = elle seule), la photo affichée dans
   la visionneuse ; plusieurs → menu réduit (`_multi_menu` : copier / déplacer vers, corbeille, supprimer) ; Suppr /
   Maj+Suppr marchent dans la grille ; `_removed_many` tient tout à jour ; barre d'état « N sélectionnées (X Mo) ».
+- Outils image d'Odysseus (demande de Tof) : « Convertir / redimensionner… » (Ctrl+E, clic droit sur une ou
+  plusieurs photos, menu principal) = `backend/imagetools.py` (copie de `odysseus/backend/images.py` : une passe
+  d'ImageMagick, sélecteur `[0]`, `-auto-orient`, sortie cachée puis `edit._place_new`, remplacer = même format
+  `os.replace` / autre format nouvelle image puis original à la corbeille ; Job réduit : progression, annulation
+  qui tue ImageMagick) + `ui/image_dialog.py` (dialogue d'Odysseus, progression et Annuler DANS le dialogue,
+  fermer = annuler ; derniers choix dans les réglages `image_*`). Traductions reprises des catalogues d'Odysseus.
 - SVG (vu chez Tof : icône 48 × 48 minuscule puis pixelisée au zoom) : `ImageView.vector` = chemin du SVG →
   ajusté À la fenêtre (agrandi, comme gThumb), et redessiné net à la taille affichée (`_hires` :
   `Pixbuf.new_from_file_at_scale` dans un fil, 150 ms après le dernier changement de zoom, 6000 px au plus) ; en

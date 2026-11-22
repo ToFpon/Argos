@@ -28,6 +28,21 @@ msgstr "TB"
 msgid "o"
 msgstr "B"
 
+msgid "ImageMagick n'est pas installé"
+msgstr "ImageMagick ist nicht installiert"
+
+msgid "Aucune image n'a pu être traitée"
+msgstr "Kein Bild konnte verarbeitet werden"
+
+msgid "{0} ({1} sur {2})"
+msgstr "{0} ({1} von {2})"
+
+msgid "ImageMagick a échoué"
+msgstr "ImageMagick ist fehlgeschlagen"
+
+msgid "Décodeur HEIC absent ? Installez-le avec :\n{0}"
+msgstr "HEIC-Decoder fehlt? Installieren Sie ihn mit:\n{0}"
+
 msgid "Image trop grande"
 msgstr "Bild zu groß"
 
@@ -60,6 +75,9 @@ msgstr "Drehen, zuschneiden und in einem anderen Format speichern"
 
 msgid "Demande ImageMagick (paquet imagemagick)"
 msgstr "Benötigt ImageMagick (Paket imagemagick)"
+
+msgid "Annuler"
+msgstr "Abbrechen"
 
 msgid "Plein écran"
 msgstr "Vollbild"
@@ -97,14 +115,14 @@ msgstr "Bild kopiert"
 msgid "Renommer"
 msgstr "Umbenennen"
 
-msgid "Annuler"
-msgstr "Abbrechen"
-
 msgid "Si vous supprimez un élément, il sera définitivement perdu."
 msgstr "Wenn Sie ein Objekt löschen, geht es dauerhaft verloren."
 
 msgid "Définir comme arrière-plan"
 msgstr "Als Hintergrund festlegen"
+
+msgid "Convertir / redimensionner…"
+msgstr "Konvertieren / Größe ändern …"
 
 msgid "Nom"
 msgstr "Name"
@@ -191,6 +209,126 @@ msgid_plural "{0} photos supprimées"
 msgstr[0] "{0} Foto gelöscht"
 msgstr[1] "{0} Fotos gelöscht"
 
+msgid "90° à droite"
+msgstr "90° im Uhrzeigersinn"
+
+msgid "90° à gauche"
+msgstr "90° gegen den Uhrzeigersinn"
+
+msgid "180°"
+msgstr "180°"
+
+msgid "Angle libre"
+msgstr "Beliebiger Winkel"
+
+msgid "Enregistrer"
+msgstr "Speichern"
+
+msgid "Méthode"
+msgstr "Methode"
+
+msgid "Échelle (%)"
+msgstr "Maßstab (%)"
+
+msgid "Largeur maximale (px)"
+msgstr "Maximale Breite (px)"
+
+msgid "Hauteur maximale (px)"
+msgstr "Maximale Höhe (px)"
+
+msgid "Rotation"
+msgstr "Drehung"
+
+msgid "Angle (degrés, sens horaire)"
+msgstr "Winkel (Grad, im Uhrzeigersinn)"
+
+msgid "Format"
+msgstr "Format"
+
+msgid "Qualité JPEG / WebP"
+msgstr "JPEG-/WebP-Qualität"
+
+msgid "Redimensionner les images"
+msgstr "Bilder skalieren"
+
+msgid "Pivoter les images"
+msgstr "Bilder drehen"
+
+msgid "Convertir les images"
+msgstr "Bilder umwandeln"
+
+msgid "Modifications"
+msgstr "Änderungen"
+
+msgid "Combinables : par exemple redimensionner et convertir en une fois"
+msgstr "Kombinierbar: zum Beispiel in einem Schritt skalieren und umwandeln"
+
+msgid "Redimensionner"
+msgstr "Skalieren"
+
+msgid "À l'échelle"
+msgstr "Prozentual"
+
+msgid "Taille maximale"
+msgstr "Maximale Größe"
+
+msgid "Ne pas agrandir les petites images"
+msgstr "Kleinere Bilder nicht vergrößern"
+
+msgid "Pivoter"
+msgstr "Drehen"
+
+msgid "Convertir le format"
+msgstr "Format umwandeln"
+
+msgid "Enregistrement"
+msgstr "Speichern"
+
+msgid "Remplacer les originaux"
+msgstr "Originale ersetzen"
+
+msgid "Ajouter au nom des nouvelles images"
+msgstr "An den Namen der neuen Bilder anhängen"
+
+msgid "Dossier de destination"
+msgstr "Zielordner"
+
+msgid "À côté de chaque image"
+msgstr "Neben jedem Bild"
+
+msgid "Les images changent de format : les originaux iront à la corbeille une fois les nouvelles images enregistrées."
+msgstr "Die Bilder ändern ihr Format: Die Originale werden in den Papierkorb verschoben, sobald die neuen Bilder gespeichert sind."
+
+msgid "{0} image enregistrée"
+msgid_plural "{0} images enregistrées"
+msgstr[0] "{0} Bild gespeichert"
+msgstr[1] "{0} Bilder gespeichert"
+
+msgid "Certaines images n'ont pas pu être traitées"
+msgstr "Einige Bilder konnten nicht verarbeitet werden"
+
+msgid " (redimensionnée)"
+msgstr " (skaliert)"
+
+msgid " (pivotée)"
+msgstr " (gedreht)"
+
+msgid "Chaque original est remplacé d'un coup, une fois la nouvelle image complète : jamais d'image à moitié écrite."
+msgstr "Jedes Original wird in einem Schritt ersetzt, sobald das neue Bild vollständig ist: nie ein halb geschriebenes Bild."
+
+msgid "{0} image"
+msgid_plural "{0} images"
+msgstr[0] "{0} Bild"
+msgstr[1] "{0} Bilder"
+
+msgid "{0} erreur"
+msgid_plural "{0} erreurs"
+msgstr[0] "{0} Fehler"
+msgstr[1] "{0} Fehler"
+
+msgid "Exemple : {0}"
+msgstr "Beispiel: {0}"
+
 msgid "Fichier"
 msgstr "Datei"
 
@@ -232,9 +370,6 @@ msgstr "Abmessungen"
 
 msgid "Taille"
 msgstr "Größe"
-
-msgid "Format"
-msgstr "Format"
 
 msgid "Modifié le"
 msgstr "Geändert am"
@@ -412,9 +547,6 @@ msgstr "An Fenster anpassen / Originalgröße (0 / 1)"
 
 msgid "Recadrer (C)"
 msgstr "Zuschneiden (C)"
-
-msgid "Enregistrer"
-msgstr "Speichern"
 
 msgid "Remplacer la photo (Ctrl+S)"
 msgstr "Foto ersetzen (Strg+S)"

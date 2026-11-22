@@ -73,6 +73,7 @@ class MainWindow(FileMenu, Adw.ApplicationWindow):
         sec = Gio.Menu()
         sec.append(tr("Ouvrir un dossier…"), "win.open-folder")
         sec.append(tr("Ouvrir des photos…"), "win.open-files")
+        sec.append(tr("Convertir / redimensionner…"), "win.image-tools")
         menu.append_section(None, sec)
         sort = Gio.Menu()
         sort.append(tr("Nom"), "win.sort::name")

@@ -352,6 +352,26 @@ def steps(app):
         sec = menu.get_item_link(i, "section")
         labels += [sec.get_item_attribute_value(j, "label").get_string() for j in range(sec.get_n_items())]
     check(tr("Renommer…") not in labels and tr("Mettre à la corbeille") in labels, "menu de plusieurs photos")
+    # convertir les photos sélectionnées (outils image d'Odysseus)
+    from argos.ui import image_dialog
+    win.image_tools()
+    yield lambda: image_dialog._last is not None and image_dialog._last.dialog.get_visible()
+    dlg = image_dialog._last
+    dlg.convert.set_enable_expansion(True)
+    dlg.fmt.set_selected(1)                                  # PNG
+    dlg.replace.set_active(False)
+    dlg.suffix.set_text("")
+    dlg._go()
+    pngs = [os.path.splitext(p)[0] + ".png" for p in two]
+    yield lambda: all(os.path.exists(p) for p in pngs) and not dlg.dialog.get_visible()
+    check(all(os.path.exists(p) for p in pngs) and all(os.path.exists(p) for p in two),
+          "convertir : PNG posés à côté, originaux gardés")
+    yield lambda: all(win._index_of(p) >= 0 for p in pngs)
+    win.grid.selection.unselect_all()
+    for i, e in enumerate(win.images):
+        if e.path in two:
+            win.grid.selection.select_item(i, False)
+    yield 50
     n = len(win.images)
     win.trash()
     yield 100

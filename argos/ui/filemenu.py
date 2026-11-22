@@ -16,6 +16,7 @@ gi.require_version("Adw", "1")
 gi.require_version("GdkPixbuf", "2.0")
 from gi.repository import Adw, Gdk, GdkPixbuf, Gio, GLib, Gtk  # noqa: E402
 
+from .. import features  # noqa: E402
 from ..backend import edit  # noqa: E402
 from ..backend import folder as fold  # noqa: E402
 from ..i18n import ntr, tr  # noqa: E402
@@ -56,6 +57,7 @@ class FileMenu:
         add("rename", self.rename, accels=["F2"])
         add("delete", self.delete_for_good, accels=["<Shift>Delete"])
         add("ctx-trash", lambda: self.trash_paths(self._targets()))
+        add("image-tools", self.image_tools, accels=["<Control>e"])
 
     # --- cible ---
 
@@ -105,6 +107,8 @@ class FileMenu:
         menu.append_section(None, s2)
         s3 = Gio.Menu()
         s3.append(tr("Copier l'image"), "win.copy-image")
+        if not features.blocked("edit"):
+            s3.append(tr("Convertir / redimensionner…"), "win.image-tools")
         menu.append_section(None, s3)
         s4 = Gio.Menu()
         s4.append(tr("Copier vers…"), "win.copy-to")
@@ -120,6 +124,10 @@ class FileMenu:
     def _multi_menu(self) -> Gio.Menu:
         """Plusieurs photos : seulement ce qui a un sens pour toutes."""
         menu = Gio.Menu()
+        s0 = Gio.Menu()
+        if not features.blocked("edit"):
+            s0.append(tr("Convertir / redimensionner…"), "win.image-tools")
+            menu.append_section(None, s0)
         s1 = Gio.Menu()
         s1.append(tr("Copier vers…"), "win.copy-to")
         s1.append(tr("Déplacer vers…"), "win.move-to")
@@ -129,6 +137,17 @@ class FileMenu:
         s2.append(tr("Supprimer…"), "win.delete")
         menu.append_section(None, s2)
         return menu
+
+    def image_tools(self):
+        """Convertir / redimensionner / pivoter (outils image d'Odysseus) : photo affichée ou sélection."""
+        paths = self._targets()
+        if not paths:
+            return
+        if features.blocked("edit"):
+            alert(self, tr("ImageMagick n'est pas installé"), "sudo apt install imagemagick")
+            return
+        from .image_dialog import ImageToolsDialog
+        ImageToolsDialog(self, paths, "convert").present(self)
 
     def show_file_menu(self, widget: Gtk.Widget, path: str, x: float, y: float):
         self._ctx = path

@@ -28,6 +28,21 @@ msgstr "TB"
 msgid "o"
 msgstr "B"
 
+msgid "ImageMagick n'est pas installé"
+msgstr "ImageMagick is not installed"
+
+msgid "Aucune image n'a pu être traitée"
+msgstr "No image could be processed"
+
+msgid "{0} ({1} sur {2})"
+msgstr "{0} ({1} of {2})"
+
+msgid "ImageMagick a échoué"
+msgstr "ImageMagick failed"
+
+msgid "Décodeur HEIC absent ? Installez-le avec :\n{0}"
+msgstr "HEIC decoder missing? Install it with:\n{0}"
+
 msgid "Image trop grande"
 msgstr "Image too large"
 
@@ -60,6 +75,9 @@ msgstr "Rotate, crop and save in another format"
 
 msgid "Demande ImageMagick (paquet imagemagick)"
 msgstr "Requires ImageMagick (imagemagick package)"
+
+msgid "Annuler"
+msgstr "Cancel"
 
 msgid "Plein écran"
 msgstr "Fullscreen"
@@ -97,14 +115,14 @@ msgstr "Image copied"
 msgid "Renommer"
 msgstr "Rename"
 
-msgid "Annuler"
-msgstr "Cancel"
-
 msgid "Si vous supprimez un élément, il sera définitivement perdu."
 msgstr "If you delete an item, it will be permanently lost."
 
 msgid "Définir comme arrière-plan"
 msgstr "Set as Background"
+
+msgid "Convertir / redimensionner…"
+msgstr "Convert / Resize…"
 
 msgid "Nom"
 msgstr "Name"
@@ -191,6 +209,126 @@ msgid_plural "{0} photos supprimées"
 msgstr[0] "{0} photo deleted"
 msgstr[1] "{0} photos deleted"
 
+msgid "90° à droite"
+msgstr "90° clockwise"
+
+msgid "90° à gauche"
+msgstr "90° counterclockwise"
+
+msgid "180°"
+msgstr "180°"
+
+msgid "Angle libre"
+msgstr "Custom angle"
+
+msgid "Enregistrer"
+msgstr "Save"
+
+msgid "Méthode"
+msgstr "Method"
+
+msgid "Échelle (%)"
+msgstr "Scale (%)"
+
+msgid "Largeur maximale (px)"
+msgstr "Maximum width (px)"
+
+msgid "Hauteur maximale (px)"
+msgstr "Maximum height (px)"
+
+msgid "Rotation"
+msgstr "Rotation"
+
+msgid "Angle (degrés, sens horaire)"
+msgstr "Angle (degrees, clockwise)"
+
+msgid "Format"
+msgstr "Format"
+
+msgid "Qualité JPEG / WebP"
+msgstr "JPEG / WebP quality"
+
+msgid "Redimensionner les images"
+msgstr "Resize Images"
+
+msgid "Pivoter les images"
+msgstr "Rotate Images"
+
+msgid "Convertir les images"
+msgstr "Convert Images"
+
+msgid "Modifications"
+msgstr "Changes"
+
+msgid "Combinables : par exemple redimensionner et convertir en une fois"
+msgstr "Can be combined: for example resize and convert in one go"
+
+msgid "Redimensionner"
+msgstr "Resize"
+
+msgid "À l'échelle"
+msgstr "By percentage"
+
+msgid "Taille maximale"
+msgstr "Maximum size"
+
+msgid "Ne pas agrandir les petites images"
+msgstr "Do not enlarge smaller images"
+
+msgid "Pivoter"
+msgstr "Rotate"
+
+msgid "Convertir le format"
+msgstr "Convert format"
+
+msgid "Enregistrement"
+msgstr "Saving"
+
+msgid "Remplacer les originaux"
+msgstr "Replace the originals"
+
+msgid "Ajouter au nom des nouvelles images"
+msgstr "Append to the name of the new images"
+
+msgid "Dossier de destination"
+msgstr "Destination folder"
+
+msgid "À côté de chaque image"
+msgstr "Next to each image"
+
+msgid "Les images changent de format : les originaux iront à la corbeille une fois les nouvelles images enregistrées."
+msgstr "The images change format: the originals will be moved to the trash once the new images are saved."
+
+msgid "{0} image enregistrée"
+msgid_plural "{0} images enregistrées"
+msgstr[0] "{0} image saved"
+msgstr[1] "{0} images saved"
+
+msgid "Certaines images n'ont pas pu être traitées"
+msgstr "Some images could not be processed"
+
+msgid " (redimensionnée)"
+msgstr " (resized)"
+
+msgid " (pivotée)"
+msgstr " (rotated)"
+
+msgid "Chaque original est remplacé d'un coup, une fois la nouvelle image complète : jamais d'image à moitié écrite."
+msgstr "Each original is replaced in one step, once the new image is complete: never a half-written image."
+
+msgid "{0} image"
+msgid_plural "{0} images"
+msgstr[0] "{0} image"
+msgstr[1] "{0} images"
+
+msgid "{0} erreur"
+msgid_plural "{0} erreurs"
+msgstr[0] "{0} error"
+msgstr[1] "{0} errors"
+
+msgid "Exemple : {0}"
+msgstr "Example: {0}"
+
 msgid "Fichier"
 msgstr "File"
 
@@ -232,9 +370,6 @@ msgstr "Dimensions"
 
 msgid "Taille"
 msgstr "Size"
-
-msgid "Format"
-msgstr "Format"
 
 msgid "Modifié le"
 msgstr "Modified"
@@ -412,9 +547,6 @@ msgstr "Fit to window / actual size (0 / 1)"
 
 msgid "Recadrer (C)"
 msgstr "Crop (C)"
-
-msgid "Enregistrer"
-msgstr "Save"
 
 msgid "Remplacer la photo (Ctrl+S)"
 msgstr "Replace the photo (Ctrl+S)"

@@ -28,6 +28,15 @@ DEFAULTS: dict[str, Any] = {
     "sort_reverse": False,
     "show_hidden": False,
     "previous_defaults": {},        # application par défaut d'avant, par type (defaultapp.py)
+    "image_resize": "scale",       # outils image (repris d'Odysseus) : derniers choix
+    "image_scale": 50,
+    "image_width": 1920,
+    "image_height": 1080,
+    "image_no_enlarge": True,
+    "image_rotate": 90,
+    "image_format": "jpg",
+    "image_quality": 90,
+    "image_replace": False,
     "features": {},                 # fonctionnalités activées / désactivées (voir features.py)
 }
 

@@ -2,13 +2,16 @@
 
 from __future__ import annotations
 
+import os
 from typing import Callable, Optional
 
 import gi
 
 gi.require_version("Gtk", "4.0")
 gi.require_version("Adw", "1")
-from gi.repository import Adw, Gdk, GLib, GObject, Gtk  # noqa: E402
+from gi.repository import Adw, Gdk, Gio, GLib, GObject, Gtk  # noqa: E402
+
+from ..i18n import tr  # noqa: E402
 
 
 
@@ -208,3 +211,38 @@ def _drop_popover(parent: Gtk.Widget):
         pop.unparent()
     parent._argos_popover = None
 
+
+
+def dialog_shell(title: str, action_label: str, width: int = 560, height: int = 680,
+                 destructive: bool = False):
+    """Fenêtre de dialogue avec barre d'en-tête Annuler / Action et page de préférences."""
+    dialog = DialogWindow(title=title, content_width=width, content_height=height)
+    tv = Adw.ToolbarView()
+    header = Adw.HeaderBar(show_end_title_buttons=False, show_start_title_buttons=False)
+    cancel = Gtk.Button(label=tr("Annuler"))
+    cancel.connect("clicked", lambda *_: dialog.close())
+    header.pack_start(cancel)
+    action = Gtk.Button(label=action_label,
+                        css_classes=["destructive-action" if destructive else "suggested-action"])
+    header.pack_end(action)
+    tv.add_top_bar(header)
+    page = Adw.PreferencesPage()
+    tv.set_content(page)
+    dialog.set_child(tv)
+    dialog.set_default_widget(action)
+    return dialog, page, action
+
+
+def choose_folder(parent: Gtk.Widget, title: str, initial: str, callback: Callable[[str], None]):
+    dlg = Gtk.FileDialog(title=title, modal=True)
+    if initial and os.path.isdir(initial):
+        dlg.set_initial_folder(Gio.File.new_for_path(initial))
+
+    def done(d, res):
+        try:
+            f = d.select_folder_finish(res)
+        except GLib.Error:
+            return
+        if f and f.get_path():
+            callback(f.get_path())
+    dlg.select_folder(parent.get_root(), None, done)
