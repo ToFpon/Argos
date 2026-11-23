@@ -143,6 +143,24 @@ Nom : Argos le géant aux cent yeux (et le chien d'Ulysse, le seul à le reconna
 - `app.py` : instance unique ; `argos PHOTO` → son dossier, photo affichée ; `argos DOSSIER` → grille ; seul →
   dernier dossier (sinon Images). Nom du processus « argos » (prctl, l'icône du Moniteur système en dépend).
 
+## Audit de novembre 2026 (tests `test_audit`, ils échouent sur l'ancien code ; « deux Ctrl+S » dans ui_smoke)
+
+- ImageMagick lit « %d », « %o », « %x »… d'un chemin comme un GABARIT, à l'entrée comme à la sortie, et « %% »
+  n'y échappe pas : « 50%off.jpg », dossier « Taux 5%o » → pivoter, recadrer, « Convertir / redimensionner »
+  répondaient « no images defined ». `edit.magick_paths(src, out)` (repris d'Odysseus) : avec un « % », ImageMagick
+  ne voit que des liens aux noms sûrs dans un dossier privé `argos-img-*` ; utilisé par `edit.apply`, `_quality`
+  et `imagetools.process`. PIÈGE de test : `convert` d'un test qui FABRIQUE une photo au nom piégé se fait piéger
+  aussi — la créer sous un nom sûr ailleurs puis la déplacer (`test_audit.photo`).
+- Photo ouverte par un lien symbolique : enregistrer (et « Annuler ») remplaçait le LIEN par un fichier ;
+  maintenant la vraie photo est remplacée (`realpath` dans `edit.apply` / `restore`), le lien reste.
+- Enregistrer pendant un enregistrement (Ctrl+S deux fois, « Enregistrer ? » en changeant de photo pendant
+  l'écriture d'une grosse photo) : `pending()` restait vrai, un second fil appliquait la rotation à la photo DÉJÀ
+  pivotée. `MainWindow._saving` : un seul à la fois, les suites attendent (`_after_save`), pivoter / recadrer
+  ignorés pendant l'écriture ; échec : on reste sur la photo, retouches gardées.
+- settings.json en `ensure_ascii` : un dernier dossier au nom non UTF-8 bloquait tout enregistrement des réglages.
+- Renommer en changeant la seule casse sur une clé FAT / exFAT (« photo.JPG » → « photo.jpg ») : refusé
+  (« existe déjà », même fichier) → `samefile` dans `rename`.
+
 ## Tests
 
 ```sh

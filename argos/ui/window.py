@@ -52,6 +52,10 @@ class MainWindow(FileMenu, Adw.ApplicationWindow):
         self._refresh_id = 0
         self._want_path: Optional[str] = None      # photo à montrer une fois le dossier lu
         from collections import OrderedDict
+        # enregistrement en cours (fil) : un seul à la fois, les suites (« Enregistrer ? » en changeant de photo)
+        # attendent sa fin — sinon la rotation était appliquée DEUX fois à la photo
+        self._saving = False
+        self._after_save: list = []
         self._folder_cache: "OrderedDict[str, tuple]" = OrderedDict()   # dossier → (options, (dossiers, photos))
 
         self.stack = Gtk.Stack(transition_type=Gtk.StackTransitionType.CROSSFADE, transition_duration=150)
@@ -720,14 +724,14 @@ class MainWindow(FileMenu, Adw.ApplicationWindow):
                 a.set_enabled(ok and self.stack.get_visible_child_name() == "viewer")
 
     def rotate(self, quarter: int):
-        if self.view.cropping:
+        if self.view.cropping or self._saving:
             return
         self.view.rotate(quarter)
         self._sync_status()
         self._sync_edit()
 
     def start_crop(self):
-        if not self.editable() or self.view.cropping:
+        if not self.editable() or self.view.cropping or self._saving:
             return
         self.view.start_crop()
         self._ratio_changed()
@@ -753,6 +757,9 @@ class MainWindow(FileMenu, Adw.ApplicationWindow):
 
     def guard(self, then):
         """Modifications en attente : « Enregistrer ? » avant de quitter la photo (comme Papers / Calypso)."""
+        if self._saving:                    # la photo est en train d'être enregistrée : on y va après
+            self._after_save.append(then)
+            return
         if self.view.cropping:
             self.end_crop(False)
         if not self.pending():
@@ -776,21 +783,39 @@ class MainWindow(FileMenu, Adw.ApplicationWindow):
 
     def save(self, after=None):
         """Remplace la photo par sa version pivotée / recadrée ; l'original est gardé pour « Annuler »."""
+        if self._saving:
+            if after is not None:
+                self._after_save.append(after)
+            return
         if not self.pending():
             return
         path = self.picture.path
         rotation, crop = self._edit_params()
+        self._saving = True
+        if after is not None:
+            self._after_save.append(after)
 
         def work():
             from ..backend import edit
             try:
                 copy = edit.backup(path)
                 edit.apply(path, path, rotation, crop, replace=True)
-                GLib.idle_add(lambda: (self._saved(path, path, copy, after), False)[1])
+                GLib.idle_add(lambda: (self._saved(path, path, copy), False)[1])
             except (edit.EditError, OSError) as e:
                 msg = str(e)
-                GLib.idle_add(lambda: (alert(self, tr("Enregistrement impossible"), shown(msg)), False)[1])
+                GLib.idle_add(lambda: (self._save_failed(msg), False)[1])
         threading.Thread(target=work, daemon=True).start()
+
+    def _save_done(self, run_after: bool):
+        self._saving = False
+        waiting, self._after_save = self._after_save, []
+        if run_after:
+            for cb in waiting:
+                cb()
+
+    def _save_failed(self, msg: str):
+        self._save_done(False)              # photo pas enregistrée : on ne la quitte pas, les retouches restent
+        alert(self, tr("Enregistrement impossible"), shown(msg))
 
     def _saved(self, src: str, target: str, copy: Optional[str], after=None):
         self.loader.forget(target)
@@ -814,6 +839,8 @@ class MainWindow(FileMenu, Adw.ApplicationWindow):
             self.view.rotation = 0
             self._reload_current()
         self._sync_edit()
+        if src == target:
+            self._save_done(True)
         if after is not None:
             after()
 

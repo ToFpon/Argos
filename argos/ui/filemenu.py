@@ -362,10 +362,21 @@ class FileMenu:
             w = 8 * len(old)
         d.set_default_size(max(420, min(760, w + 150)), -1)        # le nom entier lisible (leçon d'Odysseus)
 
+        def taken(text):
+            """Nom pris par un AUTRE fichier. Clé FAT / exFAT : « photo.jpg » existe pour « photo.JPG » (même
+            fichier, insensible à la casse) — changer la seule casse doit rester possible."""
+            target = os.path.join(folder, text)
+            if text == old or not os.path.lexists(target):
+                return False
+            try:
+                return not os.path.samefile(target, path)
+            except OSError:
+                return True
+
         def problem(text):
             if not text.strip() or "/" in text or text in (".", ".."):
                 return tr("Nom impossible")
-            if text != old and os.path.lexists(os.path.join(folder, text)):
+            if taken(text):
                 return tr("« {0} » existe déjà").format(text)
             return ""
 
@@ -382,7 +393,7 @@ class FileMenu:
                 return
             target = os.path.join(folder, new)
             try:
-                if os.path.lexists(target):
+                if taken(new):
                     raise FileExistsError(target)
                 os.rename(path, target)
             except OSError as e:

@@ -183,9 +183,14 @@ def steps(app):
     win.rotate(1)
     check(win.pending() and win.save_button.get_visible(), "pivotée : bouton Enregistrer")
     check("200 × 300" in win.status.get_label(), "dimensions après rotation")
+    from argos.backend import edit as _edit
+    before = set(os.listdir(_edit.UNDO_DIR)) if os.path.isdir(_edit.UNDO_DIR) else set()
     win.save()
+    win.save()                 # Ctrl+S deux fois (ou « Enregistrer ? » en changeant de photo) pendant l'écriture
     yield lambda: dims(path) == (200, 300) and not win.pending()
-    check(dims(path) == (200, 300), "enregistrée pivotée")
+    yield 600
+    check(dims(path) == (200, 300), "enregistrée pivotée, une seule fois (pas de seconde rotation)")
+    check(len(set(os.listdir(_edit.UNDO_DIR)) - before) == 1, "un seul enregistrement lancé")
     yield lambda: win.picture is not None and win.picture.width == 200
     check(win.view.rotation == 0 and win.picture.width == 200, "photo relue après l'enregistrement")
 

@@ -86,7 +86,7 @@ class Settings:
             os.makedirs(os.path.dirname(self.path), exist_ok=True)
             tmp = self.path + ".tmp"
             with open(tmp, "w", encoding="utf-8") as fh:
-                json.dump(self.data, fh, indent=2, ensure_ascii=False)
+                json.dump(self.data, fh, indent=2, ensure_ascii=True)     # nom non UTF-8 : « \\udcXX », sinon plus rien d'enregistré
             os.replace(tmp, self.path)
         except OSError:
             pass

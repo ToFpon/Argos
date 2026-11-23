@@ -197,8 +197,10 @@ def process(job: Job, sources: list[str], o: Options, on_file=None) -> Result:
         tmp = _tmp_name(folder)
         ok = False
         try:
-            p = job.popen(command(src, tmp, o), stdout=subprocess.DEVNULL, stderr=subprocess.PIPE, text=True)
-            _out, err = p.communicate()
+            with edit.magick_paths(src, tmp) as (im_src, im_out):        # « % » dans un chemin : noms sûrs
+                p = job.popen(command(im_src, im_out, o), stdout=subprocess.DEVNULL, stderr=subprocess.PIPE,
+                              text=True, errors="replace")
+                _out, err = p.communicate()
             if job.cancelled:
                 raise Cancelled()
             if p.returncode != 0 or not os.path.isfile(tmp) or os.path.getsize(tmp) == 0:

@@ -8,6 +8,7 @@ orientation EXIF remise à « normale » (`-auto-orient` avant toute chose : ce 
 
 from __future__ import annotations
 
+import contextlib
 import os
 import shutil
 import subprocess
@@ -32,6 +33,31 @@ def magick_command() -> Optional[list[str]]:
     return None
 
 
+@contextlib.contextmanager
+def magick_paths(src: str, out: str):
+    """(entrée, sortie) à donner à ImageMagick. Il lit « %d », « %o », « %x »… d'un chemin comme un GABARIT, à
+    l'entrée comme à la sortie, et « %% » n'y échappe pas (« 50%off.jpg », dossier « Taux 5%o » : « no images
+    defined », audit de novembre 2026, repris d'Odysseus) → avec un « % », il ne voit que des liens aux noms sûrs
+    dans un dossier privé. `out` doit exister (fichier vide) : le lien écrit à travers."""
+    if "%" not in src and "%" not in out:
+        yield src, out
+        return
+    safe = tempfile.mkdtemp(prefix="argos-img-")
+    try:
+        im_src = os.path.join(safe, "in" + os.path.splitext(src)[1].lower())
+        os.symlink(os.path.abspath(src), im_src)
+        if not os.path.lexists(out):
+            with open(out, "x"):
+                pass
+        im_out = os.path.join(safe, "out")
+        os.symlink(os.path.abspath(out), im_out)
+        yield im_src, im_out
+        if os.path.isfile(im_out) and not os.path.islink(im_out):
+            shutil.move(im_out, out)               # un codeur a recréé la sortie au lieu d'écrire à travers
+    finally:
+        shutil.rmtree(safe, ignore_errors=True)
+
+
 def free_name(path: str) -> str:
     """« photo.png » s'il est libre, sinon « photo (2).png », « photo (3).png »…"""
     if not os.path.lexists(path):
@@ -45,7 +71,9 @@ def free_name(path: str) -> str:
 
 def _quality(src: str) -> str:
     try:
-        out = subprocess.run(["identify", "-format", "%Q", src + "[0]"], capture_output=True, text=True, timeout=20)
+        with magick_paths(src, os.devnull) as (im_src, _out):
+            out = subprocess.run(["identify", "-format", "%Q", im_src + "[0]"], capture_output=True, text=True,
+                                 errors="replace", timeout=20)
         q = int(out.stdout.strip() or 0)
         if 1 <= q <= 100:
             return str(q)
@@ -77,6 +105,8 @@ def apply(src: str, dest: str, rotation: int = 0, crop=None, replace: bool = Fal
     cmd = magick_command()
     if cmd is None:
         raise EditError("ImageMagick")
+    if replace and os.path.islink(dest):
+        dest = os.path.realpath(dest)             # lien symbolique : c'est la photo visée qu'on remplace, le lien reste
     folder = os.path.dirname(os.path.abspath(dest)) or "."
     ext = os.path.splitext(dest)[1].lstrip(".").lower()
     quality = _quality(src) if ext in ("jpg", "jpeg", "webp") and os.path.splitext(src)[1].lower() in (
@@ -84,8 +114,10 @@ def apply(src: str, dest: str, rotation: int = 0, crop=None, replace: bool = Fal
     fd, tmp = tempfile.mkstemp(dir=folder, prefix=".argos-", suffix="." + (ext or "png"))
     os.close(fd)
     try:
-        r = subprocess.run(cmd + build_args(src, rotation, crop, ext, quality) + [f"{ext}:{tmp}" if ext else tmp],
-                           capture_output=True, text=True, timeout=300)
+        with magick_paths(src, tmp) as (im_src, im_out):
+            r = subprocess.run(cmd + build_args(im_src, rotation, crop, ext, quality)
+                               + [f"{ext}:{im_out}" if ext else im_out],
+                               capture_output=True, text=True, errors="replace", timeout=300)
         if r.returncode != 0 or os.path.getsize(tmp) == 0:
             raise EditError((r.stderr or "").strip().splitlines()[-1] if r.stderr.strip() else "ImageMagick")
         with open(tmp, "rb") as fh:
@@ -149,7 +181,9 @@ def backup(path: str) -> str:
 
 
 def restore(copy: str, path: str):
-    """Remet l'original (copie cachée à côté, fsync, échange) puis efface la sauvegarde."""
+    """Remet l'original (copie cachée à côté, fsync, échange) puis efface la sauvegarde. Lien symbolique : la photo
+    visée est remise, le lien reste."""
+    path = os.path.realpath(path)
     folder = os.path.dirname(os.path.abspath(path))
     fd, tmp = tempfile.mkstemp(dir=folder, prefix=".argos-", suffix=os.path.splitext(path)[1])
     os.close(fd)
