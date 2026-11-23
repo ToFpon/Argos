@@ -1,3 +1,17 @@
+argos-viewer (0.1.8~noble1) noble; urgency=medium
+
+  * Pivoter, recadrer et Convertir / redimensionner marchent de nouveau
+    sur une photo dont le nom ou le dossier contient « % ».
+  * Une photo ouverte par un lien symbolique : l'enregistrement modifie
+    la vraie photo, le lien reste.
+  * Enregistrer deux fois de suite pendant l'écriture d'une grosse photo
+    ne la fait plus pivoter deux fois.
+  * Les réglages s'enregistrent de nouveau après l'ouverture d'un dossier
+    au nom non UTF-8.
+  * Renommer en changeant seulement la casse marche sur une clé FAT.
+
+ -- Tof <nourpon@gmail.com>  Mon, 23 Nov 2026 12:20:19 +0000
+
 argos-viewer (0.1.7~noble1) noble; urgency=medium
 
   * Convertir / redimensionner (Ctrl+E) : redimensionner, pivoter et

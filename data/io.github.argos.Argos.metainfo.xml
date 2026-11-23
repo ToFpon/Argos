@@ -69,6 +69,17 @@
   </requires>
   <content_rating type="oars-1.1"/>
   <releases>
+    <release version="0.1.8" date="2026-11-23">
+      <description>
+        <ul>
+          <li>Rotating, cropping and Convert / Resize work again on photos whose name or folder contains “%”</li>
+          <li>Saving a photo opened through a symbolic link changes the real photo and keeps the link</li>
+          <li>Saving twice in a row while a large photo is being written no longer rotates it twice</li>
+          <li>Settings are saved again after opening a folder whose name is not UTF-8</li>
+          <li>Renaming a photo by changing only the case of its name works on FAT / exFAT drives</li>
+        </ul>
+      </description>
+    </release>
     <release version="0.1.7" date="2026-11-22">
       <description>
         <ul>
