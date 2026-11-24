@@ -143,6 +143,24 @@ Nom : Argos le géant aux cent yeux (et le chien d'Ulysse, le seul à le reconna
 - `app.py` : instance unique ; `argos PHOTO` → son dossier, photo affichée ; `argos DOSSIER` → grille ; seul →
   dernier dossier (sinon Images). Nom du processus « argos » (prctl, l'icône du Moniteur système en dépend).
 
+## AVIF / HEIC en haute définition (retour de Tof : gros dossiers d'AVIF très lents ; tests `test_heif`)
+
+- PIÈGE : le loader heif de GdkPixbuf (heif-gdk-pixbuf) DÉCODE L'IMAGE ENTIÈRE pour `get_file_info` (0,67 s pour
+  un AVIF de 24 Mpx, autant qu'un vrai décodage ; AV1 ne sait pas décoder en plus petit). Avant : 3 décodages par
+  photo dans la visionneuse (`format_name` + contrôle de taille + lecture), et un par vignette de la grille ET de la
+  bande À CHAQUE affichage, miniature en cache ou pas (`ThumbLoader._make` voulait la taille d'origine), plus deux
+  dans le panneau d'infos. Maintenant `loader.image_size` : AVIF / HEIC lus dans l'EN-TÊTE (boîtes ISOBMFF
+  « ispe », la plus grande = image entière — tuiles et vignette d'un HEIC de téléphone sont plus petites ; « irot »
+  impair = largeur / hauteur échangées), GdkPixbuf pour le reste (rapide) ; `format_name` d'après l'extension pour
+  ces formats. JAMAIS `get_file_info` sur une photo ailleurs que par `image_size`.
+  Mesuré (12 AVIF 6000 × 4000, un fil) : visionneuse 1,76 → 0,74 s ; grille 1re visite 14,9 → 7,5 s ; retour sur le
+  dossier 7,0 → 0,02 s. Le reste de la 1re visite = un décodage par miniature, inévitable (cache freedesktop
+  partagé avec Nautilus ensuite).
+- Cache de la visionneuse : 7 photos ET `CACHE_BYTES` (640 Mo de pixels) au plus — 7 AVIF de 48 Mpx décodés
+  pesaient 1,3 Go ; la dernière lue reste toujours.
+- Banc d'essai : `apt install heif-gdk-pixbuf libheif-examples libheif-plugin-dav1d libheif-plugin-aomenc` (heif-enc
+  -A fabrique les AVIF ; `convert … plasma:fractal` pour une image de photo).
+
 ## Audit de novembre 2026 (tests `test_audit`, ils échouent sur l'ancien code ; « deux Ctrl+S » dans ui_smoke)
 
 - ImageMagick lit « %d », « %o », « %x »… d'un chemin comme un GABARIT, à l'entrée comme à la sortie, et « %% »

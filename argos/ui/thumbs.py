@@ -16,6 +16,7 @@ gi.require_version("GdkPixbuf", "2.0")
 from gi.repository import Gdk, GdkPixbuf, GLib  # noqa: E402
 
 from ..backend import thumbnails  # noqa: E402
+from ..backend.loader import image_size  # noqa: E402
 
 WORKERS = 3
 FRAME = 3                           # cadre blanc des photos (base.css, .argos-photo)
@@ -85,11 +86,9 @@ class ThumbLoader:
         if pb is None:
             return None
         w, h = pb.get_width(), pb.get_height()
-        try:
-            info = GdkPixbuf.Pixbuf.get_file_info(path)
-            nat = (info[1], info[2]) if isinstance(info, tuple) and info[0] is not None else (w, h)
-        except GLib.Error:
-            nat = (w, h)
+        # taille d'origine SANS décoder (image_size) : get_file_info décodait un AVIF entier à chaque vignette,
+        # miniature en cache ou pas
+        nat = image_size(path) or (w, h)
         box = self.pixels - (2 * FRAME if not pb.get_has_alpha() else 0)
         k = min(box / w, box / h)                               # remplit la case…
         k = min(k, max(nat[0], 1) / w, max(nat[1], 1) / h)       # …sans dépasser la taille de l'image

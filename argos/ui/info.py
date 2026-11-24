@@ -12,8 +12,7 @@ from typing import Optional
 import gi
 
 gi.require_version("Gtk", "4.0")
-gi.require_version("GdkPixbuf", "2.0")
-from gi.repository import GdkPixbuf, GLib, Gtk, Pango  # noqa: E402
+from gi.repository import GLib, Gtk, Pango  # noqa: E402
 
 from ..backend.folder import human_size  # noqa: E402
 from ..i18n import LANGUAGE, decimal, tr  # noqa: E402
@@ -169,7 +168,7 @@ class InfoPanel(Gtk.ScrolledWindow):
 
         def work():
             from types import SimpleNamespace
-            from ..backend.loader import format_name
+            from ..backend.loader import format_name, image_size
             try:
                 st = os.stat(path)
             except OSError:
@@ -177,12 +176,7 @@ class InfoPanel(Gtk.ScrolledWindow):
             w = h = 0
             fmt = ""
             if not os.path.isdir(path):
-                try:
-                    info = GdkPixbuf.Pixbuf.get_file_info(path)
-                    if isinstance(info, tuple) and info[0] is not None:
-                        w, h = info[1], info[2]
-                except GLib.Error:
-                    pass
+                w, h = image_size(path) or (0, 0)          # sans décoder (AVIF : get_file_info décodait tout)
                 fmt = format_name(path)
             pic = SimpleNamespace(path=path, width=w, height=h, size=0 if os.path.isdir(path) else st.st_size,
                                   format=fmt, mtime=st.st_mtime, is_dir=os.path.isdir(path))

@@ -8,6 +8,7 @@ La texture (`Gdk.Texture`, immuable) est fabriquée dans le fil : le fil princip
 from __future__ import annotations
 
 import os
+import struct
 import threading
 from collections import OrderedDict
 from dataclasses import dataclass
@@ -20,6 +21,7 @@ gi.require_version("GdkPixbuf", "2.0")
 from gi.repository import Gdk, GdkPixbuf, GLib  # noqa: E402
 
 CACHE_ITEMS = 7                     # courante + 3 de chaque côté au plus
+CACHE_BYTES = 640 * 1024 * 1024     # …et 640 Mo de pixels au plus : 7 AVIF de 48 Mpx décodés pesaient 1,3 Go
 MAX_PIXELS = 400_000_000            # au-delà, refus net (une image de 20 000 × 20 000 occupe 1,6 Go en mémoire)
 
 
@@ -36,7 +38,56 @@ class Picture:
     mtime: float = 0.0
 
 
+HEIF_EXTS = {".avif": "AVIF", ".avifs": "AVIF", ".heic": "HEIC", ".heif": "HEIF", ".hif": "HEIF"}
+HEADER_BYTES = 512 * 1024
+
+
+def _heif_size(path: str) -> Optional[tuple[int, int]]:
+    """Taille d'un AVIF / HEIC lue dans son EN-TÊTE (boîte ISOBMFF « ispe »), sans décoder. Le loader heif de
+    GdkPixbuf DÉCODE l'image entière pour get_file_info (0,7 s pour un AVIF de 24 Mpx, vu chez Tof : gros
+    dossiers d'AVIF qui « galèrent »). Plusieurs « ispe » (tuiles d'un HEIC de téléphone, vignette intégrée,
+    couche alpha) : la plus grande est l'image entière. Quart de tour « irot » impair : largeur et hauteur
+    échangées (libheif l'applique au décodage)."""
+    try:
+        with open(path, "rb") as fh:
+            data = fh.read(HEADER_BYTES)
+    except OSError:
+        return None
+    best = None
+    i = data.find(b"ispe")
+    while i >= 4:
+        if i + 16 <= len(data) and struct.unpack(">I", data[i - 4:i])[0] >= 20:
+            w, h = struct.unpack(">II", data[i + 8:i + 16])
+            if w and h and (best is None or w * h > best[0] * best[1]):
+                best = (w, h)
+        i = data.find(b"ispe", i + 4)
+    if best is None:
+        return None
+    r = data.find(b"irot")
+    if r >= 4 and r + 4 < len(data) and struct.unpack(">I", data[r - 4:r])[0] == 9 and data[r + 4] & 1:
+        best = (best[1], best[0])
+    return best
+
+
+def image_size(path: str) -> Optional[tuple[int, int]]:
+    """(largeur, hauteur) sans décoder l'image quand c'est possible ; None si illisible."""
+    if os.path.splitext(path)[1].lower() in HEIF_EXTS:
+        found = _heif_size(path)
+        if found is not None:
+            return found
+    try:
+        info = GdkPixbuf.Pixbuf.get_file_info(path)
+        if isinstance(info, tuple) and info[0] is not None:
+            return info[1], info[2]
+    except GLib.Error:
+        pass
+    return None
+
+
 def format_name(path: str) -> str:
+    ext = os.path.splitext(path)[1].lower()
+    if ext in HEIF_EXTS:
+        return HEIF_EXTS[ext]                 # sans get_file_info (décodage complet pour ce loader)
     try:
         info = GdkPixbuf.Pixbuf.get_file_info(path)
         fmt = info[0] if isinstance(info, tuple) else info
@@ -63,10 +114,10 @@ def load(path: str) -> Picture:
         return Picture(path, None, 0, 0, 0, "", error=e.strerror or str(e))
     fmt = format_name(path)
     try:
-        info = GdkPixbuf.Pixbuf.get_file_info(path)
-        if isinstance(info, tuple) and info[0] is not None and info[1] * info[2] > MAX_PIXELS:
+        dims = image_size(path)
+        if dims is not None and dims[0] * dims[1] > MAX_PIXELS:
             from ..i18n import tr
-            return Picture(path, None, info[1], info[2], st.st_size, fmt, error=tr("Image trop grande"),
+            return Picture(path, None, dims[0], dims[1], st.st_size, fmt, error=tr("Image trop grande"),
                            mtime=st.st_mtime)
         anim = GdkPixbuf.PixbufAnimation.new_from_file(path)
         if not anim.is_static_image():
@@ -85,6 +136,11 @@ def load(path: str) -> Picture:
         if pkg and e.matches(GdkPixbuf.pixbuf_error_quark(), GdkPixbuf.PixbufError.UNKNOWN_TYPE):
             msg = tr("Format non pris en charge : installez le paquet « {0} »").format(pkg)
         return Picture(path, None, 0, 0, st.st_size, fmt, error=msg, mtime=st.st_mtime)
+
+
+def _weight(cache) -> int:
+    """Octets de pixels décodés gardés (4 par pixel)."""
+    return sum(p.width * p.height * 4 for p in cache.values() if p.texture is not None)
 
 
 class Loader:
@@ -145,8 +201,8 @@ class Loader:
                 self._busy = None
                 self._cache[path] = pic
                 self._cache.move_to_end(path)
-                while len(self._cache) > CACHE_ITEMS:
-                    self._cache.popitem(last=False)
+                while len(self._cache) > CACHE_ITEMS or (len(self._cache) > 1 and _weight(self._cache) > CACHE_BYTES):
+                    self._cache.popitem(last=False)          # la plus ancienne ; la dernière lue reste
                 cbs = self._waiters.pop(path, [])
             for cb in cbs:
                 GLib.idle_add(lambda cb=cb, pic=pic: (cb(pic), False)[1])
