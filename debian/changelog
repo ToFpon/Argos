@@ -1,3 +1,14 @@
+argos-viewer (0.1.9~noble1) noble; urgency=medium
+
+  * Gros dossiers de photos AVIF et HEIC en haute définition beaucoup
+    plus rapides : leur taille est lue dans l'en-tête du fichier au lieu
+    de décoder l'image entière.
+  * Revenir sur un dossier d'AVIF est instantané, la visionneuse les
+    ouvre plus de deux fois plus vite.
+  * La visionneuse garde au plus 640 Mo de photos décodées en mémoire.
+
+ -- Tof <nourpon@gmail.com>  Tue, 24 Nov 2026 06:34:29 +0000
+
 argos-viewer (0.1.8~noble1) noble; urgency=medium
 
   * Pivoter, recadrer et Convertir / redimensionner marchent de nouveau
