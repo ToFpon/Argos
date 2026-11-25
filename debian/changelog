@@ -1,3 +1,13 @@
+argos-viewer (0.2.0~noble1) noble; urgency=medium
+
+  * Taille des vignettes en choix simple (petites, moyennes, grandes, très
+    grandes), appliquée tout de suite ; aussi Ctrl + molette et + / − dans
+    la grille.
+  * Nouveau réglage « Ouvrir Argos sur » : le dernier dossier ouvert, le
+    dossier Images ou un dossier choisi.
+
+ -- Tof <nourpon@gmail.com>  Wed, 25 Nov 2026 18:44:32 +0000
+
 argos-viewer (0.1.9~noble1) noble; urgency=medium
 
   * Gros dossiers de photos AVIF et HEIC en haute définition beaucoup
