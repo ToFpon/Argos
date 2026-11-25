@@ -29,7 +29,7 @@ def _groups():
             ("i", tr("Propriétés")),
         ]),
         (tr("Zoom"), [
-            ("plus minus", tr("Zoom avant / arrière")),
+            ("plus minus", tr("Zoom avant / arrière ; dans la grille : taille des vignettes")),
             ("0", tr("Ajuster à la fenêtre")),
             ("1", tr("Taille réelle (100 %)")),
         ]),
@@ -45,7 +45,7 @@ def _groups():
         ]),
         (tr("Souris"), [
             (None, tr("Molette : photo suivante / précédente")),
-            (None, tr("Ctrl + molette : zoom autour du pointeur")),
+            (None, tr("Ctrl + molette : zoom autour du pointeur ; dans la grille : taille des vignettes")),
             (None, tr("Glisser : déplacer la photo agrandie")),
             (None, tr("Double-clic : plein écran")),
         ]),

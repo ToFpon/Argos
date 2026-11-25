@@ -401,12 +401,89 @@ def steps(app):
     yield lambda: abs(win.view._hires.get_width() - 48 * win.view.zoom) < 4
     check(abs(win.view._hires.get_width() - 48 * win.view.zoom) < 4, "SVG : redessiné après un zoom")
 
+    # taille des vignettes : choix simple, en direct (demande d'un utilisateur)
+    win.show_browser()
+    yield lambda: win.stack.get_visible_child_name() == "browser"
+    settings["grid_size"] = 128
+    yield 100
+    win.activate_action("win.zoom-in", None)                 # Ctrl + + dans la grille
+    yield 200
+    check(settings["grid_size"] == 192 and win.grid.size == 192, "Ctrl + + dans la grille : vignettes plus grandes, tout de suite")
+    win.activate_action("win.zoom-out", None)
+    win.activate_action("win.zoom-out", None)
+    yield 200
+    check(win.grid.size == 96, "Ctrl + − : plus petites")
+    win.activate_action("win.zoom-out", None)
+    yield 100
+    check(win.grid.size == 96, "bornée à « Petites »")
+    yield lambda: win.grid.view.get_max_columns() > 1
+    cols_small = win.grid.view.get_max_columns()
+    settings["grid_size"] = 256
+    yield lambda: win.grid.view.get_max_columns() < cols_small
+    check(win.grid.view.get_max_columns() < cols_small, "« Très grandes » : moins de colonnes")
+    yield lambda: any(c.picture.get_paintable() is not None for c in _cells(win.grid.view))
+    check(any(c.size == 256 and c.picture.get_paintable() is not None for c in _cells(win.grid.view)),
+          "nouvelles cases avec leurs miniatures")
+    settings["grid_size"] = 128
+
     # préférences
     from argos.ui.preferences import PreferencesWindow
     pw = PreferencesWindow(win)
     pw.present()
     yield 200
+    rows = _rows(pw)
+    size_row = next(r for r in rows if isinstance(r, Adw.ComboRow) and r.get_title() == tr("Taille des vignettes"))
+    size_row.set_selected(2)
+    yield 200
+    check(win.grid.size == 192, "Préférences → Taille des vignettes « Grandes » : grille changée tout de suite")
+    win.activate_action("win.zoom-out", None)
+    yield 200
+    check(size_row.get_selected() == 1, "Ctrl + − : le choix des Préférences suit")
+    start_row = next(r for r in rows if isinstance(r, Adw.ComboRow) and r.get_title() == tr("Ouvrir Argos sur"))
+    start_row.set_selected(1)
+    yield 100
+    from argos.app import start_folder
+    from argos.backend import folder as fold
+    check(settings["startup"] == "pictures" and start_folder() == fold.pictures_dir(), "« Ouvrir Argos sur » : Images")
+    settings["startup_folder"] = os.path.join(PHOTOS, "Sous-dossier")
+    start_row.set_selected(2)
+    yield 100
+    check(start_folder() == os.path.join(PHOTOS, "Sous-dossier"), "« Ouvrir Argos sur » : dossier choisi")
+    settings["startup_folder"] = os.path.join(PHOTOS, "disparu")
+    check(start_folder() == fold.pictures_dir(), "dossier choisi disparu : Images")
+    start_row.set_selected(0)
+    yield 100
+    check(start_folder() == PHOTOS or settings["last_folder"] == start_folder(), "« Ouvrir Argos sur » : dernier dossier")
+    for d in dialogs(app):
+        d.close()
     pw.close()
+
+
+def _cells(view):
+    from argos.ui.gallery import _Cell
+    out, todo = [], [view]
+    while todo:
+        w = todo.pop()
+        if isinstance(w, _Cell):
+            out.append(w)
+        c = w.get_first_child()
+        while c is not None:
+            todo.append(c)
+            c = c.get_next_sibling()
+    return out
+
+
+def _rows(window):
+    out, todo = [], [window]
+    while todo:
+        w = todo.pop()
+        if isinstance(w, Adw.PreferencesRow):
+            out.append(w)
+        c = w.get_first_child()
+        while c is not None:
+            todo.append(c)
+            c = c.get_next_sibling()
+    return out
 
 
 def run_steps(app):

@@ -22,7 +22,7 @@ from ..backend.loader import Loader, Picture  # noqa: E402
 from ..i18n import LANGUAGE, decimal, ntr, tr  # noqa: E402
 from ..settings import settings  # noqa: E402
 from .common import alert, shown, toast  # noqa: E402
-from .gallery import Filmstrip, Grid, store_of  # noqa: E402
+from .gallery import Filmstrip, Grid, nearest_size, step_size, store_of  # noqa: E402
 from .filemenu import FileMenu  # noqa: E402
 from .info import InfoPanel  # noqa: E402
 from .thumbs import forget_everywhere  # noqa: E402
@@ -109,7 +109,14 @@ class MainWindow(FileMenu, Adw.ApplicationWindow):
         self.browser_title = Adw.WindowTitle()
         header.set_title_widget(self.browser_title)
         header.pack_end(self._menu())
-        self.grid = Grid(settings["grid_size"])
+        self.grid = Grid(nearest_size(settings["grid_size"]))
+        # Ctrl + molette sur la grille : taille des vignettes (comme Nautilus / gThumb), en CAPTURE avant le défilement
+        grid_wheel = Gtk.EventControllerScroll(flags=Gtk.EventControllerScrollFlags.VERTICAL,
+                                               propagation_phase=Gtk.PropagationPhase.CAPTURE)
+        grid_wheel.connect("scroll", self._on_grid_wheel)
+        self.grid.add_controller(grid_wheel)
+        self._grid_wheel_acc = 0.0
+        settings.connect(self._on_setting)
         self.grid.connect("open", lambda _g, e: self.open_entry(e))
         self.grid.connect("context-menu", self._grid_menu)
         self.empty = Adw.StatusPage(icon_name="image-x-generic-symbolic", title=tr("Aucune image"))
@@ -305,8 +312,8 @@ class MainWindow(FileMenu, Adw.ApplicationWindow):
         add("up", self.go_up, ["<Alt>Up"])
         add("back", self.back)
         add("fullscreen", self.toggle_fullscreen, ["F11", "f"])
-        add("zoom-in", lambda: self.view.zoom_step(1), ["plus", "KP_Add", "equal", "<Control>plus"])
-        add("zoom-out", lambda: self.view.zoom_step(-1), ["minus", "KP_Subtract", "<Control>minus"])
+        add("zoom-in", lambda: self._zoom(1), ["plus", "KP_Add", "equal", "<Control>plus"])
+        add("zoom-out", lambda: self._zoom(-1), ["minus", "KP_Subtract", "<Control>minus"])
         add("zoom-fit", self.view.set_fit, ["0", "KP_0", "<Control>0"])
         add("zoom-100", lambda: self.view.set_zoom(1.0), ["1", "KP_1"])
         add("zoom-toggle", self.zoom_toggle)
@@ -327,7 +334,8 @@ class MainWindow(FileMenu, Adw.ApplicationWindow):
             a.connect("activate", lambda a, _p, key=key: (a.set_state(GLib.Variant("b", not a.get_state())),
                                                           self._set_option(key, a.get_state().get_boolean())))
             self.add_action(a)
-        self._viewer_actions = ("back", "fullscreen", "zoom-in", "zoom-out", "zoom-fit", "zoom-100", "zoom-toggle",
+        # (zoom-in / zoom-out servent aussi dans la grille : taille des vignettes)
+        self._viewer_actions = ("back", "fullscreen", "zoom-fit", "zoom-100", "zoom-toggle",
                                 "rotate-right", "rotate-left", "info", "crop", "save", "save-as",
                                 "revert")
         self._setup_file_menu()
@@ -898,6 +906,27 @@ class MainWindow(FileMenu, Adw.ApplicationWindow):
             threading.Thread(target=work, daemon=True).start()
         d.save(self, None, done)
 
+    def _zoom(self, step: int):
+        """+ / − : zoom de la photo dans la visionneuse, taille des vignettes dans la grille."""
+        if self.stack.get_visible_child_name() == "viewer":
+            self.view.zoom_step(step)
+        else:
+            settings["grid_size"] = step_size(settings["grid_size"], step)
+
+    def _on_grid_wheel(self, ctl, _dx, dy):
+        if not ctl.get_current_event_state() & Gdk.ModifierType.CONTROL_MASK:
+            return False
+        self._grid_wheel_acc += dy                 # pavé tactile : petits pas cumulés jusqu'à un cran
+        if abs(self._grid_wheel_acc) >= 1:
+            step = -1 if self._grid_wheel_acc > 0 else 1         # vers le haut : plus grandes
+            self._grid_wheel_acc = 0.0
+            settings["grid_size"] = step_size(settings["grid_size"], step)
+        return True
+
+    def _on_setting(self, key, value):
+        if key == "grid_size":
+            self.grid.set_size(nearest_size(value))
+
     def zoom_toggle(self):
         if self.view.fit:
             self.view.set_zoom(1.0)
@@ -1035,4 +1064,5 @@ class MainWindow(FileMenu, Adw.ApplicationWindow):
             settings["window_width"], settings["window_height"] = w, h
         if self._monitor is not None:
             self._monitor.cancel()
+        settings.disconnect(self._on_setting)
         return False

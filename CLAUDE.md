@@ -140,8 +140,17 @@ Nom : Argos le géant aux cent yeux (et le chien d'Ulysse, le seul à le reconna
   retenue au glisser (`info_ratio`), arbre de 120 px au moins.
 - `ui/info.py` : propriétés (fichier) + prise de vue par GExiv2 (date, appareil, objectif, exposition, ouverture,
   ISO, focale, flash, position), dans un fil.
+- Taille des vignettes (retour d'un utilisateur : utile à ceux qui voient mal ; l'ancien réglage en pixels, appliqué
+  au redémarrage, n'était pas trouvé) : Préférences → Affichage = Petites / Moyennes / Grandes / Très grandes
+  (`gallery.GRID_SIZES` 96 / 128 / 192 / 256, `nearest_size` ramène un ancien réglage), EN DIRECT (`Grid.set_size` :
+  nouvelle fabrique de cases, colonnes recalculées, sélection gardée ; fenêtre → `settings.connect`) ; aussi
+  Ctrl + molette sur la grille (`_on_grid_wheel`, en capture) et + / − (`_zoom` : photo dans la visionneuse,
+  vignettes dans la grille — d'où zoom-in / zoom-out hors de `_viewer_actions`). Le choix des Préférences suit.
+- « Ouvrir Argos sur » (même retour ; l'arbre des dossiers RESTE, choix de Tof, masquable par F9) : réglages
+  `startup` (last par défaut / pictures / folder) + `startup_folder`, Préférences → Général → Comportement
+  (choisir « Un dossier choisi » sans dossier ouvre le sélecteur), `app.start_folder` (disparu → Images).
 - `app.py` : instance unique ; `argos PHOTO` → son dossier, photo affichée ; `argos DOSSIER` → grille ; seul →
-  dernier dossier (sinon Images). Nom du processus « argos » (prctl, l'icône du Moniteur système en dépend).
+  `start_folder()` (dernier dossier par défaut, sinon Images). Nom du processus « argos » (prctl, l'icône du Moniteur système en dépend).
 
 ## AVIF / HEIC en haute définition (retour de Tof : gros dossiers d'AVIF très lents ; tests `test_heif`)
 

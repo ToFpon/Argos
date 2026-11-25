@@ -26,6 +26,17 @@ from .settings import settings  # noqa: E402
 DATA_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data")
 
 
+def start_folder() -> str:
+    """« Ouvrir Argos sur » (Préférences → Général, demande d'un utilisateur) : dernier dossier (défaut), dossier
+    Images ou dossier choisi ; disparu → Images."""
+    choice = settings["startup"]
+    if choice == "folder" and settings["startup_folder"] and os.path.isdir(settings["startup_folder"]):
+        return settings["startup_folder"]
+    if choice == "last" and settings["last_folder"] and os.path.isdir(settings["last_folder"]):
+        return settings["last_folder"]
+    return fold.pictures_dir()
+
+
 class ArgosApp(Adw.Application):
     def __init__(self):
         super().__init__(application_id=APP_ID, flags=Gio.ApplicationFlags.HANDLES_OPEN)
@@ -68,8 +79,7 @@ class ArgosApp(Adw.Application):
         new = self.get_active_window() is None
         win = self._window()
         if new:
-            last = settings["last_folder"]
-            win.open_folder(last if last and os.path.isdir(last) else fold.pictures_dir())
+            win.open_folder(start_folder())
         win.present()
 
     def do_open(self, files, n_files, hint):

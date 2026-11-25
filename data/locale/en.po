@@ -7,654 +7,935 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
+#: argos/app.py:110
 msgid "Remerciements"
 msgstr "Thanks"
 
+#: argos/app.py:107
 msgid "Visionneuse de photos simple et rapide"
 msgstr "A simple, fast photo viewer"
 
+#: argos/backend/folder.py:107
 msgid "Ko"
 msgstr "kB"
 
+#: argos/backend/folder.py:107
 msgid "Mo"
 msgstr "MB"
 
+#: argos/backend/folder.py:107
 msgid "Go"
 msgstr "GB"
 
+#: argos/backend/folder.py:107 argos/backend/folder.py:109
 msgid "To"
 msgstr "TB"
 
+#: argos/backend/folder.py:106
 msgid "o"
 msgstr "B"
 
+#: argos/backend/imagetools.py:186 argos/ui/filemenu.py:147
 msgid "ImageMagick n'est pas installé"
 msgstr "ImageMagick is not installed"
 
+#: argos/backend/imagetools.py:257
 msgid "Aucune image n'a pu être traitée"
 msgstr "No image could be processed"
 
+#: argos/backend/imagetools.py:191
 msgid "{0} ({1} sur {2})"
 msgstr "{0} ({1} of {2})"
 
+#: argos/backend/imagetools.py:208
 msgid "ImageMagick a échoué"
 msgstr "ImageMagick failed"
 
-msgid "Décodeur HEIC absent ? Installez-le avec :\n{0}"
-msgstr "HEIC decoder missing? Install it with:\n{0}"
+#: argos/backend/imagetools.py:211
+msgid ""
+"Décodeur HEIC absent ? Installez-le avec :\n"
+"{0}"
+msgstr ""
+"HEIC decoder missing? Install it with:\n"
+"{0}"
 
+#: argos/backend/loader.py:120
 msgid "Image trop grande"
 msgstr "Image too large"
 
+#: argos/backend/loader.py:137
 msgid "Format non pris en charge : installez le paquet « {0} »"
 msgstr "Unsupported format: install the “{0}” package"
 
+#: argos/features.py:33
 msgid "Molette = photo suivante"
 msgstr "Wheel = next photo"
 
-msgid "La molette passe à la photo suivante ou précédente, Ctrl + molette zoome (comme FastStone) ; coupée, la molette zoome"
-msgstr "The wheel goes to the next or previous photo, Ctrl + wheel zooms (like FastStone); when off, the wheel zooms"
+#: argos/features.py:34
+msgid ""
+"La molette passe à la photo suivante ou précédente, Ctrl + molette zoome "
+"(comme FastStone) ; coupée, la molette zoome"
+msgstr ""
+"The wheel goes to the next or previous photo, Ctrl + wheel zooms (like "
+"FastStone); when off, the wheel zooms"
 
+#: argos/features.py:37
 msgid "Revenir au début"
 msgstr "Loop"
 
+#: argos/features.py:38
 msgid "Après la dernière photo du dossier, on repart de la première"
 msgstr "After the last photo of the folder, start again from the first"
 
+#: argos/features.py:40
 msgid "Préchargement"
 msgstr "Preloading"
 
-msgid "Les photos voisines sont lues d'avance : la suivante s'affiche tout de suite"
-msgstr "Neighbouring photos are read in advance: the next one shows up instantly"
+#: argos/features.py:41
+msgid ""
+"Les photos voisines sont lues d'avance : la suivante s'affiche tout de suite"
+msgstr ""
+"Neighbouring photos are read in advance: the next one shows up instantly"
 
+#: argos/features.py:43
 msgid "Retouche simple"
 msgstr "Simple editing"
 
+#: argos/features.py:44
 msgid "Pivoter, recadrer et enregistrer sous un autre format"
 msgstr "Rotate, crop and save in another format"
 
+#: argos/features.py:46
 msgid "Demande ImageMagick (paquet imagemagick)"
 msgstr "Requires ImageMagick (imagemagick package)"
 
+#: argos/ui/common.py:222 argos/ui/filemenu.py:353 argos/ui/filemenu.py:461
+#: argos/ui/window.py:285
 msgid "Annuler"
 msgstr "Cancel"
 
+#: argos/ui/filemenu.py:89 argos/ui/shortcuts.py:37
 msgid "Plein écran"
 msgstr "Fullscreen"
 
+#: argos/ui/filemenu.py:94 argos/ui/shortcuts.py:26
 msgid "Imprimer…"
 msgstr "Print…"
 
+#: argos/ui/filemenu.py:104
 msgid "Autre application…"
 msgstr "Other Application…"
 
+#: argos/ui/filemenu.py:106
 msgid "Ouvrir avec"
 msgstr "Open With"
 
+#: argos/ui/filemenu.py:109 argos/ui/shortcuts.py:25
 msgid "Copier l'image"
 msgstr "Copy Image"
 
+#: argos/ui/filemenu.py:114 argos/ui/filemenu.py:132
 msgid "Copier vers…"
 msgstr "Copy To…"
 
+#: argos/ui/filemenu.py:115 argos/ui/filemenu.py:133
 msgid "Déplacer vers…"
 msgstr "Move To…"
 
+#: argos/ui/filemenu.py:116 argos/ui/shortcuts.py:24
 msgid "Renommer…"
 msgstr "Rename…"
 
+#: argos/ui/filemenu.py:119 argos/ui/filemenu.py:136 argos/ui/shortcuts.py:22
 msgid "Mettre à la corbeille"
 msgstr "Move to trash"
 
+#: argos/ui/filemenu.py:120 argos/ui/filemenu.py:137 argos/ui/shortcuts.py:23
 msgid "Supprimer…"
 msgstr "Delete…"
 
+#: argos/ui/filemenu.py:288
 msgid "Image copiée"
 msgstr "Image copied"
 
+#: argos/ui/filemenu.py:352 argos/ui/filemenu.py:354
 msgid "Renommer"
 msgstr "Rename"
 
+#: argos/ui/filemenu.py:460
 msgid "Si vous supprimez un élément, il sera définitivement perdu."
 msgstr "If you delete an item, it will be permanently lost."
 
+#: argos/ui/filemenu.py:91
 msgid "Définir comme arrière-plan"
 msgstr "Set as Background"
 
+#: argos/ui/filemenu.py:111 argos/ui/filemenu.py:129 argos/ui/shortcuts.py:27
+#: argos/ui/window.py:80
 msgid "Convertir / redimensionner…"
 msgstr "Convert / Resize…"
 
+#: argos/ui/filemenu.py:345 argos/ui/info.py:143 argos/ui/window.py:83
 msgid "Nom"
 msgstr "Name"
 
+#: argos/ui/filemenu.py:378
 msgid "Nom impossible"
 msgstr "Invalid name"
 
+#: argos/ui/filemenu.py:480
 msgid "Impossible de mettre à la corbeille"
 msgstr "Cannot move to trash"
 
+#: argos/ui/filemenu.py:191
 msgid "Impossible de définir l'arrière-plan"
 msgstr "Cannot set the background"
 
+#: argos/ui/filemenu.py:211
 msgid "« {0} » est maintenant l'arrière-plan"
 msgstr "“{0}” is now the background"
 
+#: argos/ui/filemenu.py:221 argos/ui/filemenu.py:241
 msgid "Impression impossible"
 msgstr "Cannot print"
 
+#: argos/ui/filemenu.py:272
 msgid "Ouverture impossible"
 msgstr "Cannot open"
 
+#: argos/ui/filemenu.py:295
 msgid "Déplacer vers"
 msgstr "Move To"
 
+#: argos/ui/filemenu.py:295
 msgid "Copier vers"
 msgstr "Copy To"
 
+#: argos/ui/filemenu.py:329
 msgid "Déplacement impossible"
 msgstr "Cannot move"
 
+#: argos/ui/filemenu.py:329
 msgid "Copie impossible"
 msgstr "Cannot copy"
 
+#: argos/ui/filemenu.py:438
 msgid "Supprimer définitivement « {0} » ?"
 msgstr "Permanently delete “{0}”?"
 
+#: argos/ui/filemenu.py:440
 msgid "Supprimer définitivement l'élément sélectionné ?"
 msgid_plural "Supprimer définitivement les {0} éléments sélectionnés ?"
 msgstr[0] "Permanently delete the selected item?"
 msgstr[1] "Permanently delete the {0} selected items?"
 
+#: argos/ui/filemenu.py:455
 msgid "Suppression impossible"
 msgstr "Cannot delete"
 
+#: argos/ui/filemenu.py:461
 msgid "Supprimer"
 msgstr "Delete"
 
+#: argos/ui/filemenu.py:380
 msgid "« {0} » existe déjà"
 msgstr "“{0}” already exists"
 
+#: argos/ui/filemenu.py:400
 msgid "Renommage impossible"
 msgstr "Cannot rename"
 
+#: argos/ui/filemenu.py:482
 msgid "« {0} » mis à la corbeille"
 msgstr "“{0}” moved to trash"
 
+#: argos/ui/filemenu.py:335
 msgid "« {0} » déplacée dans {1}"
 msgstr "“{0}” moved to {1}"
 
+#: argos/ui/filemenu.py:335
 msgid "« {0} » copiée dans {1}"
 msgstr "“{0}” copied to {1}"
 
+#: argos/ui/filemenu.py:337
 msgid "{0} photo déplacée dans {1}"
 msgid_plural "{0} photos déplacées dans {1}"
 msgstr[0] "{0} photo moved to {1}"
 msgstr[1] "{0} photos moved to {1}"
 
+#: argos/ui/filemenu.py:338
 msgid "{0} photo copiée dans {1}"
 msgid_plural "{0} photos copiées dans {1}"
 msgstr[0] "{0} photo copied to {1}"
 msgstr[1] "{0} photos copied to {1}"
 
+#: argos/ui/filemenu.py:457
 msgid "« {0} » supprimée"
 msgstr "“{0}” deleted"
 
+#: argos/ui/filemenu.py:484
 msgid "{0} photo mise à la corbeille"
 msgid_plural "{0} photos mises à la corbeille"
 msgstr[0] "{0} photo moved to trash"
 msgstr[1] "{0} photos moved to trash"
 
+#: argos/ui/filemenu.py:459
 msgid "{0} photo supprimée"
 msgid_plural "{0} photos supprimées"
 msgstr[0] "{0} photo deleted"
 msgstr[1] "{0} photos deleted"
 
+#: argos/ui/image_dialog.py:17
 msgid "90° à droite"
 msgstr "90° clockwise"
 
+#: argos/ui/image_dialog.py:17
 msgid "90° à gauche"
 msgstr "90° counterclockwise"
 
+#: argos/ui/image_dialog.py:17
 msgid "180°"
 msgstr "180°"
 
+#: argos/ui/image_dialog.py:18
 msgid "Angle libre"
 msgstr "Custom angle"
 
+#: argos/ui/image_dialog.py:33 argos/ui/window.py:208 argos/ui/window.py:786
 msgid "Enregistrer"
 msgstr "Save"
 
+#: argos/ui/image_dialog.py:40
 msgid "Méthode"
 msgstr "Method"
 
+#: argos/ui/image_dialog.py:44
 msgid "Échelle (%)"
 msgstr "Scale (%)"
 
+#: argos/ui/image_dialog.py:48
 msgid "Largeur maximale (px)"
 msgstr "Maximum width (px)"
 
+#: argos/ui/image_dialog.py:51
 msgid "Hauteur maximale (px)"
 msgstr "Maximum height (px)"
 
+#: argos/ui/image_dialog.py:63
 msgid "Rotation"
 msgstr "Rotation"
 
+#: argos/ui/image_dialog.py:67
 msgid "Angle (degrés, sens horaire)"
 msgstr "Angle (degrees, clockwise)"
 
+#: argos/ui/image_dialog.py:75 argos/ui/info.py:149
 msgid "Format"
 msgstr "Format"
 
+#: argos/ui/image_dialog.py:83
 msgid "Qualité JPEG / WebP"
 msgstr "JPEG / WebP quality"
 
+#: argos/ui/image_dialog.py:30
 msgid "Redimensionner les images"
 msgstr "Resize Images"
 
+#: argos/ui/image_dialog.py:30
 msgid "Pivoter les images"
 msgstr "Rotate Images"
 
+#: argos/ui/image_dialog.py:31
 msgid "Convertir les images"
 msgstr "Convert Images"
 
+#: argos/ui/image_dialog.py:35
 msgid "Modifications"
 msgstr "Changes"
 
+#: argos/ui/image_dialog.py:36
 msgid "Combinables : par exemple redimensionner et convertir en une fois"
 msgstr "Can be combined: for example resize and convert in one go"
 
+#: argos/ui/image_dialog.py:38
 msgid "Redimensionner"
 msgstr "Resize"
 
+#: argos/ui/image_dialog.py:40
 msgid "À l'échelle"
 msgstr "By percentage"
 
+#: argos/ui/image_dialog.py:40
 msgid "Taille maximale"
 msgstr "Maximum size"
 
+#: argos/ui/image_dialog.py:53
 msgid "Ne pas agrandir les petites images"
 msgstr "Do not enlarge smaller images"
 
+#: argos/ui/image_dialog.py:59
 msgid "Pivoter"
 msgstr "Rotate"
 
+#: argos/ui/image_dialog.py:72
 msgid "Convertir le format"
 msgstr "Convert format"
 
+#: argos/ui/image_dialog.py:81
 msgid "Enregistrement"
 msgstr "Saving"
 
+#: argos/ui/image_dialog.py:86
 msgid "Remplacer les originaux"
 msgstr "Replace the originals"
 
+#: argos/ui/image_dialog.py:88
 msgid "Ajouter au nom des nouvelles images"
 msgstr "Append to the name of the new images"
 
+#: argos/ui/image_dialog.py:92 argos/ui/image_dialog.py:94
 msgid "Dossier de destination"
 msgstr "Destination folder"
 
+#: argos/ui/image_dialog.py:92
 msgid "À côté de chaque image"
 msgstr "Next to each image"
 
-msgid "Les images changent de format : les originaux iront à la corbeille une fois les nouvelles images enregistrées."
-msgstr "The images change format: the originals will be moved to the trash once the new images are saved."
+#: argos/ui/image_dialog.py:155
+msgid ""
+"Les images changent de format : les originaux iront à la corbeille une fois "
+"les nouvelles images enregistrées."
+msgstr ""
+"The images change format: the originals will be moved to the trash once the "
+"new images are saved."
 
+#: argos/ui/image_dialog.py:225
 msgid "{0} image enregistrée"
 msgid_plural "{0} images enregistrées"
 msgstr[0] "{0} image saved"
 msgstr[1] "{0} images saved"
 
+#: argos/ui/image_dialog.py:228
 msgid "Certaines images n'ont pas pu être traitées"
 msgstr "Some images could not be processed"
 
+#: argos/ui/image_dialog.py:89
 msgid " (redimensionnée)"
 msgstr " (resized)"
 
+#: argos/ui/image_dialog.py:89
 msgid " (pivotée)"
 msgstr " (rotated)"
 
-msgid "Chaque original est remplacé d'un coup, une fois la nouvelle image complète : jamais d'image à moitié écrite."
-msgstr "Each original is replaced in one step, once the new image is complete: never a half-written image."
+#: argos/ui/image_dialog.py:158
+msgid ""
+"Chaque original est remplacé d'un coup, une fois la nouvelle image "
+"complète : jamais d'image à moitié écrite."
+msgstr ""
+"Each original is replaced in one step, once the new image is complete: never "
+"a half-written image."
 
+#: argos/ui/image_dialog.py:102
 msgid "{0} image"
 msgid_plural "{0} images"
 msgstr[0] "{0} image"
 msgstr[1] "{0} images"
 
+#: argos/ui/image_dialog.py:227
 msgid "{0} erreur"
 msgid_plural "{0} erreurs"
 msgstr[0] "{0} error"
 msgstr[1] "{0} errors"
 
+#: argos/ui/image_dialog.py:162
 msgid "Exemple : {0}"
 msgstr "Example: {0}"
 
+#: argos/ui/info.py:152
 msgid "Fichier"
 msgstr "File"
 
+#: argos/ui/info.py:72
 msgid "Prise le"
 msgstr "Taken on"
 
+#: argos/ui/info.py:76
 msgid "Appareil"
 msgstr "Camera"
 
+#: argos/ui/info.py:79
 msgid "Objectif"
 msgstr "Lens"
 
+#: argos/ui/info.py:82
 msgid "Exposition"
 msgstr "Exposure"
 
+#: argos/ui/info.py:85
 msgid "Ouverture"
 msgstr "Aperture"
 
+#: argos/ui/info.py:88
 msgid "Sensibilité"
 msgstr "Sensitivity"
 
+#: argos/ui/info.py:95
 msgid "Focale"
 msgstr "Focal length"
 
+#: argos/ui/info.py:98
 msgid "Flash"
 msgstr "Flash"
 
+#: argos/ui/info.py:104
 msgid "Position"
 msgstr "Location"
 
+#: argos/ui/info.py:143 argos/ui/preferences.py:101
 msgid "Dossier"
 msgstr "Folder"
 
+#: argos/ui/info.py:188
 msgid "Prise de vue"
 msgstr "Shot"
 
+#: argos/ui/info.py:145
 msgid "Dimensions"
 msgstr "Dimensions"
 
+#: argos/ui/info.py:147 argos/ui/window.py:85
 msgid "Taille"
 msgstr "Size"
 
+#: argos/ui/info.py:151
 msgid "Modifié le"
 msgstr "Modified"
 
+#: argos/ui/info.py:94
 msgid "(équivalent {0} mm)"
 msgstr "({0} mm equivalent)"
 
+#: argos/ui/preferences.py:67
 msgid "Style"
 msgstr "Style"
 
+#: argos/ui/preferences.py:78
 msgid "Taille des vignettes"
 msgstr "Thumbnail size"
 
-msgid "Dans la grille du dossier (appliquée au prochain démarrage)"
-msgstr "In the folder grid (applied at next start)"
+#: argos/ui/preferences.py:81
+msgid "Aussi Ctrl + molette ou Ctrl + + / − dans la grille"
+msgstr "Also Ctrl + wheel or Ctrl + + / − in the grid"
 
+#: argos/ui/preferences.py:98 argos/ui/preferences.py:123
+msgid "Ouvrir Argos sur"
+msgstr "Open Argos on"
+
+#: argos/ui/preferences.py:53 argos/ui/shortcuts.py:42 argos/ui/window.py:92
 msgid "Préférences"
 msgstr "Preferences"
 
+#: argos/ui/preferences.py:59
 msgid "Général"
 msgstr "General"
 
+#: argos/ui/preferences.py:61
 msgid "Visionneuse de photos par défaut"
 msgstr "Default photo viewer"
 
-msgid "Les photos s'ouvrent avec Argos ; coupé, l'application d'avant reprend la main."
-msgstr "Photos open with Argos; when off, the previous application takes over again."
+#: argos/ui/preferences.py:62
+msgid ""
+"Les photos s'ouvrent avec Argos ; coupé, l'application d'avant reprend la "
+"main."
+msgstr ""
+"Photos open with Argos; when off, the previous application takes over again."
 
+#: argos/ui/preferences.py:66
 msgid "Apparence"
 msgstr "Appearance"
 
+#: argos/ui/preferences.py:67 argos/ui/preferences.py:72
 msgid "Comme le système"
 msgstr "Follow system"
 
+#: argos/ui/preferences.py:67
 msgid "Clair"
 msgstr "Light"
 
+#: argos/ui/preferences.py:67
 msgid "Sombre"
 msgstr "Dark"
 
+#: argos/ui/preferences.py:72
 msgid "Langue"
 msgstr "Language"
 
+#: argos/ui/preferences.py:73
 msgid "Appliquée au prochain démarrage"
 msgstr "Applied at next start"
 
+#: argos/ui/preferences.py:75
 msgid "Affichage"
 msgstr "Display"
 
+#: argos/ui/preferences.py:79
+msgid "Petites"
+msgstr "Small"
+
+#: argos/ui/preferences.py:79
+msgid "Moyennes"
+msgstr "Medium"
+
+#: argos/ui/preferences.py:79
+msgid "Grandes"
+msgstr "Large"
+
+#: argos/ui/preferences.py:79
+msgid "Très grandes"
+msgstr "Extra large"
+
+#: argos/ui/preferences.py:96
+msgid "Comportement"
+msgstr "Behavior"
+
+#: argos/ui/preferences.py:99
+msgid "Le dernier dossier ouvert"
+msgstr "The last opened folder"
+
+#: argos/ui/preferences.py:99
+msgid "Le dossier Images"
+msgstr "The Pictures folder"
+
+#: argos/ui/preferences.py:99
+msgid "Un dossier choisi"
+msgstr "A chosen folder"
+
+#: argos/ui/preferences.py:102
+msgid "Aucun dossier choisi"
+msgstr "No folder chosen"
+
+#: argos/ui/preferences.py:103
+msgid "Choisir un dossier"
+msgstr "Choose a folder"
+
+#: argos/ui/preferences.py:132
 msgid "Fonctionnalités"
 msgstr "Features"
 
-msgid "Chaque fonctionnalité s'active ou se coupe tout de suite, sans redémarrer Argos"
+#: argos/ui/preferences.py:134
+msgid ""
+"Chaque fonctionnalité s'active ou se coupe tout de suite, sans redémarrer "
+"Argos"
 msgstr "Each feature turns on or off right away, without restarting Argos"
 
+#: argos/ui/preferences.py:40
 msgid "{0} n'est pas installé (lancé depuis les sources)"
 msgstr "{0} is not installed (run from source)"
 
+#: argos/ui/shortcuts.py:18
 msgid "Photos"
 msgstr "Photos"
 
+#: argos/ui/shortcuts.py:31
 msgid "Zoom"
 msgstr "Zoom"
 
+#: argos/ui/shortcuts.py:36
 msgid "Fenêtre"
 msgstr "Window"
 
+#: argos/ui/shortcuts.py:46
 msgid "Souris"
 msgstr "Mouse"
 
+#: argos/ui/shortcuts.py:19 argos/ui/shortcuts.py:20
 msgid "Photo suivante / précédente"
 msgstr "Next / previous photo"
 
+#: argos/ui/shortcuts.py:21
 msgid "Première / dernière photo"
 msgstr "First / last photo"
 
+#: argos/ui/shortcuts.py:28
 msgid "Pivoter à droite / à gauche"
 msgstr "Rotate right / left"
 
+#: argos/ui/shortcuts.py:29
 msgid "Propriétés"
 msgstr "Properties"
 
-msgid "Zoom avant / arrière"
-msgstr "Zoom in / out"
+#: argos/ui/shortcuts.py:32
+msgid "Zoom avant / arrière ; dans la grille : taille des vignettes"
+msgstr "Zoom in / out; in the grid: thumbnail size"
 
+#: argos/ui/shortcuts.py:33
 msgid "Ajuster à la fenêtre"
 msgstr "Fit to window"
 
+#: argos/ui/shortcuts.py:34
 msgid "Taille réelle (100 %)"
 msgstr "Actual size (100%)"
 
+#: argos/ui/shortcuts.py:38
 msgid "Quitter le plein écran, puis revenir au dossier"
 msgstr "Leave fullscreen, then back to the folder"
 
+#: argos/ui/shortcuts.py:39
 msgid "Barre latérale (grille) / bande de vignettes (photo)"
 msgstr "Sidebar (grid) / thumbnail strip (photo)"
 
+#: argos/ui/shortcuts.py:40
 msgid "Dossier parent"
 msgstr "Parent folder"
 
+#: argos/ui/shortcuts.py:41 argos/ui/window.py:526
 msgid "Ouvrir un dossier"
 msgstr "Open a folder"
 
+#: argos/ui/shortcuts.py:43 argos/ui/window.py:93
 msgid "Raccourcis clavier"
 msgstr "Keyboard shortcuts"
 
+#: argos/ui/shortcuts.py:44
 msgid "Fermer la fenêtre"
 msgstr "Close window"
 
+#: argos/ui/shortcuts.py:47
 msgid "Molette : photo suivante / précédente"
 msgstr "Wheel: next / previous photo"
 
-msgid "Ctrl + molette : zoom autour du pointeur"
-msgstr "Ctrl + wheel: zoom around the pointer"
+#: argos/ui/shortcuts.py:48
+msgid ""
+"Ctrl + molette : zoom autour du pointeur ; dans la grille : taille des "
+"vignettes"
+msgstr "Ctrl + wheel: zoom around the pointer; in the grid: thumbnail size"
 
+#: argos/ui/shortcuts.py:49
 msgid "Glisser : déplacer la photo agrandie"
 msgstr "Drag: move the zoomed photo"
 
+#: argos/ui/shortcuts.py:50
 msgid "Double-clic : plein écran"
 msgstr "Double click: fullscreen"
 
+#: argos/ui/sidebar.py:48
 msgid "Dossier personnel"
 msgstr "Home"
 
+#: argos/ui/sidebar.py:64
 msgid "Ordinateur"
 msgstr "Computer"
 
+#: argos/ui/window.py:78
 msgid "Ouvrir un dossier…"
 msgstr "Open a Folder…"
 
+#: argos/ui/window.py:79
 msgid "Ouvrir des photos…"
 msgstr "Open Photos…"
 
+#: argos/ui/window.py:84
 msgid "Date de modification"
 msgstr "Modification date"
 
+#: argos/ui/window.py:86
 msgid "Ordre inverse"
 msgstr "Reverse order"
 
+#: argos/ui/window.py:87
 msgid "Trier par"
 msgstr "Sort by"
 
+#: argos/ui/window.py:89
 msgid "Afficher les fichiers cachés"
 msgstr "Show hidden files"
 
+#: argos/ui/window.py:94
 msgid "À propos d'Argos"
 msgstr "About Argos"
 
+#: argos/ui/window.py:206
 msgid "Enregistrer sous…"
 msgstr "Save As…"
 
+#: argos/ui/window.py:207
 msgid "Annuler les modifications"
 msgstr "Discard changes"
 
+#: argos/ui/window.py:784
 msgid "Enregistrer les modifications ?"
 msgstr "Save changes?"
 
+#: argos/ui/window.py:826 argos/ui/window.py:905
+msgid "Enregistrement impossible"
+msgstr "Cannot save"
+
+#: argos/ui/window.py:96
 msgid "Menu principal"
 msgstr "Main menu"
 
+#: argos/ui/window.py:101
 msgid "Dossier parent (Alt+↑)"
 msgstr "Parent folder (Alt+↑)"
 
+#: argos/ui/window.py:104
 msgid "Barre latérale (F9)"
 msgstr "Sidebar (F9)"
 
+#: argos/ui/window.py:122 argos/ui/window.py:441
 msgid "Aucune image"
 msgstr "No images"
 
+#: argos/ui/window.py:155 argos/ui/window.py:182
 msgid "Propriétés (I)"
 msgstr "Properties (I)"
 
+#: argos/ui/window.py:189
 msgid "Ajuster à la fenêtre / taille réelle (0 / 1)"
 msgstr "Fit to window / actual size (0 / 1)"
 
+#: argos/ui/window.py:202
 msgid "Recadrer (C)"
 msgstr "Crop (C)"
 
+#: argos/ui/window.py:209
 msgid "Remplacer la photo (Ctrl+S)"
 msgstr "Replace the photo (Ctrl+S)"
 
+#: argos/ui/window.py:258
 msgid "Bande de vignettes (F9)"
 msgstr "Thumbnail strip (F9)"
 
+#: argos/ui/window.py:277
 msgid "Libre"
 msgstr "Free"
 
+#: argos/ui/window.py:277
 msgid "Comme l'original"
 msgstr "Original"
 
+#: argos/ui/window.py:281
 msgid "Glissez pour tracer le cadre, ses bords et ses coins pour l'ajuster"
 msgstr "Drag to draw the frame, drag its edges and corners to adjust it"
 
+#: argos/ui/window.py:288
 msgid "Recadrer"
 msgstr "Crop"
 
+#: argos/ui/window.py:437
 msgid "Accès impossible"
 msgstr "Cannot access"
 
+#: argos/ui/window.py:540
 msgid "Ouvrir des photos"
 msgstr "Open Photos"
 
+#: argos/ui/window.py:541
 msgid "Images"
 msgstr "Images"
 
+#: argos/ui/window.py:703
 msgid "Lecture impossible"
 msgstr "Cannot read"
 
+#: argos/ui/window.py:867
 msgid "Enregistrer sous"
 msgstr "Save As"
 
+#: argos/ui/window.py:107
 msgid "Ouvrir un dossier (Ctrl+O)"
 msgstr "Open a folder (Ctrl+O)"
 
+#: argos/ui/window.py:176
 msgid "Retour au dossier (Échap)"
 msgstr "Back to the folder (Esc)"
 
+#: argos/ui/window.py:184
 msgid "Plein écran (F11)"
 msgstr "Fullscreen (F11)"
 
+#: argos/ui/window.py:187
 msgid "Zoom arrière (−)"
 msgstr "Zoom out (−)"
 
+#: argos/ui/window.py:193
 msgid "Zoom avant (+)"
 msgstr "Zoom in (+)"
 
+#: argos/ui/window.py:197
 msgid "Pivoter à gauche (Maj+R)"
 msgstr "Rotate left (Shift+R)"
 
+#: argos/ui/window.py:199
 msgid "Pivoter à droite (R)"
 msgstr "Rotate right (R)"
 
+#: argos/ui/window.py:276
 msgid "Proportions"
 msgstr "Aspect ratio"
 
+#: argos/ui/window.py:599
 msgid "{0} photo ({1})"
 msgid_plural "{0} photos ({1})"
 msgstr[0] "{0} photo ({1})"
 msgstr[1] "{0} photos ({1})"
 
+#: argos/ui/window.py:785
 msgid "« {0} » a été pivotée ou recadrée."
 msgstr "“{0}” has been rotated or cropped."
 
+#: argos/ui/window.py:786
 msgid "Abandonner"
 msgstr "Discard"
 
+#: argos/ui/window.py:893
 msgid "Format inconnu"
 msgstr "Unknown format"
 
+#: argos/ui/window.py:228
 msgid "Photo précédente"
 msgstr "Previous photo"
 
+#: argos/ui/window.py:228
 msgid "Photo suivante"
 msgstr "Next photo"
 
+#: argos/ui/window.py:601
 msgid "{0} sélectionnée ({1})"
 msgid_plural "{0} sélectionnées ({1})"
 msgstr[0] "{0} selected ({1})"
 msgstr[1] "{0} selected ({1})"
 
+#: argos/ui/window.py:842
 msgid "« {0} » enregistrée"
 msgstr "“{0}” saved"
 
+#: argos/ui/window.py:844
 msgid "Enregistrée sous « {0} »"
 msgstr "Saved as “{0}”"
 
+#: argos/ui/window.py:941
 msgid "{0} sur {1} photo"
 msgid_plural "{0} sur {1} photos"
 msgstr[0] "{0} of {1} photo"
 msgstr[1] "{0} of {1} photos"
 
+#: argos/ui/window.py:837
 msgid "Impossible d'annuler"
 msgstr "Cannot undo"
 
+#: argos/ui/window.py:869
 msgid "modifiée"
 msgstr "edited"
 
+#: argos/ui/window.py:894
 msgid "Terminez le nom par l'extension du format voulu : {0}"
 msgstr "End the name with the extension of the wanted format: {0}"
 
+#: argos/ui/window.py:605
 msgid "« {0} » sélectionné"
 msgstr "“{0}” selected"
 
+#: argos/ui/window.py:606
 msgid "« {0} » sélectionnée ({1})"
 msgstr "“{0}” selected ({1})"
-
-msgid "Enregistrement impossible"
-msgstr "Cannot save"

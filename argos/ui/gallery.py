@@ -53,6 +53,25 @@ def store_of(entries: list[Entry]) -> EntryList:
     return EntryList(list(entries))
 
 
+# Taille des vignettes de la grille (demande d'un utilisateur : un choix simple, utile à ceux qui voient mal)
+GRID_SIZES = [96, 128, 192, 256]          # Petites, Moyennes (gThumb), Grandes, Très grandes
+
+
+def nearest_size(px) -> int:
+    """La taille de la liste la plus proche (un ancien réglage en pixels libres : 160 → 128 ou 192)."""
+    try:
+        px = int(px)
+    except (TypeError, ValueError):
+        return 128
+    return min(GRID_SIZES, key=lambda s: (abs(s - px), s))
+
+
+def step_size(px, step: int) -> int:
+    """Taille suivante (+1) / précédente (-1), bornée."""
+    i = GRID_SIZES.index(nearest_size(px))
+    return GRID_SIZES[max(0, min(len(GRID_SIZES) - 1, i + step))]
+
+
 def columns_for(width: int, cell: int) -> int:
     """Vrai nombre de colonnes : sans lui, Gtk.GridView remplit d'abord « max_columns » colonnes sans connaître
     la largeur des cases (leçon d'Odysseus : ~2 000 cases créées d'un coup, secondes figées)."""
@@ -197,6 +216,7 @@ class Grid(_SizedGrid, Gtk.ScrolledWindow):
 
     def __init__(self, size: int = 128):
         super().__init__(hexpand=True, vexpand=True, hscrollbar_policy=Gtk.PolicyType.NEVER)
+        self.size = size
         self._init_sizing(size + 16 + 6)                # case + padding (base.css) + espacement
         # sélection MULTIPLE (demande de Tof) : Ctrl / Maj + clic, cadre à la souris, Ctrl+A (fournis par GTK)
         self.selection = Gtk.MultiSelection()
@@ -211,6 +231,19 @@ class Grid(_SizedGrid, Gtk.ScrolledWindow):
 
     def do_size_allocate(self, width, height, baseline):
         self._size_allocated(width, height, baseline)
+
+    def set_size(self, size: int):
+        """Taille des vignettes changée EN DIRECT (Préférences, Ctrl + molette, Ctrl + + / −) : nouvelles cases
+        (nouvelle fabrique), colonnes recalculées ; sélection et modèle gardés."""
+        if size == self.size:
+            return
+        self.size = size
+        self._cell = size + 16 + 6
+        self.view.set_factory(_factory(size, True))
+        if self._sized():
+            self._apply_cols(columns_for(self.get_width(), self._cell))
+        else:
+            self.queue_resize()
 
     def _on_right(self, _g, _n, x, y):
         """Clic droit sur une vignette : elle est sélectionnée, puis le menu (photos seulement)."""

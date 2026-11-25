@@ -11,7 +11,8 @@ from gi.repository import Adw, Gtk  # noqa: E402
 from .. import features  # noqa: E402
 from ..i18n import LANGUAGE_NAMES, tr  # noqa: E402
 from ..settings import settings  # noqa: E402
-from .common import combo_row  # noqa: E402
+from .common import choose_folder, combo_row, shown  # noqa: E402
+from .gallery import GRID_SIZES, nearest_size  # noqa: E402
 
 
 def apply_theme():
@@ -61,6 +62,7 @@ class PreferencesWindow(Adw.PreferencesWindow):
                                    tr("Les photos s'ouvrent avec Argos ; coupé, l'application d'avant reprend la main."),
                                    "Argos"))
         page.add(system)
+        page.add(self._startup_group())
         look = Adw.PreferencesGroup(title=tr("Apparence"))
         theme = _choice(tr("Style"), "theme", [tr("Comme le système"), tr("Clair"), tr("Sombre")],
                         ["system", "light", "dark"])
@@ -71,14 +73,60 @@ class PreferencesWindow(Adw.PreferencesWindow):
                          codes, tr("Appliquée au prochain démarrage")))
         page.add(look)
         view = Adw.PreferencesGroup(title=tr("Affichage"))
-        size = Adw.SpinRow.new_with_range(96, 320, 16)
-        size.set_title(tr("Taille des vignettes"))
-        size.set_subtitle(tr("Dans la grille du dossier (appliquée au prochain démarrage)"))
-        size.set_value(settings["grid_size"])
-        size.connect("notify::value", lambda r, *_: settings.__setitem__("grid_size", int(r.get_value())))
+        # choix simple (demande d'un utilisateur, utile à ceux qui voient mal), appliqué tout de suite ; aussi
+        # Ctrl + molette / Ctrl + + / − sur la grille
+        size = combo_row(tr("Taille des vignettes"),
+                         [tr("Petites"), tr("Moyennes"), tr("Grandes"), tr("Très grandes")],
+                         GRID_SIZES.index(nearest_size(settings["grid_size"])),
+                         tr("Aussi Ctrl + molette ou Ctrl + + / − dans la grille"))
+        size.connect("notify::selected", lambda r, *_: settings.__setitem__("grid_size", GRID_SIZES[r.get_selected()]))
+
+        def follow(key, value):                     # changée par Ctrl + molette pendant que la fenêtre est ouverte
+            if key == "grid_size" and GRID_SIZES[size.get_selected()] != nearest_size(value):
+                size.set_selected(GRID_SIZES.index(nearest_size(value)))
+        settings.connect(follow)
+        self.connect("close-request", lambda *_: settings.disconnect(follow) or False)
         view.add(size)
         page.add(view)
         return page
+
+    def _startup_group(self) -> Adw.PreferencesGroup:
+        """« Ouvrir Argos sur » (demande d'un utilisateur, comme dans Odysseus) : dernier dossier, Images ou un dossier
+        choisi — avec l'arbre masqué (F9), Argos s'ouvre toujours au même endroit."""
+        group = Adw.PreferencesGroup(title=tr("Comportement"))
+        choices = ["last", "pictures", "folder"]
+        where = combo_row(tr("Ouvrir Argos sur"),
+                          [tr("Le dernier dossier ouvert"), tr("Le dossier Images"), tr("Un dossier choisi")],
+                          choices.index(settings["startup"]) if settings["startup"] in choices else 0)
+        folder = Adw.ActionRow(title=tr("Dossier"), use_markup=False)
+        folder.set_subtitle(shown(settings["startup_folder"]) or tr("Aucun dossier choisi"))
+        pick = Gtk.Button(icon_name="folder-open-symbolic", tooltip_text=tr("Choisir un dossier"),
+                          valign=Gtk.Align.CENTER, css_classes=["flat"])
+        folder.add_suffix(pick)
+        folder.set_activatable_widget(pick)
+
+        def sync():
+            folder.set_sensitive(settings["startup"] == "folder")
+
+        def chose(r, *_):
+            settings["startup"] = choices[r.get_selected()]
+            sync()
+            if settings["startup"] == "folder" and not settings["startup_folder"]:
+                browse()
+
+        def picked(path):
+            settings["startup_folder"] = path
+            folder.set_subtitle(shown(path))
+
+        def browse(*_):
+            from ..backend import folder as fold
+            choose_folder(self, tr("Ouvrir Argos sur"), settings["startup_folder"] or fold.pictures_dir(), picked)
+        where.connect("notify::selected", chose)
+        pick.connect("clicked", browse)
+        sync()
+        group.add(where)
+        group.add(folder)
+        return group
 
     def _features(self) -> Adw.PreferencesPage:
         page = Adw.PreferencesPage(title=tr("Fonctionnalités"), icon_name="application-x-addon-symbolic",
