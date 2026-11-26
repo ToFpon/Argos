@@ -244,4 +244,6 @@ tools/screenshot.py SORTIE.png CHEMIN [--dark] [--size=LxH] [--zoom=F] [--info] 
    Powell, Utah.jpg --dark --crop), info (Antennae galaxies.jpg --dark --info), grid (dossier --dark --info --select="Antennae galaxies.jpg" --delay=4000),
    slide (Aurora over Florida.jpg --dark --no-strip --slide=0.4), convert (dossier --dark --multi=4 --convert) ;
    le README montre dark + grid / slide / convert. Photos : images-api.nasa.gov.
+   Aucune ligne de plus de 512 caractères dans site/index.html : lintian la prend pour du code minifié
+   (`source-is-missing [site/index.html]`, vu à la 0.2.3 : pied de page à 577).
 4. Essai chez Tof.
