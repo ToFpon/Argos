@@ -1,3 +1,14 @@
+argos-viewer (0.2.1~noble1) noble; urgency=medium
+
+  * Diaporama : F5, menu principal ou clic droit ; une photo toutes les
+    quelques secondes (Préférences), Espace pour la pause, Échap pour
+    arrêter.
+  * Plein écran : les flèches de navigation et le pointeur se cachent
+    après deux secondes, et reviennent près des bords de l'écran ou au
+    changement de photo.
+
+ -- Tof <nourpon@gmail.com>  Thu, 26 Nov 2026 10:34:11 +0000
+
 argos-viewer (0.2.0~noble1) noble; urgency=medium
 
   * Taille des vignettes en choix simple (petites, moyennes, grandes, très
