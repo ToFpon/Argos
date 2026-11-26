@@ -1,3 +1,11 @@
+argos-viewer (0.2.3~noble1) noble; urgency=medium
+
+  * Photo ouverte depuis le gestionnaire de fichiers : le zoom, la
+    rotation ou le recadrage commencés pendant la lecture du dossier ne
+    sont plus remis à zéro.
+
+ -- Tof <nourpon@gmail.com>  Thu, 26 Nov 2026 18:14:34 +0000
+
 argos-viewer (0.2.2~noble1) noble; urgency=medium
 
   * Transition douce entre les photos (glissement par défaut, ou fondu
