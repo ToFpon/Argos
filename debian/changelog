@@ -1,3 +1,11 @@
+argos-viewer (0.2.2~noble1) noble; urgency=medium
+
+  * Transition douce entre les photos (glissement par défaut, ou fondu
+    enchaîné) dans le diaporama et en naviguant au clavier ou à la
+    molette ; réglable dans les Préférences.
+
+ -- Tof <nourpon@gmail.com>  Thu, 26 Nov 2026 11:41:44 +0000
+
 argos-viewer (0.2.1~noble1) noble; urgency=medium
 
   * Diaporama : F5, menu principal ou clic droit ; une photo toutes les

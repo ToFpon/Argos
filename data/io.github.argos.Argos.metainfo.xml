@@ -69,6 +69,13 @@
   </requires>
   <content_rating type="oars-1.1"/>
   <releases>
+    <release version="0.2.2" date="2026-11-26">
+      <description>
+        <ul>
+          <li>Smooth transition between photos (slide by default, or crossfade) in the slideshow and when browsing with the keyboard or the mouse wheel; can be turned off in the Preferences</li>
+        </ul>
+      </description>
+    </release>
     <release version="0.2.1" date="2026-11-26">
       <description>
         <ul>
