@@ -17,7 +17,8 @@ import gi
 gi.require_version("Gtk", "4.0")
 gi.require_version("Gsk", "4.0")
 gi.require_version("Graphene", "1.0")
-from gi.repository import Gdk, GdkPixbuf, GLib, GObject, Graphene, Gsk, Gtk  # noqa: E402
+gi.require_version("Adw", "1")
+from gi.repository import Adw, Gdk, GdkPixbuf, GLib, GObject, Graphene, Gsk, Gtk  # noqa: E402
 
 from .. import features  # noqa: E402
 
@@ -60,6 +61,8 @@ class ImageView(Gtk.Widget):
         self._scroll_acc = 0.0
         self._drag_start = (0.0, 0.0)
         self._pointer = None
+        self._trans = None               # transition du diaporama : [genre, sens, ancienne image (nœud), avancement]
+        self._trans_anim = None
 
         scroll = Gtk.EventControllerScroll(flags=Gtk.EventControllerScrollFlags.VERTICAL
                                            | Gtk.EventControllerScrollFlags.KINETIC)
@@ -89,9 +92,18 @@ class ImageView(Gtk.Widget):
     # --- image ---
 
     def set_picture(self, texture: Optional[Gdk.Texture], animation=None, keep_view: bool = False,
-                    vector: Optional[str] = None):
+                    vector: Optional[str] = None, transition: Optional[tuple[str, int]] = None):
         """vector : chemin d'un SVG — agrandi à la fenêtre comme gThumb, et redessiné net à la taille affichée
-        (vu chez Tof : une icône 48 × 48 restait minuscule, puis pixelisait au zoom)."""
+        (vu chez Tof : une icône 48 × 48 restait minuscule, puis pixelisait au zoom).
+        transition : (« slide » | « fade », sens +1 / -1) — diaporama (demande de Tof) : l'image d'avant, figée en
+        nœud de rendu, glisse hors de l'écran pendant que la nouvelle arrive (ou fondu enchaîné)."""
+        old = None
+        if transition and transition[0] in ("slide", "fade") and self.texture is not None and texture is not None \
+                and self.get_width() > 0:
+            snap = Gtk.Snapshot()
+            self._draw(snap)
+            old = snap.to_node()
+        self._stop_transition()
         self._stop_animation()
         self.texture = texture
         self.vector = vector
@@ -108,7 +120,36 @@ class ImageView(Gtk.Widget):
             self._schedule_frame()
         self._sync_zoom()
         self.set_cursor_from_name(self._idle_cursor())
+        if old is not None:
+            self._start_transition(transition[0], 1 if transition[1] >= 0 else -1, old)
         self.queue_draw()
+
+    TRANSITION_MS = {"slide": 450, "fade": 600}
+
+    def _start_transition(self, kind: str, direction: int, old):
+        self._trans = [kind, direction, old, 0.0]
+
+        def step(value):
+            if self._trans is not None:
+                self._trans[3] = value
+                self.queue_draw()
+        anim = Adw.TimedAnimation(widget=self, value_from=0.0, value_to=1.0, duration=self.TRANSITION_MS[kind],
+                                  target=Adw.CallbackAnimationTarget.new(step))
+        anim.set_easing(Adw.Easing.EASE_OUT_CUBIC if kind == "slide" else Adw.Easing.EASE_IN_OUT_CUBIC)
+        anim.connect("done", lambda a: self._trans_anim is a and self._stop_transition())
+        self._trans_anim = anim
+        anim.play()                      # animations coupées dans le système : libadwaita va droit à la fin
+
+    def _stop_transition(self):
+        anim, self._trans_anim = self._trans_anim, None
+        if anim is not None:
+            anim.skip()
+        if self._trans is not None:
+            self._trans = None
+            self.queue_draw()
+
+    def in_transition(self) -> bool:
+        return self._trans is not None
 
     HIRES_MAX = 6000                 # côté le plus long d'un rendu vectoriel (au-delà, mémoire)
 
@@ -236,6 +277,29 @@ class ImageView(Gtk.Widget):
         return Graphene.Rect().init(x, y, dw, dh)
 
     def do_snapshot(self, snapshot):
+        t = self._trans
+        if t is None:
+            self._draw(snapshot)
+            return
+        kind, direction, old, p = t
+        if kind == "fade":
+            snapshot.push_cross_fade(p)
+            snapshot.append_node(old)
+            snapshot.pop()
+            self._draw(snapshot)
+            snapshot.pop()
+            return
+        w = self.get_width()
+        snapshot.save()
+        snapshot.translate(Graphene.Point().init(-direction * p * w, 0))
+        snapshot.append_node(old)
+        snapshot.restore()
+        snapshot.save()
+        snapshot.translate(Graphene.Point().init(direction * (1 - p) * w, 0))
+        self._draw(snapshot)
+        snapshot.restore()
+
+    def _draw(self, snapshot):
         if self.texture is None:
             return
         r = self.image_rect()

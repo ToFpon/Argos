@@ -241,6 +241,7 @@ class MainWindow(FileMenu, Adw.ApplicationWindow):
         self._last_motion = None
         self._slideshow_id = 0
         self._slideshow_paused = False
+        self._slide_step = 0             # prochaine photo du diaporama : transition dans ce sens
 
         self.info = InfoPanel()
         self.split = Adw.OverlaySplitView(content=overlay, sidebar=self.info, sidebar_position=Gtk.PackType.END,
@@ -758,6 +759,7 @@ class MainWindow(FileMenu, Adw.ApplicationWindow):
             self.stop_slideshow()
             toast(self, tr("Fin du diaporama"))
             return False
+        self._slide_step = 1
         self._go(1)
         self._arm_slideshow()
         return False
@@ -785,6 +787,7 @@ class MainWindow(FileMenu, Adw.ApplicationWindow):
     def go(self, step: int):
         if self.slideshow_running() and not self._slideshow_paused:
             self._arm_slideshow()                   # navigation à la main : le minuteur repart de zéro
+            self._slide_step = step
         self._show_chrome(arrows=True)
         if self.pending() or self.view.cropping:
             self.guard(lambda: self._go(step))
@@ -799,6 +802,7 @@ class MainWindow(FileMenu, Adw.ApplicationWindow):
         if features.enabled("loop"):
             i %= n
         elif not 0 <= i < n:
+            self._slide_step = 0
             return
         self.show_index(i)
 
@@ -823,6 +827,8 @@ class MainWindow(FileMenu, Adw.ApplicationWindow):
         if not (0 <= self.index < len(self.images)) or self.images[self.index].path != pic.path:
             return
         self.picture = pic
+        step, self._slide_step = self._slide_step, 0
+        transition = (settings["slideshow_transition"], step) if step and self.slideshow_running() else None
         if pic.error:
             self.view.set_picture(None)
             self.error_page.set_title(tr("Lecture impossible"))
@@ -831,7 +837,8 @@ class MainWindow(FileMenu, Adw.ApplicationWindow):
         else:
             self.error_page.set_visible(False)
             self.view.set_picture(pic.texture, pic.animation, keep_view,
-                                  vector=pic.path if pic.format in ("SVG", "SVGZ") else None)
+                                  vector=pic.path if pic.format in ("SVG", "SVGZ") else None,
+                                  transition=transition)
         self._sync_status()
         self._sync_info()
         self._sync_edit()

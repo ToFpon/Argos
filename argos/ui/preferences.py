@@ -91,6 +91,8 @@ class PreferencesWindow(Adw.PreferencesWindow):
         view.add(_choice(tr("Diaporama"), "slideshow_delay",
                          [ntr("{0} seconde par photo", "{0} secondes par photo", d).format(d) for d in delays], delays,
                          tr("F5, ou Diaporama dans le menu ; Espace pour la pause, Échap pour arrêter")))
+        view.add(_choice(tr("Transition du diaporama"), "slideshow_transition",
+                         [tr("Glissement"), tr("Fondu enchaîné"), tr("Sans transition")], ["slide", "fade", "none"]))
         page.add(view)
         return page
 

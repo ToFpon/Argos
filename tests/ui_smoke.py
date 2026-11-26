@@ -269,6 +269,15 @@ def steps(app):
     check(win.slideshow_running(), "F5 : diaporama en plein écran")
     yield lambda: win.index != start
     check(win.index == (start + 1) % len(win.images), "diaporama : photo suivante toute seule")
+    yield lambda: win.view.in_transition()
+    check(win.view._trans[0] == "slide" and win.view._trans[1] == 1, "diaporama : la photo arrive en glissant")
+    yield lambda: not win.view.in_transition()
+    check(not win.view.in_transition(), "glissement terminé")
+    settings["slideshow_transition"] = "fade"
+    was = win.index
+    yield lambda: win.index != was and win.view.in_transition()
+    check(win.view._trans[0] == "fade", "diaporama : fondu enchaîné (Préférences)")
+    settings["slideshow_transition"] = "slide"
     win._on_key(None, Gdk.KEY_space, 0, 0)
     check(win._slideshow_paused, "Espace : pause")
     paused_at = win.index
