@@ -1,3 +1,14 @@
+argos-viewer (0.3.0~noble1) noble; urgency=medium
+
+  * Annoter une photo (A, bouton crayon, clic droit) : rectangle, ellipse,
+    flèche, trait, main levée, surligneur, pixellisation et texte, avec
+    Ctrl+Z. Repris d'Odysseus, sans en dépendre.
+  * La photo est remplacée en toute sécurité, avec « Annuler » juste
+    après ; date et appareil gardés. Ou enregistrée comme nouvelle image.
+  * Se coupe dans Préférences, Fonctionnalités.
+
+ -- Tof <nourpon@gmail.com>  Thu, 26 Nov 2026 18:49:50 +0000
+
 argos-viewer (0.2.3~noble1) noble; urgency=medium
 
   * Photo ouverte depuis le gestionnaire de fichiers : le zoom, la
