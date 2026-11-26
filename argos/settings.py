@@ -20,6 +20,7 @@ DEFAULTS: dict[str, Any] = {
     "last_folder": "",              # dossier ouvert la dernière fois (vide : Images)
     "startup": "last",              # ouvrir Argos sur : last (dernier dossier), pictures (Images), folder (choisi)
     "startup_folder": "",
+    "slideshow_delay": 4,           # diaporama : secondes par photo
     "filmstrip": True,
     "strip_height": 110,            # hauteur de la bande de vignettes (séparateur réglable)
     "browser_info": False,

@@ -9,7 +9,7 @@ gi.require_version("Adw", "1")
 from gi.repository import Adw, Gtk  # noqa: E402
 
 from .. import features  # noqa: E402
-from ..i18n import LANGUAGE_NAMES, tr  # noqa: E402
+from ..i18n import LANGUAGE_NAMES, ntr, tr  # noqa: E402
 from ..settings import settings  # noqa: E402
 from .common import choose_folder, combo_row, shown  # noqa: E402
 from .gallery import GRID_SIZES, nearest_size  # noqa: E402
@@ -87,6 +87,10 @@ class PreferencesWindow(Adw.PreferencesWindow):
         settings.connect(follow)
         self.connect("close-request", lambda *_: settings.disconnect(follow) or False)
         view.add(size)
+        delays = [2, 3, 4, 5, 8, 10, 15]
+        view.add(_choice(tr("Diaporama"), "slideshow_delay",
+                         [ntr("{0} seconde par photo", "{0} secondes par photo", d).format(d) for d in delays], delays,
+                         tr("F5, ou Diaporama dans le menu ; Espace pour la pause, Échap pour arrêter")))
         page.add(view)
         return page
 

@@ -515,9 +515,18 @@ class ImageView(Gtk.Widget):
         iw, ih = self.image_size()
         return iw * self.zoom > self.get_width() + 0.5 or ih * self.zoom > self.get_height() + 0.5
 
+    pointer_hidden = False                   # plein écran, souris immobile : pointeur caché (fenêtre)
+
+    def set_pointer_hidden(self, hidden: bool):
+        if hidden != self.pointer_hidden:
+            self.pointer_hidden = hidden
+            self.set_cursor_from_name(self._idle_cursor())
+
     def _idle_cursor(self) -> str:
         if self.cropping:
             return "crosshair"
+        if self.pointer_hidden:
+            return "none"
         return "grab" if self.texture is not None and self._movable() else "default"
 
     def _on_drag_begin(self, gesture, x, y):

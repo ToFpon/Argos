@@ -7,6 +7,10 @@
 .argos-zoom { min-width: 64px; font-feature-settings: "tnum"; }
 .argos-arrow { opacity: 0.0; transition: opacity 150ms; min-width: 40px; min-height: 40px; }
 overlay:hover > .argos-arrow { opacity: 0.85; }
+/* plein écran : flèches cachées au repos, montrées au bord de l'écran ou à la navigation (classe « shown », posée
+   et retirée par la fenêtre) — la souris y est toujours « sur l'image », :hover les laissait affichées */
+window.argos-fullscreen overlay:hover > .argos-arrow { opacity: 0; }
+window.argos-fullscreen overlay > .argos-arrow.shown { opacity: 0.85; }
 window.argos-fullscreen .argos-view { background-color: black; }
 .argos-status { min-height: 30px; }
 .argos-tree listview.navigation-sidebar > row { min-height: 26px; padding-top: 1px; padding-bottom: 1px; margin-top: 0; margin-bottom: 0; }

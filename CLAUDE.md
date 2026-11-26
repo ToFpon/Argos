@@ -146,6 +146,17 @@ Nom : Argos le géant aux cent yeux (et le chien d'Ulysse, le seul à le reconna
   nouvelle fabrique de cases, colonnes recalculées, sélection gardée ; fenêtre → `settings.connect`) ; aussi
   Ctrl + molette sur la grille (`_on_grid_wheel`, en capture) et + / − (`_zoom` : photo dans la visionneuse,
   vignettes dans la grille — d'où zoom-in / zoom-out hors de `_viewer_actions`). Le choix des Préférences suit.
+- Plein écran (demande de Tof, capture) : flèches ‹ › et pointeur CACHÉS au repos — avant, la souris étant toujours
+  « sur l'image », `overlay:hover` les laissait affichées. Classe `shown` posée par la fenêtre (`_show_chrome`) :
+  à l'entrée en plein écran, à la souris près d'un BORD (15 %, 120 px au moins : `_on_view_motion`, faux mouvements
+  de GTK ignorés), à chaque photo suivante / précédente (`go` : clavier, molette, flèches) ; retirée après
+  `CHROME_MS` (2 s, pas tant que le pointeur est SUR une flèche). Souris au milieu : pointeur seul. Pointeur caché =
+  `ImageView.set_pointer_hidden` (« none » dans `_idle_cursor`, jamais pendant un recadrage). CSS :
+  `window.argos-fullscreen overlay > .argos-arrow.shown` (même spécificité que la règle :hover, placée après).
+- Diaporama (demande de Tof) : F5, menu principal, clic droit (depuis CETTE photo) — plein écran, photo suivante
+  toutes les `slideshow_delay` s (Préférences → Affichage, 2 à 15 s), Espace / P = pause / reprise, ← → naviguent
+  (minuteur relancé), Échap ou sortie du plein écran = arrêt ; fin sans « Revenir au début » (`loop`) : arrêt +
+  toast. Depuis la grille : la photo sélectionnée, sinon la première. Testé : ui_smoke (minuteur réduit).
 - « Ouvrir Argos sur » (même retour ; l'arbre des dossiers RESTE, choix de Tof, masquable par F9) : réglages
   `startup` (last par défaut / pictures / folder) + `startup_folder`, Préférences → Général → Comportement
   (choisir « Un dossier choisi » sans dossier ouvre le sélecteur), `app.start_folder` (disparu → Images).

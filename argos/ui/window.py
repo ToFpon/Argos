@@ -78,6 +78,7 @@ class MainWindow(FileMenu, Adw.ApplicationWindow):
         sec.append(tr("Ouvrir un dossier…"), "win.open-folder")
         sec.append(tr("Ouvrir des photos…"), "win.open-files")
         sec.append(tr("Convertir / redimensionner…"), "win.image-tools")
+        sec.append(tr("Diaporama"), "win.slideshow")
         menu.append_section(None, sec)
         sort = Gio.Menu()
         sort.append(tr("Nom"), "win.sort::name")
@@ -221,6 +222,7 @@ class MainWindow(FileMenu, Adw.ApplicationWindow):
         self.error_page = Adw.StatusPage(icon_name="image-missing-symbolic", visible=False)
         overlay = Gtk.Overlay(child=self.view)
         overlay.add_overlay(self.error_page)
+        self._arrows = []
         for icon, step, align in (("go-previous-symbolic", -1, Gtk.Align.START),
                                   ("go-next-symbolic", 1, Gtk.Align.END)):
             b = Gtk.Button(icon_name=icon, halign=align, valign=Gtk.Align.CENTER, margin_start=12, margin_end=12,
@@ -228,6 +230,17 @@ class MainWindow(FileMenu, Adw.ApplicationWindow):
                            tooltip_text=tr("Photo précédente") if step < 0 else tr("Photo suivante"))
             b.connect("clicked", lambda _b, s=step: self.go(s))
             overlay.add_overlay(b)
+            self._arrows.append(b)
+        # plein écran : flèches et pointeur cachés au repos, montrés au bord de l'écran ou à la navigation (demande
+        # de Tof) — avant, la souris étant toujours « sur l'image », les flèches restaient affichées
+        self.view_overlay = overlay
+        motion = Gtk.EventControllerMotion()
+        motion.connect("motion", self._on_view_motion)
+        overlay.add_controller(motion)
+        self._chrome_timer = 0
+        self._last_motion = None
+        self._slideshow_id = 0
+        self._slideshow_paused = False
 
         self.info = InfoPanel()
         self.split = Adw.OverlaySplitView(content=overlay, sidebar=self.info, sidebar_position=Gtk.PackType.END,
@@ -312,6 +325,7 @@ class MainWindow(FileMenu, Adw.ApplicationWindow):
         add("up", self.go_up, ["<Alt>Up"])
         add("back", self.back)
         add("fullscreen", self.toggle_fullscreen, ["F11", "f"])
+        add("slideshow", self.slideshow, ["F5"])
         add("zoom-in", lambda: self._zoom(1), ["plus", "KP_Add", "equal", "<Control>plus"])
         add("zoom-out", lambda: self._zoom(-1), ["minus", "KP_Subtract", "<Control>minus"])
         add("zoom-fit", self.view.set_fit, ["0", "KP_0", "<Control>0"])
@@ -660,7 +674,118 @@ class MainWindow(FileMenu, Adw.ApplicationWindow):
                 a.set_enabled(viewing)
         self._sync_edit()
 
+    # -- plein écran : flèches et pointeur à minuterie ---------------------------------------------
+
+    CHROME_MS = 2000                 # flèches et pointeur cachés après 2 s sans mouvement
+    EDGE = 0.15                      # « bord » de l'écran : 15 % de chaque côté (120 px au moins)
+
+    def _show_chrome(self, arrows: bool):
+        """Plein écran : pointeur (et flèches si `arrows`) montrés, cachés de nouveau après CHROME_MS."""
+        if not self.is_fullscreen():
+            return
+        self.view.set_pointer_hidden(False)
+        if arrows:
+            for b in self._arrows:
+                b.add_css_class("shown")
+        if self._chrome_timer:
+            GLib.source_remove(self._chrome_timer)
+        self._chrome_timer = GLib.timeout_add(self.CHROME_MS, self._hide_chrome)
+
+    def _hide_chrome(self):
+        self._chrome_timer = 0
+        if any(b.get_state_flags() & Gtk.StateFlags.PRELIGHT for b in self._arrows):
+            self._chrome_timer = GLib.timeout_add(self.CHROME_MS, self._hide_chrome)   # pointeur sur une flèche
+            return False
+        for b in self._arrows:
+            b.remove_css_class("shown")
+        if self.is_fullscreen() and not self.view.cropping:
+            self.view.set_pointer_hidden(True)
+        return False
+
+    def _reset_chrome(self):
+        """Hors du plein écran : tout redevient comme avant (flèches au survol, pointeur visible)."""
+        if self._chrome_timer:
+            GLib.source_remove(self._chrome_timer)
+            self._chrome_timer = 0
+        for b in self._arrows:
+            b.remove_css_class("shown")
+        self.view.set_pointer_hidden(False)
+
+    def _on_view_motion(self, _ctl, x, y):
+        # GTK envoie aussi un « mouvement » sans mouvement quand le contenu change sous le pointeur : ignoré
+        if self._last_motion is not None and abs(x - self._last_motion[0]) < 2 and abs(y - self._last_motion[1]) < 2:
+            return
+        self._last_motion = (x, y)
+        width = self.view_overlay.get_width()
+        edge = max(120, width * self.EDGE)
+        self._show_chrome(arrows=x < edge or x > width - edge)
+
+    # -- diaporama ---------------------------------------------------------------------------------
+
+    def slideshow(self):
+        """F5, menus : plein écran, photo suivante toutes les N s (Préférences), Espace = pause / reprise, ← → pour
+        naviguer, Échap pour arrêter. Dans la grille : à partir de la photo sélectionnée (sinon la première)."""
+        if not self.images:
+            return
+        if self.stack.get_visible_child_name() != "viewer":
+            chosen = [e for e in self.grid.selected_entries() if not e.is_dir]
+            start = self._index_of(chosen[0].path) if chosen else 0
+            self.show_index(max(0, start))
+            self.show_viewer()
+            self._start_slideshow()
+            return
+        self.guard(self._start_slideshow)
+
+    def _start_slideshow(self):
+        if self.stack.get_visible_child_name() != "viewer" or not self.images:
+            return
+        self._slideshow_paused = False
+        if not self.is_fullscreen():
+            self.fullscreen()
+        self._arm_slideshow()
+        toast(self, tr("Diaporama — Espace : pause, Échap : arrêter"))
+
+    def _arm_slideshow(self):
+        if self._slideshow_id:
+            GLib.source_remove(self._slideshow_id)
+        self._slideshow_id = GLib.timeout_add(int(settings["slideshow_delay"]) * 1000, self._slideshow_tick)
+
+    def _slideshow_tick(self):
+        self._slideshow_id = 0
+        if self.stack.get_visible_child_name() != "viewer" or self._slideshow_paused:
+            return False
+        if self.index >= len(self.images) - 1 and not features.enabled("loop"):
+            self.stop_slideshow()
+            toast(self, tr("Fin du diaporama"))
+            return False
+        self._go(1)
+        self._arm_slideshow()
+        return False
+
+    def slideshow_running(self) -> bool:
+        return bool(self._slideshow_id) or self._slideshow_paused
+
+    def toggle_slideshow_pause(self):
+        self._slideshow_paused = not self._slideshow_paused
+        if self._slideshow_paused:
+            if self._slideshow_id:
+                GLib.source_remove(self._slideshow_id)
+                self._slideshow_id = 0
+            toast(self, tr("Diaporama en pause"))
+        else:
+            self._arm_slideshow()
+            toast(self, tr("Diaporama repris"))
+
+    def stop_slideshow(self):
+        if self._slideshow_id:
+            GLib.source_remove(self._slideshow_id)
+            self._slideshow_id = 0
+        self._slideshow_paused = False
+
     def go(self, step: int):
+        if self.slideshow_running() and not self._slideshow_paused:
+            self._arm_slideshow()                   # navigation à la main : le minuteur repart de zéro
+        self._show_chrome(arrows=True)
         if self.pending() or self.view.cropping:
             self.guard(lambda: self._go(step))
             return
@@ -1005,8 +1130,12 @@ class MainWindow(FileMenu, Adw.ApplicationWindow):
         if full:
             self.split.set_show_sidebar(False)
             self.add_css_class("argos-fullscreen")
+            self._last_motion = None
+            self._show_chrome(arrows=True)            # montrées un instant, puis cachées
         else:
             self.remove_css_class("argos-fullscreen")
+            self._reset_chrome()
+            self.stop_slideshow()                     # quitter le plein écran arrête le diaporama
         GLib.idle_add(lambda: (self.view.set_fit() if self.view.fit else None, False)[1])
 
     def trash(self):
@@ -1027,6 +1156,9 @@ class MainWindow(FileMenu, Adw.ApplicationWindow):
             return False
         if state & (Gdk.ModifierType.CONTROL_MASK | Gdk.ModifierType.ALT_MASK):
             return False
+        if self.slideshow_running() and keyval in (Gdk.KEY_space, Gdk.KEY_p, Gdk.KEY_P):
+            self.toggle_slideshow_pause()
+            return True
         if keyval in (Gdk.KEY_Right, Gdk.KEY_space, Gdk.KEY_Page_Down, Gdk.KEY_Down):
             if keyval == Gdk.KEY_Down and not self.view.fit:
                 return False
@@ -1044,6 +1176,8 @@ class MainWindow(FileMenu, Adw.ApplicationWindow):
             self.show_index(len(self.images) - 1)
             return True
         if keyval == Gdk.KEY_Escape:
+            if self.slideshow_running():
+                self.stop_slideshow()                 # Échap : arrête le diaporama ET quitte le plein écran
             self.back()
             return True
         if self.view.cropping and keyval in (Gdk.KEY_Return, Gdk.KEY_KP_Enter):
@@ -1064,5 +1198,7 @@ class MainWindow(FileMenu, Adw.ApplicationWindow):
             settings["window_width"], settings["window_height"] = w, h
         if self._monitor is not None:
             self._monitor.cancel()
+        self.stop_slideshow()
+        self._reset_chrome()
         settings.disconnect(self._on_setting)
         return False

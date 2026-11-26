@@ -48,6 +48,7 @@ class FileMenu:
                 self.get_application().set_accels_for_action(f"win.{name}", list(accels))
         self._ctx = None
         add("ctx-fullscreen", self._ctx_fullscreen)
+        add("ctx-slideshow", self._ctx_slideshow)
         add("wallpaper", self.set_wallpaper)
         add("print", self.print_photo, accels=["<Control>p"])
         add("open-with", self.open_with, GLib.VariantType.new("s"))
@@ -87,6 +88,7 @@ class FileMenu:
         menu = Gio.Menu()
         s1 = Gio.Menu()
         s1.append(tr("Plein écran"), "win.ctx-fullscreen")
+        s1.append(tr("Diaporama"), "win.ctx-slideshow")
         if background_settings() is not None:
             s1.append(tr("Définir comme arrière-plan"), "win.wallpaper")
         menu.append_section(None, s1)
@@ -171,6 +173,17 @@ class FileMenu:
             self.show_viewer()
         if not self.is_fullscreen():
             self.fullscreen()
+
+    def _ctx_slideshow(self):
+        """Clic droit → Diaporama : à partir de CETTE photo."""
+        path = self._target()
+        i = self._index_of(path) if path else -1
+        if i < 0:
+            return
+        if self.stack.get_visible_child_name() != "viewer" or i != self.index:
+            self.guard(lambda: (self.show_index(i), self.show_viewer(), self._start_slideshow()))
+        else:
+            self.slideshow()
 
     def set_wallpaper(self):
         """Copie dans ~/.local/share/backgrounds (la photo peut être déplacée ou supprimée ensuite) sous un nom UNIQUE,

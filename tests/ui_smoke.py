@@ -25,7 +25,7 @@ import gi  # noqa: E402
 
 gi.require_version("Gtk", "4.0")
 gi.require_version("Adw", "1")
-from gi.repository import Adw, GLib, Gtk  # noqa: E402
+from gi.repository import Adw, Gdk, GLib, Gtk  # noqa: E402
 
 from argos.app import ArgosApp  # noqa: E402
 from argos.i18n import tr  # noqa: E402
@@ -235,9 +235,53 @@ def steps(app):
     yield lambda: win.is_fullscreen()
     yield 200
     check(not win.viewer.get_reveal_top_bars(), "plein écran : barres masquées")
+    # flèches et pointeur à minuterie (demande de Tof)
+    arrows = lambda: all(b.has_css_class("shown") for b in win._arrows)  # noqa: E731
+    check(arrows(), "plein écran : flèches montrées un instant")
+    win.CHROME_MS = 300
+    win._show_chrome(arrows=True)
+    yield lambda: not any(b.has_css_class("shown") for b in win._arrows)
+    check(not any(b.has_css_class("shown") for b in win._arrows) and win.view.pointer_hidden,
+          "au repos : flèches et pointeur cachés")
+    w = win.view_overlay.get_width()
+    win._on_view_motion(None, w / 2, 200)
+    check(not arrows() and not win.view.pointer_hidden, "souris au milieu : pointeur, pas de flèches")
+    win._on_view_motion(None, w - 20, 200)
+    check(arrows(), "souris au bord : flèches")
+    yield lambda: not arrows()
+    win.go(1)
+    yield 50
+    check(arrows(), "photo suivante (clavier, molette) : flèches montrées")
+    win.go(-1)
+    yield lambda: not arrows()
     win.back()
     yield lambda: not win.is_fullscreen()
     check(win.stack.get_visible_child_name() == "viewer", "Échap : sort du plein écran, reste sur la photo")
+    check(not win.view.pointer_hidden and not any(b.has_css_class("shown") for b in win._arrows),
+          "hors du plein écran : pointeur normal")
+    win.CHROME_MS = type(win).CHROME_MS
+
+    # diaporama (F5)
+    settings["slideshow_delay"] = 1
+    start = win.index
+    win.activate_action("win.slideshow", None)
+    yield lambda: win.is_fullscreen()
+    check(win.slideshow_running(), "F5 : diaporama en plein écran")
+    yield lambda: win.index != start
+    check(win.index == (start + 1) % len(win.images), "diaporama : photo suivante toute seule")
+    win._on_key(None, Gdk.KEY_space, 0, 0)
+    check(win._slideshow_paused, "Espace : pause")
+    paused_at = win.index
+    yield 1500
+    check(win.index == paused_at, "en pause : la photo reste")
+    win._on_key(None, Gdk.KEY_space, 0, 0)
+    yield lambda: win.index != paused_at
+    check(win.index != paused_at, "Espace : reprise")
+    win._on_key(None, Gdk.KEY_Escape, 0, 0)
+    yield lambda: not win.is_fullscreen()
+    check(not win.slideshow_running() and win.stack.get_visible_child_name() == "viewer",
+          "Échap : diaporama arrêté, plein écran quitté")
+    settings["slideshow_delay"] = 4
 
     # propriétés
     win.info_button.set_active(True)
