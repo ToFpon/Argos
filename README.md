@@ -7,6 +7,10 @@
 
 ![Argos](site/img/dark.png)
 
+| Grid / Grille | Slideshow / Diaporama | Convert / Convertir |
+|---|---|---|
+| ![Grid](site/img/grid.png) | ![Slideshow](site/img/slide.png) | ![Convert](site/img/convert.png) |
+
 ---
 
 ## English
@@ -17,14 +21,21 @@ Ctrl + wheel zooms around the pointer. It follows your desktop theme (Adwaita, l
 installed GTK4 theme).
 
 ### Features
-- **Grid** of the folder (subfolders, then photos in natural order) with thumbnails shared with Nautilus, a
-  **folder tree** (home, Pictures, mounted disks, computer) and a **properties** panel (I).
+- **Grid** of the folder's photos in natural order, with thumbnails shared with Nautilus, a **folder tree**
+  (home, Pictures, mounted disks, computer) and a **properties** panel (I). Four thumbnail sizes (Preferences, or
+  Ctrl + wheel), several photos selected with the mouse, Ctrl or Shift, a folder you come back to shows at once.
 - **Viewer**: wheel = next / previous photo, Ctrl + wheel = zoom around the pointer, drag to move a zoomed
   photo, double click = plain full screen, neighbouring photos read in advance, animated GIFs.
 - **Thumbnail strip** under the photo with an adjustable height, **status bar** (« 4 / 858 · 1920 × 1080 ·
   1.9 MB · JPEG · 56% »), **properties** with the shooting details (camera, lens, exposure, ISO…).
+- **Slideshow** (F5): full screen, a photo every few seconds, Space to pause, Escape to stop. Photos **slide in**
+  (or fade in, or no transition — Preferences), also when browsing with the keyboard or the wheel. In full screen,
+  the arrows and the pointer hide when the mouse rests.
 - **Simple editing**: rotate (R / Shift+R), crop (C, with aspect ratios), save (the original can be restored
   right after) or save as another format (JPEG, PNG, WebP, TIFF, BMP, GIF).
+- **Convert / resize** several photos at once (Ctrl+E): resize, rotate and convert in one go.
+- **Right-click**: set as wallpaper, print, open with, copy image, copy or move to, rename (F2), trash, delete.
+- Opens on the last folder, on Pictures or on a folder of your choice (Preferences).
 - Formats: JPEG, PNG, GIF, WebP, TIFF, BMP, SVG, HEIC, AVIF (those of GdkPixbuf).
 - Default photo viewer switch, English, French and German.
 
@@ -50,15 +61,24 @@ précédente, Ctrl + molette zoome autour du pointeur. Argos suit le thème du b
 couleur d'accent, thème GTK4 installé).
 
 ### Fonctionnalités
-- **Grille** du dossier (sous-dossiers, puis photos dans l'ordre naturel) avec les miniatures partagées avec
-  Nautilus, **arbre des dossiers** (dossier personnel, Images, disques montés, ordinateur) et panneau des
-  **propriétés** (I).
+- **Grille** des photos du dossier dans l'ordre naturel, avec les miniatures partagées avec Nautilus, **arbre
+  des dossiers** (dossier personnel, Images, disques montés, ordinateur) et panneau des **propriétés** (I). Quatre
+  tailles de vignettes (Préférences, ou Ctrl + molette), plusieurs photos sélectionnées à la souris, avec Ctrl ou
+  Maj, un dossier où l'on revient s'affiche tout de suite.
 - **Visionneuse** : molette = photo suivante / précédente, Ctrl + molette = zoom autour du pointeur, glisser pour
   déplacer une photo agrandie, double-clic = plein écran simple, photos voisines lues d'avance, GIF animés.
 - **Bande de vignettes** sous la photo, réglable en hauteur, **barre d'état** (« 4 / 858 · 1920 × 1080 ·
   1,9 Mo · JPEG · 56 % »), **propriétés** avec la prise de vue (appareil, objectif, exposition, ISO…).
+- **Diaporama** (F5) : plein écran, une photo toutes les quelques secondes, Espace pour la pause, Échap pour
+  arrêter. Les photos **arrivent en glissant** (ou en fondu, ou sans transition — Préférences), aussi en naviguant
+  au clavier ou à la molette. En plein écran, les flèches et le pointeur se cachent quand la souris ne bouge plus.
 - **Retouche simple** : pivoter (R / Maj+R), recadrer (C, avec proportions), enregistrer (l'original peut être
   rétabli juste après) ou enregistrer sous un autre format (JPEG, PNG, WebP, TIFF, BMP, GIF).
+- **Convertir / redimensionner** plusieurs photos d'un coup (Ctrl+E) : redimensionner, pivoter et convertir en une
+  passe.
+- **Clic droit** : définir comme arrière-plan, imprimer, ouvrir avec, copier l'image, copier ou déplacer vers,
+  renommer (F2), corbeille, supprimer.
+- S'ouvre sur le dernier dossier, sur Images ou sur un dossier choisi (Préférences).
 - Formats : JPEG, PNG, GIF, WebP, TIFF, BMP, SVG, HEIC, AVIF (ceux de GdkPixbuf).
 - Interrupteur « Visionneuse de photos par défaut », anglais, français et allemand.
 

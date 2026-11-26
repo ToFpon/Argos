@@ -242,6 +242,7 @@ class MainWindow(FileMenu, Adw.ApplicationWindow):
         self._slideshow_id = 0
         self._slideshow_paused = False
         self._slide_step = 0             # photo suivante / précédente demandée : transition dans ce sens
+        self._shown_path = None          # photo demandée en dernier à la visionneuse
 
         self.info = InfoPanel()
         self.split = Adw.OverlaySplitView(content=overlay, sidebar=self.info, sidebar_position=Gtk.PackType.END,
@@ -463,7 +464,13 @@ class MainWindow(FileMenu, Adw.ApplicationWindow):
         self._want_path = None
         if want is not None:
             i = self._index_of(want)
-            if i >= 0:
+            if i >= 0 and want == self._shown_path and self.stack.get_visible_child_name() == "viewer":
+                # photo ouverte de l'extérieur, déjà affichée (liste provisoire) : seulement sa place dans le dossier
+                # — la relire remettait à zéro un zoom, une rotation ou un recadrage commencé pendant la lecture
+                self.index = i
+                self.filmstrip.show_index(i)
+                self._sync_status()
+            elif i >= 0:
                 self.show_index(i)
                 self.show_viewer()
             elif os.path.isfile(want):           # photo d'un format inconnu, fichier caché… : montrée seule
@@ -810,6 +817,7 @@ class MainWindow(FileMenu, Adw.ApplicationWindow):
             return
         self.index = i
         entry = self.images[i]
+        self._shown_path = entry.path
         self.filmstrip.show_index(i)
         self.viewer_title.set_title(shown(entry.name))
         self.set_title(f"{shown(entry.name)} — {APP_NAME}")

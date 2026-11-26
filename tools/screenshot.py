@@ -5,6 +5,8 @@
 
 CHEMIN : une photo (visionneuse) ou un dossier (grille).
 Options : --dark --size=LxH --delay=ms --zoom=FACTEUR --info --fullscreen --no-strip --prefs=PAGE --crop --rotate
+          --multi=N (N premières photos sélectionnées dans la grille) --convert (dialogue Convertir / redimensionner
+          sur cette sélection) --slide=P (photo suivante en plein glissement, P = avancement 0..1)
 """
 import os
 import sys
@@ -33,7 +35,8 @@ import gi  # noqa: E402
 
 gi.require_version("Gtk", "4.0")
 gi.require_version("Gdk", "4.0")
-from gi.repository import GLib, Gtk  # noqa: E402
+gi.require_version("Graphene", "1.0")
+from gi.repository import GLib, Graphene, Gtk  # noqa: E402
 
 from argos.app import ArgosApp  # noqa: E402
 
@@ -44,6 +47,14 @@ def snap(widget, path):
     p = Gtk.WidgetPaintable.new(widget)
     sn = Gtk.Snapshot()
     p.snapshot(sn, widget.get_width(), widget.get_height())
+    w, h = widget.get_width(), widget.get_height()
+    for d in Gtk.Window.list_toplevels():          # dialogues posés sur la fenêtre : composés au centre
+        if d is not widget and d.get_visible() and d.get_transient_for() is widget:
+            dw, dh = d.get_width(), d.get_height()
+            sn.save()
+            sn.translate(Graphene.Point().init(max((w - dw) / 2, 0), max((h - dh) / 2, 0)))
+            Gtk.WidgetPaintable.new(d).snapshot(sn, dw, dh)
+            sn.restore()
     node = sn.to_node()
     tex = widget.get_native().get_renderer().render_texture(node, None)
     tex.save_to_png(path)
@@ -60,9 +71,34 @@ def stage():
     if opts.get("info"):
         win.info_button.set_active(True)
         win.browser_info_button.set_active(True)
-        if win.images:
-            pick = opts.get("select") or win.images[0].name
-            GLib.timeout_add(800, lambda: (win.grid.select_path(os.path.join(win.folder, pick)), False)[1])
+        def select():                            # dossier lu entre-temps (la liste est vide au départ)
+            if win.images:
+                pick = opts.get("select") or win.images[0].name
+                win.grid.select_path(os.path.join(win.folder, pick))
+            return False
+        GLib.timeout_add(int(opts.get("delay", 1500)) - 1000, select)
+    if opts.get("multi"):
+        def choose():
+            for i in range(int(opts["multi"])):
+                win.grid.selection.select_item(i, False)
+            if opts.get("convert"):
+                win.image_tools()
+            return False
+        GLib.timeout_add(800, choose)
+    if opts.get("slide"):
+        def slide():
+            win.go(1)
+
+            def hold():
+                if not win.view.in_transition():
+                    return True
+                win.view._trans_anim.pause()
+                win.view._trans[3] = float(opts["slide"])
+                win.view.queue_draw()
+                return False
+            GLib.timeout_add(20, hold)
+            return False
+        GLib.timeout_add(300, slide)
     if opts.get("crop"):
         win.start_crop()
         fw, fh = win.view.full_size()

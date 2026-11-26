@@ -337,6 +337,15 @@ def steps(app):
     check(win.stack.get_visible_child_name() == "viewer", "photo ouverte : visionneuse tout de suite")
     yield lambda: win.picture is not None and win.picture.path == target and len(win.images) > 3
     check(win.images[win.index].path == target, "puis le dossier autour de la photo")
+    # le dossier arrive APRÈS un geste sur la photo déjà affichée (gros dossier) : zoom gardé, photo pas relue
+    win.view.set_zoom(2.0)
+    cached = win._folder_cache.get(win.folder)
+    win._want_path = target
+    win._scan_seq += 1
+    win._scanned(win._scan_seq, cached[1], "")
+    yield 400
+    check(not win.view.fit and abs(win.view.zoom - 2.0) < 1e-6 and win.images[win.index].path == target,
+          "dossier lu après un zoom : la photo ouverte garde son zoom")
 
     # menu du clic droit (photo) : contenu, renommer, copier vers (sans écrasement), supprimer définitivement
     win.show_index(0)

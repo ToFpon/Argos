@@ -105,6 +105,9 @@ Nom : Argos le géant aux cent yeux (et le chien d'Ulysse, le seul à le reconna
   en même temps que le dossier (liste provisoire d'une photo) — vu chez Tof : la grille passait une fraction de
   seconde avant. Grille : nom sous les DOSSIERS seulement (demande de Tof : place pour les photos ; nom dans
   l'infobulle, la barre d'état, les propriétés). Roue de chargement de la grille : Gtk.Spinner 32 px centré (étirée, elle remplissait tout).
+  PIÈGE (vu en refaisant les captures du site) : le dossier lu APRÈS l'affichage relançait `show_index` sur la même
+  photo → relue, zoom / rotation / recadrage commencés entre-temps remis à zéro. Maintenant, photo déjà demandée
+  (`_shown_path`) : seulement sa place dans le dossier. Testé : « dossier lu après un zoom » d'ui_smoke.
 - Clic droit sur une photo, visionneuse ET grille (`ui/filemenu.py`, mixin `FileMenu` ; menu de gThumb demandé par
   Tof, sans commentaire / étiquettes / catalogue) : plein écran, définir comme arrière-plan (copie dans
   ~/.local/share/backgrounds sous un nom UNIQUE « argos-NOM-ms.ext » — vu chez Tof : même nom = même adresse, GNOME
@@ -237,6 +240,8 @@ tools/screenshot.py SORTIE.png CHEMIN [--dark] [--size=LxH] [--zoom=F] [--info] 
    (domaine public, crédit en bas du site et du README ; Wikimedia refusait nos requêtes : 429) copiées dans
    /home/tof/Photos (chemin court dans les propriétés) : `HOME=/home/tof LANGUAGE=en xvfb-run -a -s "-screen 0
    1400x1000x24" python3.12 tools/screenshot.py site/img/NOM.png CHEMIN --size=1200x780 --delay=3000 [options]` —
-   dark (Mount Everest.jpg --dark), light (Andes and the Pacific.jpg), grid (dossier --dark --info), crop (Lake
-   Powell, Utah.jpg --dark --crop), info (Antennae galaxies.jpg --dark --info). Photos : images-api.nasa.gov.
+   dark (Mount Everest.jpg --dark), light (Andes and the Pacific.jpg), crop (Lake
+   Powell, Utah.jpg --dark --crop), info (Antennae galaxies.jpg --dark --info), grid (dossier --dark --info --select="Antennae galaxies.jpg" --delay=4000),
+   slide (Aurora over Florida.jpg --dark --no-strip --slide=0.4), convert (dossier --dark --multi=4 --convert) ;
+   le README montre dark + grid / slide / convert. Photos : images-api.nasa.gov.
 4. Essai chez Tof.
