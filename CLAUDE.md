@@ -160,7 +160,7 @@ Nom : Argos le géant aux cent yeux (et le chien d'Ulysse, le seul à le reconna
   Transition (demande de Tof) : réglage `slideshow_transition` (Préférences → Affichage : glissement par défaut,
   fondu enchaîné, sans) ; seulement pendant le diaporama (minuteur ou ← → : sens du pas, `_slide_step`, appliqué
   au `_loaded` de la photo). `ImageView.set_picture(transition=)` fige l'image d'avant en nœud de rendu
-  (Gtk.Snapshot → `to_node`) puis Adw.TimedAnimation (450 / 600 ms ; animations coupées dans le système → aucune) :
+  (Gtk.Snapshot → `to_node`) puis Adw.TimedAnimation (glissement 900 ms en EASE_IN_OUT_CUBIC — 450 ms en EASE_OUT, trop brusque pour Tof —, fondu 600 ms ; animations coupées dans le système → aucune) :
   l'ancienne sort d'un côté, la nouvelle entre de l'autre (`translate`), ou `push_cross_fade`.
 - « Ouvrir Argos sur » (même retour ; l'arbre des dossiers RESTE, choix de Tof, masquable par F9) : réglages
   `startup` (last par défaut / pictures / folder) + `startup_folder`, Préférences → Général → Comportement

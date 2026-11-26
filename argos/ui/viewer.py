@@ -124,7 +124,7 @@ class ImageView(Gtk.Widget):
             self._start_transition(transition[0], 1 if transition[1] >= 0 else -1, old)
         self.queue_draw()
 
-    TRANSITION_MS = {"slide": 450, "fade": 600}
+    TRANSITION_MS = {"slide": 900, "fade": 600}
 
     def _start_transition(self, kind: str, direction: int, old):
         self._trans = [kind, direction, old, 0.0]
@@ -135,7 +135,7 @@ class ImageView(Gtk.Widget):
                 self.queue_draw()
         anim = Adw.TimedAnimation(widget=self, value_from=0.0, value_to=1.0, duration=self.TRANSITION_MS[kind],
                                   target=Adw.CallbackAnimationTarget.new(step))
-        anim.set_easing(Adw.Easing.EASE_OUT_CUBIC if kind == "slide" else Adw.Easing.EASE_IN_OUT_CUBIC)
+        anim.set_easing(Adw.Easing.EASE_IN_OUT_CUBIC)   # départ et arrivée en douceur (demande de Tof)
         anim.connect("done", lambda a: self._trans_anim is a and self._stop_transition())
         self._trans_anim = anim
         anim.play()                      # animations coupées dans le système : libadwaita va droit à la fin
