@@ -293,7 +293,7 @@ msgstr ""
 msgid "Angle libre"
 msgstr ""
 
-#: argos/ui/image_dialog.py:33 argos/ui/window.py:209 argos/ui/window.py:918
+#: argos/ui/image_dialog.py:33 argos/ui/window.py:209 argos/ui/window.py:917
 msgid "Enregistrer"
 msgstr ""
 
@@ -475,7 +475,7 @@ msgstr ""
 msgid "Position"
 msgstr ""
 
-#: argos/ui/info.py:143 argos/ui/preferences.py:107
+#: argos/ui/info.py:143 argos/ui/preferences.py:108
 msgid "Dossier"
 msgstr ""
 
@@ -511,7 +511,7 @@ msgstr ""
 msgid "Aussi Ctrl + molette ou Ctrl + + / − dans la grille"
 msgstr ""
 
-#: argos/ui/preferences.py:104 argos/ui/preferences.py:129
+#: argos/ui/preferences.py:105 argos/ui/preferences.py:130
 msgid "Ouvrir Argos sur"
 msgstr ""
 
@@ -580,38 +580,42 @@ msgid "F5, ou Diaporama dans le menu ; Espace pour la pause, Échap pour arrête
 msgstr ""
 
 #: argos/ui/preferences.py:94
-msgid "Transition du diaporama"
+msgid "Transition entre les photos"
 msgstr ""
 
-#: argos/ui/preferences.py:102
+#: argos/ui/preferences.py:96
+msgid "Diaporama, flèches du clavier et molette"
+msgstr ""
+
+#: argos/ui/preferences.py:103
 msgid "Comportement"
 msgstr ""
 
-#: argos/ui/preferences.py:105
+#: argos/ui/preferences.py:106
 msgid "Le dernier dossier ouvert"
 msgstr ""
 
-#: argos/ui/preferences.py:105
+#: argos/ui/preferences.py:106
 msgid "Le dossier Images"
 msgstr ""
 
-#: argos/ui/preferences.py:105
+#: argos/ui/preferences.py:106
 msgid "Un dossier choisi"
 msgstr ""
 
-#: argos/ui/preferences.py:108
+#: argos/ui/preferences.py:109
 msgid "Aucun dossier choisi"
 msgstr ""
 
-#: argos/ui/preferences.py:109
+#: argos/ui/preferences.py:110
 msgid "Choisir un dossier"
 msgstr ""
 
-#: argos/ui/preferences.py:138
+#: argos/ui/preferences.py:139
 msgid "Fonctionnalités"
 msgstr ""
 
-#: argos/ui/preferences.py:140
+#: argos/ui/preferences.py:141
 msgid "Chaque fonctionnalité s'active ou se coupe tout de suite, sans redémarrer Argos"
 msgstr ""
 
@@ -773,11 +777,11 @@ msgstr ""
 msgid "Diaporama — Espace : pause, Échap : arrêter"
 msgstr ""
 
-#: argos/ui/window.py:916
+#: argos/ui/window.py:915
 msgid "Enregistrer les modifications ?"
 msgstr ""
 
-#: argos/ui/window.py:958 argos/ui/window.py:1037
+#: argos/ui/window.py:957 argos/ui/window.py:1036
 msgid "Enregistrement impossible"
 msgstr ""
 
@@ -849,19 +853,19 @@ msgstr ""
 msgid "Fin du diaporama"
 msgstr ""
 
-#: argos/ui/window.py:776
+#: argos/ui/window.py:775
 msgid "Diaporama en pause"
 msgstr ""
 
-#: argos/ui/window.py:779
+#: argos/ui/window.py:778
 msgid "Diaporama repris"
 msgstr ""
 
-#: argos/ui/window.py:834
+#: argos/ui/window.py:833
 msgid "Lecture impossible"
 msgstr ""
 
-#: argos/ui/window.py:999
+#: argos/ui/window.py:998
 msgid "Enregistrer sous"
 msgstr ""
 
@@ -903,15 +907,15 @@ msgid_plural "{0} photos ({1})"
 msgstr[0] ""
 msgstr[1] ""
 
-#: argos/ui/window.py:917
+#: argos/ui/window.py:916
 msgid "« {0} » a été pivotée ou recadrée."
 msgstr ""
 
-#: argos/ui/window.py:918
+#: argos/ui/window.py:917
 msgid "Abandonner"
 msgstr ""
 
-#: argos/ui/window.py:1025
+#: argos/ui/window.py:1024
 msgid "Format inconnu"
 msgstr ""
 
@@ -929,29 +933,29 @@ msgid_plural "{0} sélectionnées ({1})"
 msgstr[0] ""
 msgstr[1] ""
 
-#: argos/ui/window.py:974
+#: argos/ui/window.py:973
 msgid "« {0} » enregistrée"
 msgstr ""
 
-#: argos/ui/window.py:976
+#: argos/ui/window.py:975
 msgid "Enregistrée sous « {0} »"
 msgstr ""
 
-#: argos/ui/window.py:1073
+#: argos/ui/window.py:1072
 msgid "{0} sur {1} photo"
 msgid_plural "{0} sur {1} photos"
 msgstr[0] ""
 msgstr[1] ""
 
-#: argos/ui/window.py:969
+#: argos/ui/window.py:968
 msgid "Impossible d'annuler"
 msgstr ""
 
-#: argos/ui/window.py:1001
+#: argos/ui/window.py:1000
 msgid "modifiée"
 msgstr ""
 
-#: argos/ui/window.py:1026
+#: argos/ui/window.py:1025
 msgid "Terminez le nom par l'extension du format voulu : {0}"
 msgstr ""
 

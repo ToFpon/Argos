@@ -252,6 +252,7 @@ def steps(app):
     win.go(1)
     yield 50
     check(arrows(), "photo suivante (clavier, molette) : flèches montrées")
+    check(win.view.in_transition() and win.view._trans[1] == 1, "photo suivante au clavier : transition aussi")
     win.go(-1)
     yield lambda: not arrows()
     win.back()

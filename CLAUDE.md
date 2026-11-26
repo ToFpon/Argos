@@ -158,8 +158,9 @@ Nom : Argos le géant aux cent yeux (et le chien d'Ulysse, le seul à le reconna
   (minuteur relancé), Échap ou sortie du plein écran = arrêt ; fin sans « Revenir au début » (`loop`) : arrêt +
   toast. Depuis la grille : la photo sélectionnée, sinon la première. Testé : ui_smoke (minuteur réduit).
   Transition (demande de Tof) : réglage `slideshow_transition` (Préférences → Affichage : glissement par défaut,
-  fondu enchaîné, sans) ; seulement pendant le diaporama (minuteur ou ← → : sens du pas, `_slide_step`, appliqué
-  au `_loaded` de la photo). `ImageView.set_picture(transition=)` fige l'image d'avant en nœud de rendu
+  fondu enchaîné, sans) ; diaporama ET navigation à la main (clavier, molette, flèches : demande de Tof) — sens du
+  pas posé par `_go` (`_slide_step`), appliqué au `_loaded` de la photo ; une nouvelle photo pendant une transition
+  coupe celle-ci (molette rapide). `ImageView.set_picture(transition=)` fige l'image d'avant en nœud de rendu
   (Gtk.Snapshot → `to_node`) puis Adw.TimedAnimation (glissement 900 ms en EASE_IN_OUT_CUBIC — 450 ms en EASE_OUT, trop brusque pour Tof —, fondu 600 ms ; animations coupées dans le système → aucune) :
   l'ancienne sort d'un côté, la nouvelle entre de l'autre (`translate`), ou `push_cross_fade`.
 - « Ouvrir Argos sur » (même retour ; l'arbre des dossiers RESTE, choix de Tof, masquable par F9) : réglages
