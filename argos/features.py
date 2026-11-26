@@ -46,6 +46,20 @@ FEATURES = [
             missing=tr("Demande ImageMagick (paquet imagemagick)")),
 ]
 
+def _cairo() -> bool:
+    import importlib.util
+    try:
+        return importlib.util.find_spec("cairo") is not None
+    except (ImportError, ValueError):
+        return False
+
+
+FEATURES.append(
+    Feature("annotate", tr("Annoter une image"),
+            tr("Flèches, cadres, texte, surligneur et dessin à main levée sur une photo (repris d'Odysseus)"),
+            "document-edit-symbolic", available=_cairo,
+            missing=tr("Demande le module cairo de Python (paquet python3-gi-cairo)")))
+
 BY_ID = {f.id: f for f in FEATURES}
 
 

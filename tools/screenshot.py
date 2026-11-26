@@ -7,6 +7,7 @@ CHEMIN : une photo (visionneuse) ou un dossier (grille).
 Options : --dark --size=LxH --delay=ms --zoom=FACTEUR --info --fullscreen --no-strip --prefs=PAGE --crop --rotate
           --multi=N (N premières photos sélectionnées dans la grille) --convert (dialogue Convertir / redimensionner
           sur cette sélection) --slide=P (photo suivante en plein glissement, P = avancement 0..1)
+          --annotate (fenêtre « Annoter » avec quelques annotations, capturée seule)
 """
 import os
 import sys
@@ -99,6 +100,26 @@ def stage():
             GLib.timeout_add(20, hold)
             return False
         GLib.timeout_add(300, slide)
+    if opts.get("annotate"):
+        from argos.ui.annotate import AnnotateWindow, Shape
+        win.annotate()
+        aw = next(w for w in Gtk.Window.list_toplevels() if isinstance(w, AnnotateWindow))
+        w0, h0 = aw.img_w, aw.img_h
+        for tool, pts, rgb, kw in (
+                ("ellipse", [(w0 * .30, h0 * .28), (w0 * .62, h0 * .66)], (0.88, 0.11, 0.14), {}),
+                ("arrow", [(w0 * .86, h0 * .12), (w0 * .64, h0 * .36)], (0.88, 0.11, 0.14), {}),
+                ("highlight", [(w0 * .05, h0 * .80), (w0 * .45, h0 * .90)], (0.96, 0.83, 0.18), {})):
+            shp = Shape(tool, rgb, 0.9, max(4, w0 / 250), **kw)
+            shp.points = pts
+            aw.shapes.append(shp)
+        txt = Shape("text", (1, 1, 1), 1.0, 4, font=f"Sans Bold {int(h0 / 22)}")
+        txt.text = "Summit"
+        txt.points = [(w0 * .70, h0 * .03)]
+        aw.shapes.append(txt)
+        aw.dirty = False
+        aw.canvas.queue_draw()
+        GLib.timeout_add(int(opts.get("delay", 1500)), lambda: (snap(aw, out), app.quit(), False)[2])
+        return False
     if opts.get("crop"):
         win.start_crop()
         fw, fh = win.view.full_size()

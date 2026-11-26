@@ -34,6 +34,8 @@ installed GTK4 theme).
 - **Simple editing**: rotate (R / Shift+R), crop (C, with aspect ratios), save (the original can be restored
   right after) or save as another format (JPEG, PNG, WebP, TIFF, BMP, GIF).
 - **Convert / resize** several photos at once (Ctrl+E): resize, rotate and convert in one go.
+- **Annotate** (A): rectangle, ellipse, arrow, line, freehand, highlighter, pixelate and text, with undo; the photo
+  is replaced safely (Undo right after, date and camera details kept) or saved as a new image.
 - **Right-click**: set as wallpaper, print, open with, copy image, copy or move to, rename (F2), trash, delete.
 - Opens on the last folder, on Pictures or on a folder of your choice (Preferences).
 - Formats: JPEG, PNG, GIF, WebP, TIFF, BMP, SVG, HEIC, AVIF (those of GdkPixbuf).
@@ -76,6 +78,9 @@ couleur d'accent, thème GTK4 installé).
   rétabli juste après) ou enregistrer sous un autre format (JPEG, PNG, WebP, TIFF, BMP, GIF).
 - **Convertir / redimensionner** plusieurs photos d'un coup (Ctrl+E) : redimensionner, pivoter et convertir en une
   passe.
+- **Annoter** (A) : rectangle, ellipse, flèche, trait, main levée, surligneur, pixellisation et texte, avec
+  Ctrl+Z ; la photo est remplacée en toute sécurité (« Annuler » juste après, date et appareil gardés) ou
+  enregistrée comme nouvelle image.
 - **Clic droit** : définir comme arrière-plan, imprimer, ouvrir avec, copier l'image, copier ou déplacer vers,
   renommer (F2), corbeille, supprimer.
 - S'ouvre sur le dernier dossier, sur Images ou sur un dossier choisi (Préférences).

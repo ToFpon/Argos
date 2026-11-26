@@ -78,6 +78,7 @@ class MainWindow(FileMenu, Adw.ApplicationWindow):
         sec.append(tr("Ouvrir un dossier…"), "win.open-folder")
         sec.append(tr("Ouvrir des photos…"), "win.open-files")
         sec.append(tr("Convertir / redimensionner…"), "win.image-tools")
+        sec.append(tr("Annoter l'image…"), "win.annotate")
         sec.append(tr("Diaporama"), "win.slideshow")
         menu.append_section(None, sec)
         sort = Gio.Menu()
@@ -203,6 +204,10 @@ class MainWindow(FileMenu, Adw.ApplicationWindow):
         self.crop_button = Gtk.Button(icon_name="argos-crop-symbolic", tooltip_text=tr("Recadrer (C)"),
                                       action_name="win.crop")
         header.pack_start(self.crop_button)
+        # Annoter (repris d'Odysseus, idée d'un utilisateur) : fenêtre à part, enregistrement sûr
+        self.annotate_button = Gtk.Button(icon_name="document-edit-symbolic", tooltip_text=tr("Annoter l'image (A)"),
+                                          action_name="win.annotate", visible=features.enabled("annotate"))
+        header.pack_start(self.annotate_button)
         save_menu = Gio.Menu()
         save_menu.append(tr("Enregistrer sous…"), "win.save-as")
         save_menu.append(tr("Annuler les modifications"), "win.revert")
@@ -991,6 +996,27 @@ class MainWindow(FileMenu, Adw.ApplicationWindow):
         if after is not None:
             after()
 
+    def annotation_saved(self, target: str, copy: Optional[str]):
+        """Image annotée enregistrée (fenêtre d'annotation) : caches oubliés, photo affichée relue ; photo remplacée
+        → « Annuler » remet l'original. Un nouveau fichier arrive dans la grille par la surveillance du dossier."""
+        self.loader.forget(target)
+        forget_everywhere(target)
+        if copy:
+            def undo():
+                from ..backend import edit
+                try:
+                    edit.restore(copy, target)
+                except OSError as e:
+                    alert(self, tr("Impossible d'annuler"), shown(e.strerror or str(e)))
+                    return
+                self.loader.forget(target)
+                forget_everywhere(target)
+                self._reload_current()
+            toast(self, tr("« {0} » annotée").format(shown(os.path.basename(target))), tr("Annuler"), undo, 8)
+        if 0 <= self.index < len(self.images) and \
+                os.path.realpath(self.images[self.index].path) == os.path.realpath(target):
+            self._reload_current()
+
     def _reload_current(self):
         if 0 <= self.index < len(self.images):
             path = self.images[self.index].path
@@ -1065,6 +1091,11 @@ class MainWindow(FileMenu, Adw.ApplicationWindow):
     def _on_setting(self, key, value):
         if key == "grid_size":
             self.grid.set_size(nearest_size(value))
+        elif key == "features":
+            self.annotate_button.set_visible(features.enabled("annotate"))
+            a = self.lookup_action("annotate")
+            if a is not None:
+                a.set_enabled(features.enabled("annotate"))
 
     def zoom_toggle(self):
         if self.view.fit:

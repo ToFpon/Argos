@@ -19,7 +19,7 @@ Nom : Argos le géant aux cent yeux (et le chien d'Ulysse, le seul à le reconna
 - Dialogues : de vraies fenêtres (`common.AlertDialog`, `common.DialogWindow`, `Adw.PreferencesWindow`,
   `Adw.AboutWindow`). Thème du système : `data/base.css` ne fait que de la mise en page ; seule couleur fixe, le
   noir autour de la photo en plein écran (et le voile du recadrage).
-- Chaque fonctionnalité facultative est dans `argos/features.py` (wheel_browse, loop, preload, edit) et se
+- Chaque fonctionnalité facultative est dans `argos/features.py` (wheel_browse, loop, preload, edit, annotate) et se
   consulte au moment de l'usage. `available` / `missing` : composant absent → interrupteur grisé.
 - Toute fonction passée à `idle_add` / `timeout_add` renvoie False (sauf répétition voulue).
 
@@ -94,6 +94,19 @@ Nom : Argos le géant aux cent yeux (et le chien d'Ulysse, le seul à le reconna
   `os.replace` / autre format nouvelle image puis original à la corbeille ; Job réduit : progression, annulation
   qui tue ImageMagick) + `ui/image_dialog.py` (dialogue d'Odysseus, progression et Annuler DANS le dialogue,
   fermer = annuler ; derniers choix dans les réglages `image_*`). Traductions reprises des catalogues d'Odysseus.
+- Annoter (idée d'un utilisateur allemand ; reprise de `odysseus/ui/annotate.py` — Argos reste INDÉPENDANT
+  d'Odysseus, choix de Tof) : `ui/annotate.py`, fonctionnalité `annotate` (cairo : python3-gi-cairo en Depends),
+  touche A, bouton crayon de l'en-tête (`annotate_button`, suit la fonctionnalité en direct), clic droit, menu
+  principal ; une fenêtre par photo (`_annotating`), retouches en attente d'abord (`guard`). Mêmes outils et
+  libellés qu'Odysseus (« Annoter l'image… », traductions reprises de ses catalogues). Différences : pas de couleur
+  fixe derrière l'image ; enregistrement SÛR `edit.write_surface` (nom caché, fsync, remplacement — lien symbolique :
+  la photo visée —, ou nom libre) au lieu d'écrire par-dessus : PNG par cairo, autres formats par GdkPixbuf
+  (`surface_pixbuf` : RGB par tranches d'octets, `Gdk.pixbuf_get_from_surface` est déprécié et garde l'alpha) ;
+  Ctrl+S = la photo elle-même (original dans ~/.cache/argos/undo → « Annuler » du toast d'Argos,
+  `MainWindow.annotation_saved`), métadonnées reprises par GExiv2 (`_copy_metadata` : orientation remise à
+  « normale », les pixels sont déjà tournés ; vignette EXIF retirée) ; format que GdkPixbuf n'écrit pas (GIF, HEIC,
+  AVIF, SVG ; WebP sans webp-pixbuf-loader) → « Enregistrer sous » « nom (annotée).png ». Testé : `test_annotate`,
+  étape « Annoter » d'ui_smoke ; capture `tools/screenshot.py … --annotate` (site/img/annotate.png, Mount Everest).
 - SVG (vu chez Tof : icône 48 × 48 minuscule puis pixelisée au zoom) : `ImageView.vector` = chemin du SVG →
   ajusté À la fenêtre (agrandi, comme gThumb), et redessiné net à la taille affichée (`_hires` :
   `Pixbuf.new_from_file_at_scale` dans un fil, 150 ms après le dernier changement de zoom, 6000 px au plus) ; en

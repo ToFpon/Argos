@@ -293,6 +293,41 @@ def steps(app):
           "Échap : diaporama arrêté, plein écran quitté")
     settings["slideshow_delay"] = 4
 
+    # annoter (repris d'Odysseus) : fenêtre, un rectangle, Ctrl+S remplace la photo, « Annuler » la remet
+    from argos import features as feats
+    from argos.ui.annotate import AnnotateWindow, Shape
+    win.show_index(0)
+    yield lambda: win.picture is not None and win.picture.path == win.images[0].path
+    target = win.images[0].path
+    before = open(target, "rb").read()
+    check(win.annotate_button.get_visible(), "Annoter : bouton dans l'en-tête")
+    win.activate_action("win.annotate", None)
+    yield lambda: any(isinstance(w, AnnotateWindow) and w.get_visible() for w in Gtk.Window.list_toplevels())
+    aw = next(w for w in Gtk.Window.list_toplevels() if isinstance(w, AnnotateWindow))
+    check((aw.img_w, aw.img_h) == (win.picture.width, win.picture.height), "Annoter : fenêtre ouverte sur la photo")
+    shp = Shape("rect", (1.0, 1.0, 0.0), 1.0, 20, fill=True)
+    shp.points = [(1, 1), (aw.img_w - 1, aw.img_h - 1)]
+    aw.shapes.append(shp)
+    aw.dirty = True
+    aw.save()
+    yield lambda: not aw.dirty and open(target, "rb").read() != before
+    from gi.repository import GdkPixbuf
+    pb = GdkPixbuf.Pixbuf.new_from_file(target)
+    px = pb.get_pixels()[pb.get_height() // 2 * pb.get_rowstride() + pb.get_width() // 2 * pb.get_n_channels():][:3]
+    check(px[0] > 220 and px[1] > 220 and px[2] < 60, "Annoter : photo enregistrée avec le rectangle jaune")
+    check(not [f for f in os.listdir(PHOTOS) if f.startswith(".argos-")], "Annoter : aucun fichier caché laissé")
+    aw.close()
+    yield lambda: aw.get_root() is None or not aw.get_visible()
+    from argos.backend import edit as _edit
+    copies = sorted(os.listdir(_edit.UNDO_DIR), key=lambda f: os.path.getmtime(os.path.join(_edit.UNDO_DIR, f)))
+    _edit.restore(os.path.join(_edit.UNDO_DIR, copies[-1]), target)
+    check(open(target, "rb").read() == before, "Annoter : l'original gardé est remis tel quel")
+    feats.set_enabled("annotate", False)
+    yield 50
+    check(not win.annotate_button.get_visible() and not win.lookup_action("annotate").get_enabled(),
+          "Annoter coupée : bouton et action retirés")
+    feats.set_enabled("annotate", True)
+
     # propriétés
     win.info_button.set_active(True)
     yield 300

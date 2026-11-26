@@ -59,6 +59,9 @@ class FileMenu:
         add("delete", self.delete_for_good, accels=["<Shift>Delete"])
         add("ctx-trash", lambda: self.trash_paths(self._targets()))
         add("image-tools", self.image_tools, accels=["<Control>e"])
+        add("annotate", self.annotate, accels=["a"])
+        self.lookup_action("annotate").set_enabled(features.enabled("annotate"))
+        self._annotating = {}
 
     # --- cible ---
 
@@ -111,6 +114,8 @@ class FileMenu:
         s3.append(tr("Copier l'image"), "win.copy-image")
         if not features.blocked("edit"):
             s3.append(tr("Convertir / redimensionner…"), "win.image-tools")
+        if features.enabled("annotate") and not features.blocked("annotate"):
+            s3.append(tr("Annoter l'image…"), "win.annotate")
         menu.append_section(None, s3)
         s4 = Gio.Menu()
         s4.append(tr("Copier vers…"), "win.copy-to")
@@ -150,6 +155,32 @@ class FileMenu:
             return
         from .image_dialog import ImageToolsDialog
         ImageToolsDialog(self, paths, "convert").present(self)
+
+    def annotate(self):
+        """Annoter la photo visée (repris d'Odysseus) : une fenêtre par photo ; retouches en attente (rotation,
+        recadrage) d'abord enregistrées ou abandonnées, l'annotation part du fichier."""
+        if not features.enabled("annotate") or features.blocked("annotate"):
+            return
+        path = self._target()
+        if not path:
+            return
+        win = self._annotating.get(path)
+        if win is not None:
+            win.present()
+            return
+
+        def open_it():
+            from .annotate import AnnotateWindow
+            w = AnnotateWindow(self, path)
+            if getattr(w, "base", None) is None:          # image illisible : déjà signalé
+                return
+            self._annotating[path] = w
+            w.connect("destroy", lambda *_: self._annotating.pop(path, None))
+            w.present()
+        if self.stack.get_visible_child_name() == "viewer" and (self.pending() or self.view.cropping):
+            self.guard(open_it)
+        else:
+            open_it()
 
     def show_file_menu(self, widget: Gtk.Widget, path: str, x: float, y: float):
         self._ctx = path

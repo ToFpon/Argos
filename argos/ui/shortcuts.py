@@ -25,6 +25,7 @@ def _groups():
             ("<Control>c", tr("Copier l'image")),
             ("<Control>p", tr("Imprimer…")),
             ("<Control>e", tr("Convertir / redimensionner…")),
+            ("a", tr("Annoter l'image…")),
             ("r <Shift>r", tr("Pivoter à droite / à gauche")),
             ("i", tr("Propriétés")),
         ]),

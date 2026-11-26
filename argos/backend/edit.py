@@ -143,6 +143,111 @@ def apply(src: str, dest: str, rotation: int = 0, crop=None, replace: bool = Fal
             os.remove(tmp)
 
 
+# Annoter (repris d'Odysseus) : image dessinée écrite par GdkPixbuf. Extension → format de GdkPixbuf.
+PIXBUF_FORMATS = {"jpg": "jpeg", "jpeg": "jpeg", "png": "png", "webp": "webp", "bmp": "bmp", "tif": "tiff",
+                  "tiff": "tiff"}
+
+
+def pixbuf_writable(path: str) -> bool:
+    """GdkPixbuf sait-il écrire ce format ? (WebP : seulement avec webp-pixbuf-loader)"""
+    import gi
+    gi.require_version("GdkPixbuf", "2.0")
+    from gi.repository import GdkPixbuf
+    fmt = PIXBUF_FORMATS.get(os.path.splitext(path)[1].lower().lstrip("."))
+    return fmt is not None and any(f.get_name() == fmt and f.is_writable() for f in GdkPixbuf.Pixbuf.get_formats())
+
+
+def _copy_metadata(src: str, dest: str):
+    """EXIF / XMP / IPTC de la photo d'origine (date, appareil, auteur) recopiés dans l'image annotée, orientation
+    remise à « normale » (les pixels sont déjà tournés) et vignette EXIF retirée (elle montrerait la photo sans les
+    annotations). Sans GExiv2 ou sur un format qu'il refuse : rien, l'image reste bonne."""
+    try:
+        import gi
+        gi.require_version("GExiv2", "0.10")
+        from gi.repository import GExiv2
+        m = GExiv2.Metadata()
+        m.open_path(src)
+        m.set_orientation(GExiv2.Orientation.NORMAL)
+        try:
+            m.erase_exif_thumbnail()
+        except Exception:  # noqa: BLE001
+            pass
+        m.save_file(dest)
+    except Exception:  # noqa: BLE001 — métadonnées en plus, jamais une raison d'échouer
+        pass
+
+
+def surface_pixbuf(surface):
+    """Surface cairo OPAQUE (ARGB32, fond déjà peint) → GdkPixbuf RGB sans alpha, par tranches d'octets (rapide même
+    sur 24 Mpx). Gdk.pixbuf_get_from_surface est déprécié et garde l'alpha (un PNG deux fois trop lourd)."""
+    import gi
+    gi.require_version("GdkPixbuf", "2.0")
+    from gi.repository import GdkPixbuf, GLib
+    surface.flush()
+    w, h, stride = surface.get_width(), surface.get_height(), surface.get_stride()
+    data = bytes(surface.get_data())
+    rows = bytearray(w * 3 * h)
+    for y in range(h):                       # ARGB32 petit-boutiste = B, G, R, A ; opaque : prémultiplié = direct
+        line = data[y * stride:y * stride + w * 4]
+        out = y * w * 3
+        rows[out:out + w * 3:3] = line[2::4]
+        rows[out + 1:out + w * 3:3] = line[1::4]
+        rows[out + 2:out + w * 3:3] = line[0::4]
+    return GdkPixbuf.Pixbuf.new_from_bytes(GLib.Bytes.new(bytes(rows)), GdkPixbuf.Colorspace.RGB, False, 8,
+                                           w, h, w * 3)
+
+
+def write_surface(surface, dest: str, replace: bool = False, meta_from: Optional[str] = None) -> str:
+    """Écrit une image cairo dans `dest` comme `apply` : nom caché dans le dossier, fsync, puis remplacement (lien
+    symbolique : la photo visée) ou nom libre. PNG par cairo (transparence gardée), autres formats par GdkPixbuf
+    (surface opaque attendue). `meta_from` : métadonnées reprises de cette photo. Renvoie le chemin écrit."""
+    if replace and os.path.islink(dest):
+        dest = os.path.realpath(dest)
+    folder = os.path.dirname(os.path.abspath(dest)) or "."
+    ext = os.path.splitext(dest)[1].lower().lstrip(".")
+    fmt = PIXBUF_FORMATS.get(ext)
+    if fmt is None or (fmt != "png" and not pixbuf_writable(dest)):
+        raise EditError(ext or dest)
+    fd, tmp = tempfile.mkstemp(dir=folder, prefix=".argos-", suffix="." + ext)
+    os.close(fd)
+    try:
+        if fmt == "png":
+            surface.write_to_png(tmp)
+        else:
+            keys, values = [], []
+            if fmt == "jpeg":
+                keys, values = ["quality"], [_quality(meta_from) if meta_from and magick_command() else "92"]
+            surface_pixbuf(surface).savev(tmp, fmt, keys, values)
+        if os.path.getsize(tmp) == 0:
+            raise EditError(dest)
+        if meta_from:
+            _copy_metadata(meta_from, tmp)
+        with open(tmp, "rb") as fh:
+            os.fsync(fh.fileno())
+        if replace and os.path.exists(dest):
+            os.chmod(tmp, os.stat(dest).st_mode & 0o7777)
+            target = dest
+            os.replace(tmp, target)
+        else:
+            target = _place_new(tmp, dest)
+            os.chmod(target, 0o666 & ~_umask())
+        dfd = os.open(folder, os.O_RDONLY)
+        try:
+            os.fsync(dfd)
+        finally:
+            os.close(dfd)
+        return target
+    except OSError as e:
+        raise EditError(e.strerror or str(e)) from e
+    except Exception as e:  # GLib.Error de savev, cairo.Error
+        if isinstance(e, EditError):
+            raise
+        raise EditError(getattr(e, "message", None) or str(e)) from e
+    finally:
+        if os.path.exists(tmp):
+            os.remove(tmp)
+
+
 def _place_new(tmp: str, dest: str) -> str:
     """Pose `tmp` sous un nom libre : lien dur (échoue si le nom vient d'être pris : on prend le suivant), repli par
     renommage là où les liens durs n'existent pas (FAT, exFAT)."""
