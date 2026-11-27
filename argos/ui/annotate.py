@@ -224,7 +224,7 @@ class AnnotateWindow(Adw.Window):
         bar.append(self.zoom_lbl)
         tv.add_top_bar(bar)
 
-        self.canvas = Gtk.DrawingArea(hexpand=True, vexpand=True)
+        self.canvas = Gtk.DrawingArea(hexpand=True, vexpand=True, focusable=True)
         self.canvas.set_draw_func(self._draw)
         self.canvas.set_cursor(Gdk.Cursor.new_from_name("crosshair", None))
         drag = Gtk.GestureDrag()
@@ -240,7 +240,10 @@ class AnnotateWindow(Adw.Window):
         tv.set_content(self.scroller)
         self.toast_overlay.set_child(tv)
         self.set_content(self.toast_overlay)
-        keys = Gtk.ShortcutController(scope=Gtk.ShortcutScope.MANAGED)
+        # en CAPTURE : avant le widget qui a le focus — sinon, curseur dans le champ « Épaisseur », c'est lui qui
+        # prenait Ctrl+Z (annuler la frappe) et le dessin n'était pas annulé (retour d'un utilisateur)
+        keys = Gtk.ShortcutController(scope=Gtk.ShortcutScope.LOCAL,
+                                      propagation_phase=Gtk.PropagationPhase.CAPTURE)
         for trig, cb in (("<Ctrl>z", self.undo), ("<Ctrl><Shift>z", self.redo_one), ("<Ctrl>s", self.save),
                          ("<Ctrl><Shift>s", self.save_as), ("<Ctrl>plus", lambda: self.zoom_step(1.25)),
                          ("<Ctrl>minus", lambda: self.zoom_step(1 / 1.25)), ("<Ctrl>0", lambda: self.set_zoom(1.0))):
@@ -314,6 +317,7 @@ class AnnotateWindow(Adw.Window):
                      self.fill.get_active(), font=desc.to_string() if desc else "Sans Bold 28")
 
     def _begin(self, g, x, y):
+        self.canvas.grab_focus()          # on dessine : le clavier quitte le champ « Épaisseur »
         self._start = (x, y)
         p = self._to_img(x, y)
         if self.tool == "text":
@@ -422,6 +426,7 @@ class AnnotateWindow(Adw.Window):
                 f = dlg.save_finish(res)
             except GLib.Error:
                 self._close_after_save = False
+                self._close_asked = False
                 return
             target = f.get_path() if f is not None else None
             if not target:
@@ -465,6 +470,7 @@ class AnnotateWindow(Adw.Window):
     def _write_failed(self, msg: str):
         self._saving = False
         self._close_after_save = False
+        self._close_asked = False
         alert(self, tr("Enregistrement impossible"), shown(msg))
 
     def _written(self, target: str, copy):
@@ -474,11 +480,14 @@ class AnnotateWindow(Adw.Window):
         if self.main is not None and hasattr(self.main, "annotation_saved"):
             self.main.annotation_saved(target, copy)
         if self._close_after_save:
-            self.destroy()
+            GLib.idle_add(lambda: (self.destroy(), False)[1])
 
     def _on_close(self, *_):
         if not self.dirty:
             return False
+        if getattr(self, "_close_asked", False):     # question déjà posée (deuxième clic sur la croix)
+            return True
+        self._close_asked = True
 
         def resp(r):
             if r == "save":
@@ -486,7 +495,12 @@ class AnnotateWindow(Adw.Window):
                 self.save()
             elif r == "discard":
                 self.dirty = False
-                self.destroy()
+                # détruite après la fermeture de la question : détruite pendant sa réponse, GTK pouvait encore
+                # vouloir lui rendre la main (« A window is shown after it has been destroyed », retour d'un
+                # utilisateur, une fois, suivi d'un gel)
+                GLib.idle_add(lambda: (self.destroy(), False)[1])
+            if r != "save":
+                self._close_asked = False
         alert(self, tr("Enregistrer les annotations ?"), tr("Les modifications seront perdues sinon."),
               responses=(("cancel", tr("Annuler")), ("discard", tr("Ne pas enregistrer")),
                          ("save", tr("Enregistrer"))),

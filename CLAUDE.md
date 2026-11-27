@@ -107,6 +107,12 @@ Nom : Argos le géant aux cent yeux (et le chien d'Ulysse, le seul à le reconna
   « normale », les pixels sont déjà tournés ; vignette EXIF retirée) ; format que GdkPixbuf n'écrit pas (GIF, HEIC,
   AVIF, SVG ; WebP sans webp-pixbuf-loader) → « Enregistrer sous » « nom (annotée).png ». Testé : `test_annotate`,
   étape « Annoter » d'ui_smoke ; capture `tools/screenshot.py … --annotate` (site/img/annotate.png, Mount Everest).
+  Retours de l'utilisateur allemand (0.4.0), corrigés aussi dans Odysseus : Ctrl+Z sans effet tant que le curseur était
+  dans le champ « Épaisseur » (le Gtk.Text de la SpinButton prenait Ctrl+Z pour lui) → raccourcis en CAPTURE
+  (Gtk.ShortcutController LOCAL + PropagationPhase.CAPTURE) et le canevas prend le focus quand on dessine (vérifié par
+  de vraies touches xdotool sous openbox). Une fois : « A window is shown after it has been destroyed » puis gel en
+  fermant (non reproduit) → fenêtre détruite en idle APRÈS la question, une seule question à la fois (`_close_asked`,
+  remis à faux si l'enregistrement échoue ou si « Enregistrer sous » est abandonné).
 - Vidéos (demande de Tof, comme gThumb ; fonctionnalité `videos`, active par défaut, grisée sans le module GStreamer de
   GTK — `Gtk.MediaFile.new()` = GtkNoMediaFile) : `folder.VIDEO_EXTS` / `is_video`, `scan(videos=)` (clé du cache des
   dossiers, `_scan_options`[3] ; interrupteur → relecture en direct, `_videos_shown`). Miniatures : module repris
