@@ -54,6 +54,24 @@ def _cairo() -> bool:
         return False
 
 
+def _media() -> bool:
+    """Lecteur vidéo de GTK présent ? (module GStreamer de GTK : libgtk-4-media-gstreamer)"""
+    try:
+        import gi
+        gi.require_version("Gtk", "4.0")
+        from gi.repository import Gtk
+        return Gtk.MediaFile.new().__gtype__.name != "GtkNoMediaFile"
+    except Exception:  # noqa: BLE001
+        return False
+
+
+FEATURES.append(
+    Feature("videos", tr("Vidéos"),
+            tr("Les vidéos du dossier apparaissent avec les photos et se lisent dans la visionneuse (sautées "
+               "par le diaporama)"),
+            "video-x-generic-symbolic", available=_media,
+            missing=tr("Demande le lecteur de GTK (paquet libgtk-4-media-gstreamer)")))
+
 FEATURES.append(
     Feature("annotate", tr("Annoter une image"),
             tr("Flèches, cadres, texte, surligneur et dessin à main levée sur une photo (repris d'Odysseus)"),

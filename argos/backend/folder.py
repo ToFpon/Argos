@@ -20,8 +20,20 @@ IMAGE_EXTS = {
 }
 
 
+# Vidéos (demande de Tof, comme gThumb) : montrées dans la grille et lues dans la visionneuse (Gtk.Video, GStreamer)
+# quand la fonctionnalité « videos » est active.
+VIDEO_EXTS = {
+    ".mp4", ".m4v", ".mkv", ".webm", ".avi", ".mov", ".wmv", ".flv", ".mpg", ".mpeg", ".ts", ".m2ts", ".mts",
+    ".3gp", ".ogv", ".vob",
+}
+
+
 def is_image(name: str) -> bool:
     return os.path.splitext(name)[1].lower() in IMAGE_EXTS
+
+
+def is_video(name: str) -> bool:
+    return os.path.splitext(name)[1].lower() in VIDEO_EXTS
 
 
 def _glib_collate():
@@ -59,9 +71,9 @@ class Entry:
     key: bytes = field(default=b"", repr=False)
 
 
-def scan(folder: str, show_hidden: bool = False, sort_key: str = "name", reverse: bool = False
-         ) -> tuple[list[Entry], list[Entry]]:
-    """(sous-dossiers, photos) du dossier. Lève OSError si le dossier est illisible."""
+def scan(folder: str, show_hidden: bool = False, sort_key: str = "name", reverse: bool = False,
+         videos: bool = False) -> tuple[list[Entry], list[Entry]]:
+    """(sous-dossiers, photos — et vidéos si `videos`) du dossier. Lève OSError si le dossier est illisible."""
     dirs: list[Entry] = []
     images: list[Entry] = []
     with os.scandir(folder) as it:
@@ -72,7 +84,7 @@ def scan(folder: str, show_hidden: bool = False, sort_key: str = "name", reverse
             try:
                 if de.is_dir():
                     dirs.append(Entry(de.path, name, True, key=name_key(name)))
-                elif is_image(name) and de.is_file():
+                elif (is_image(name) or videos and is_video(name)) and de.is_file():
                     st = de.stat()
                     images.append(Entry(de.path, name, False, st.st_size, st.st_mtime, name_key(name)))
             except OSError:

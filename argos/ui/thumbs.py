@@ -16,6 +16,7 @@ gi.require_version("GdkPixbuf", "2.0")
 from gi.repository import Gdk, GdkPixbuf, GLib  # noqa: E402
 
 from ..backend import thumbnails  # noqa: E402
+from ..backend.folder import is_video  # noqa: E402
 from ..backend.loader import image_size  # noqa: E402
 
 WORKERS = 3
@@ -77,7 +78,8 @@ class ThumbLoader:
         icône de 48 px reste à 48 px), photo = sans transparence (elle aura un cadre). None si impossible."""
         pb = self._cached(path, mtime)
         if pb is None and not thumbnails.failed(path, mtime):
-            png = thumbnails.generate(path, "image/", mtime, max(128, self.pixels))
+            kind = "video/" if is_video(path) else "image/"
+            png = thumbnails.generate(path, kind, mtime, max(128, self.pixels))
             if png is not None:
                 try:
                     pb = GdkPixbuf.Pixbuf.new_from_file(png)
@@ -88,7 +90,8 @@ class ThumbLoader:
         w, h = pb.get_width(), pb.get_height()
         # taille d'origine SANS décoder (image_size) : get_file_info décodait un AVIF entier à chaque vignette,
         # miniature en cache ou pas
-        nat = image_size(path) or (w, h)
+        # (vidéo : l'image tirée remplit la case, pas de taille « d'origine » à respecter)
+        nat = (10 ** 6, 10 ** 6) if is_video(path) else image_size(path) or (w, h)
         box = self.pixels - (2 * FRAME if not pb.get_has_alpha() else 0)
         k = min(box / w, box / h)                               # remplit la case…
         k = min(k, max(nat[0], 1) / w, max(nat[1], 1) / h)       # …sans dépasser la taille de l'image

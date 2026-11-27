@@ -142,16 +142,23 @@ class InfoPanel(Gtk.ScrolledWindow):
         self._path = pic.path
         rows = [(tr("Nom"), os.path.basename(pic.path)), (tr("Dossier"), os.path.dirname(pic.path))]
         if pic.width:
-            rows.append((tr("Dimensions"), f"{pic.width} × {pic.height} ({decimal(pic.width * pic.height / 1e6)} Mpx)"))
+            rows.append((tr("Dimensions"), f"{pic.width} × {pic.height}" if getattr(pic, "video", False) else
+                         f"{pic.width} × {pic.height} ({decimal(pic.width * pic.height / 1e6)} Mpx)"))
         if not getattr(pic, "is_dir", False):
             rows.append((tr("Taille"), human_size(pic.size)))
         if pic.format:
             rows.append((tr("Format"), pic.format))
+        if getattr(pic, "video", False):
+            if pic.duration:
+                from .window import duration_text
+                rows.append((tr("Durée"), duration_text(pic.duration)))
+            if pic.codecs:
+                rows.append((tr("Codecs"), ", ".join(pic.codecs)))
         if pic.mtime:
             rows.append((tr("Modifié le"), date_text(datetime.datetime.fromtimestamp(pic.mtime))))
         self._group(tr("Fichier"), rows)
         path = pic.path
-        if getattr(pic, "is_dir", False):
+        if getattr(pic, "is_dir", False) or getattr(pic, "video", False):
             return
 
         def work():
@@ -173,13 +180,21 @@ class InfoPanel(Gtk.ScrolledWindow):
                 st = os.stat(path)
             except OSError:
                 return
+            from ..backend.folder import is_video
+            from ..backend.loader import probe_video
             w = h = 0
             fmt = ""
-            if not os.path.isdir(path):
+            duration, codecs = 0.0, ()
+            video = not os.path.isdir(path) and is_video(path)
+            if video:
+                w, h, duration, codecs = probe_video(path)
+                fmt = os.path.splitext(path)[1].lstrip(".").upper()
+            elif not os.path.isdir(path):
                 w, h = image_size(path) or (0, 0)          # sans décoder (AVIF : get_file_info décodait tout)
                 fmt = format_name(path)
             pic = SimpleNamespace(path=path, width=w, height=h, size=0 if os.path.isdir(path) else st.st_size,
-                                  format=fmt, mtime=st.st_mtime, is_dir=os.path.isdir(path))
+                                  format=fmt, mtime=st.st_mtime, is_dir=os.path.isdir(path), video=video,
+                                  duration=duration, codecs=codecs)
             GLib.idle_add(lambda: (self._path == path and self.show_picture(pic), False)[1])
         threading.Thread(target=work, daemon=True).start()
 

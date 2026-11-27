@@ -34,6 +34,21 @@ def percent(zoom: float) -> str:
     return decimal(p, 0 if p >= 10 else 1) + ("%" if LANGUAGE == "en" else " %")
 
 
+def count_text(entries) -> str:
+    """« 12 photos », ou « 12 photos, 1 vidéo » quand le dossier a des vidéos."""
+    videos = sum(1 for e in entries if fold.is_video(e.name))
+    photos = len(entries) - videos
+    text = ntr("{0} photo", "{0} photos", photos).format(photos)
+    if videos:
+        text += ", " + ntr("{0} vidéo", "{0} vidéos", videos).format(videos)
+    return text
+
+
+def duration_text(seconds: float) -> str:
+    s = int(round(seconds))
+    return f"{s // 3600}:{s // 60 % 60:02d}:{s % 60:02d}" if s >= 3600 else f"{s // 60}:{s % 60:02d}"
+
+
 class MainWindow(FileMenu, Adw.ApplicationWindow):
     def __init__(self, app):
         super().__init__(application=app, title=APP_NAME)
@@ -43,6 +58,7 @@ class MainWindow(FileMenu, Adw.ApplicationWindow):
             self.maximize()
         self.loader = Loader()
         self.folder = ""
+        self._videos_shown = None        # vidéos montrées par la dernière lecture du dossier (fonctionnalité « videos »)
         self.dirs: list[fold.Entry] = []
         self.images: list[fold.Entry] = []
         self.index = -1
@@ -226,6 +242,22 @@ class MainWindow(FileMenu, Adw.ApplicationWindow):
                           self.show_file_menu(v.get_parent(), self.images[self.index].path, x, y))
         self.error_page = Adw.StatusPage(icon_name="image-missing-symbolic", visible=False)
         overlay = Gtk.Overlay(child=self.view)
+        # vidéos (demande de Tof, comme gThumb) : lecteur de GTK (GStreamer), lecture dès qu'on arrive dessus
+        self.video = Gtk.Video(autoplay=True, visible=False, hexpand=True, vexpand=True, focusable=False)
+        self.video.add_css_class("argos-video")
+        wheel = Gtk.EventControllerScroll(flags=Gtk.EventControllerScrollFlags.VERTICAL
+                                          | Gtk.EventControllerScrollFlags.DISCRETE)
+        wheel.connect("scroll", self._on_video_wheel)
+        self.video.add_controller(wheel)
+        clicks = Gtk.GestureClick()
+        clicks.connect("pressed", lambda _g, n, _x, _y: n == 2 and self.toggle_fullscreen())
+        self.video.add_controller(clicks)
+        right = Gtk.GestureClick(button=Gdk.BUTTON_SECONDARY)
+        right.connect("pressed", lambda _g, _n, x, y: 0 <= self.index < len(self.images) and
+                      self.show_file_menu(self.video.get_parent(), self.images[self.index].path, x, y))
+        self.video.add_controller(right)
+        self._video_error_id = 0
+        overlay.add_overlay(self.video)
         overlay.add_overlay(self.error_page)
         self._arrows = []
         for icon, step, align in (("go-previous-symbolic", -1, Gtk.Align.START),
@@ -407,7 +439,8 @@ class MainWindow(FileMenu, Adw.ApplicationWindow):
 
     @staticmethod
     def _scan_options():
-        return settings["show_hidden"], settings["sort_key"], settings["sort_reverse"]
+        return settings["show_hidden"], settings["sort_key"], settings["sort_reverse"], \
+            features.enabled("videos") and not features.blocked("videos")
 
     @staticmethod
     def _signature(result):
@@ -421,11 +454,12 @@ class MainWindow(FileMenu, Adw.ApplicationWindow):
         if not quiet:
             self.browser_stack.set_visible_child_name("loading")
         opts = self._scan_options()
-        hidden, key, rev = opts
+        hidden, key, rev, videos = opts
+        self._videos_shown = videos
 
         def work():
             try:
-                result = fold.scan(folder, hidden, key, rev)
+                result = fold.scan(folder, hidden, key, rev, videos)
                 err = ""
             except OSError as e:
                 result, err = ([], []), e.strerror or str(e)
@@ -621,9 +655,8 @@ class MainWindow(FileMenu, Adw.ApplicationWindow):
     def _grid_selected(self):
         chosen = self.grid.selected_entries()
         entry = chosen[0] if len(chosen) == 1 else None
-        n = len(self.images)
         total = sum(e.size for e in self.images)
-        parts = [ntr("{0} photo ({1})", "{0} photos ({1})", n).format(n, fold.human_size(total))]
+        parts = [count_text(self.images) + f" ({fold.human_size(total)})"]
         if len(chosen) > 1:
             parts.append(ntr("{0} sélectionnée ({1})", "{0} sélectionnées ({1})", len(chosen)).format(
                 len(chosen), fold.human_size(sum(e.size for e in chosen))))
@@ -657,6 +690,7 @@ class MainWindow(FileMenu, Adw.ApplicationWindow):
     # ------------------------------------------------------------------ visionneuse
 
     def show_browser(self):
+        self._stop_video()
         if self.is_fullscreen():
             self.unfullscreen()
         self.stack.set_visible_child_name("browser")
@@ -753,6 +787,12 @@ class MainWindow(FileMenu, Adw.ApplicationWindow):
         if self.stack.get_visible_child_name() != "viewer" or not self.images:
             return
         self._slideshow_paused = False
+        if 0 <= self.index < len(self.images) and fold.is_video(self.images[self.index].name):
+            i = self._step_index(1, photos_only=True)          # diaporama de PHOTOS : on part de la suivante
+            if i is None:
+                toast(self, tr("Aucune photo pour le diaporama"))
+                return
+            self.show_index(i)
         if not self.is_fullscreen():
             self.fullscreen()
         self._arm_slideshow()
@@ -767,11 +807,11 @@ class MainWindow(FileMenu, Adw.ApplicationWindow):
         self._slideshow_id = 0
         if self.stack.get_visible_child_name() != "viewer" or self._slideshow_paused:
             return False
-        if self.index >= len(self.images) - 1 and not features.enabled("loop"):
+        if self._step_index(1, photos_only=True) is None:      # plus de photo (les vidéos sont sautées)
             self.stop_slideshow()
             toast(self, tr("Fin du diaporama"))
             return False
-        self._go(1)
+        self._go(1, photos_only=True)                # le minuteur vient de se terminer : slideshow_running() est faux
         self._arm_slideshow()
         return False
 
@@ -804,14 +844,27 @@ class MainWindow(FileMenu, Adw.ApplicationWindow):
             return
         self._go(step)
 
-    def _go(self, step: int):
+    def _step_index(self, step: int, photos_only: bool = False) -> Optional[int]:
+        """Position après `step` (bouclée si « Revenir au début ») ; `photos_only` (diaporama) : vidéos sautées."""
         n = len(self.images)
-        if not n:
+        i = self.index
+        for _ in range(n):
+            i += step
+            if features.enabled("loop"):
+                i %= n
+            elif not 0 <= i < n:
+                return None
+            if not (photos_only and fold.is_video(self.images[i].name)):
+                return i if i != self.index else None
+        return None
+
+    def _go(self, step: int, photos_only: Optional[bool] = None):
+        if not self.images:
             return
-        i = self.index + step
-        if features.enabled("loop"):
-            i %= n
-        elif not 0 <= i < n:
+        if photos_only is None:
+            photos_only = self.slideshow_running()
+        i = self._step_index(step, photos_only=photos_only)
+        if i is None:
             self._slide_step = 0
             return
         self._slide_step = step                     # transition dans le sens du pas (diaporama, clavier, molette)
@@ -823,6 +876,8 @@ class MainWindow(FileMenu, Adw.ApplicationWindow):
         self.index = i
         entry = self.images[i]
         self._shown_path = entry.path
+        if self.showing_video() and (self.video.get_file() is None or self.video.get_file().get_path() != entry.path):
+            self._stop_video()                      # on quitte la vidéo : le son s'arrête tout de suite
         self.filmstrip.show_index(i)
         self.viewer_title.set_title(shown(entry.name))
         self.set_title(f"{shown(entry.name)} — {APP_NAME}")
@@ -841,12 +896,20 @@ class MainWindow(FileMenu, Adw.ApplicationWindow):
         self.picture = pic
         step, self._slide_step = self._slide_step, 0
         transition = (settings["slideshow_transition"], step) if step else None
-        if pic.error:
+        if pic.video:
+            self.error_page.set_visible(False)
+            self.view.set_picture(None)
+            self._play(pic.path)
+        elif pic.error:
+            self._stop_video()
+            self.error_page.set_icon_name("image-missing-symbolic")
+            self.error_page.set_tooltip_text(None)
             self.view.set_picture(None)
             self.error_page.set_title(tr("Lecture impossible"))
             self.error_page.set_description(shown(pic.error))
             self.error_page.set_visible(True)
         else:
+            self._stop_video()
             self.error_page.set_visible(False)
             self.view.set_picture(pic.texture, pic.animation, keep_view,
                                   vector=pic.path if pic.format in ("SVG", "SVGZ") else None,
@@ -857,17 +920,84 @@ class MainWindow(FileMenu, Adw.ApplicationWindow):
 
     # ------------------------------------------------------------------ retouche
 
+    # ------------------------------------------------------------------ vidéos
+
+    def showing_video(self) -> bool:
+        return self.video.get_visible()
+
+    def _play(self, path: str):
+        """Vidéo affichée : lue tout de suite par Gtk.Video (GStreamer). Format illisible : page d'erreur."""
+        if self.video.get_visible() and self.video.get_file() is not None and \
+                self.video.get_file().get_path() == path:
+            return
+        self._stop_video()
+        self.video.set_visible(True)
+        self.video.set_filename(path)
+        stream = self.video.get_media_stream()
+        if stream is not None:
+            self._video_error_id = stream.connect("notify::error", self._on_video_error)
+
+    def _on_video_error(self, stream, _pspec):
+        err = stream.get_error()
+        if err is None:
+            return
+        self._stop_video()
+        # le message de GStreamer (« Error from element /GstPlayBin:playbin/… ») ne dit rien à personne : une phrase
+        # claire, le détail dans l'infobulle
+        self.error_page.set_icon_name("video-x-generic-symbolic")
+        self.error_page.set_title(tr("Lecture impossible"))
+        self.error_page.set_description(tr("Format non pris en charge, ou fichier abîmé.") + "\n\n" + tr(
+            "Il manque peut-être un décodeur : sudo apt install gstreamer1.0-libav — ou ouvrez la vidéo avec un "
+            "autre lecteur (clic droit, Ouvrir avec)."))
+        self.error_page.set_tooltip_text(shown(err.message))
+        self.error_page.set_visible(True)
+
+    def _stop_video(self):
+        stream = self.video.get_media_stream()
+        if stream is not None:
+            if self._video_error_id:
+                stream.disconnect(self._video_error_id)
+            stream.pause()
+        self._video_error_id = 0
+        self.video.set_file(None)
+        self.video.set_visible(False)
+
+    def toggle_video(self):
+        stream = self.video.get_media_stream()
+        if stream is not None:
+            if stream.get_ended():
+                stream.seek(0)
+                stream.play()
+            else:
+                stream.set_playing(not stream.get_playing())
+
+    def _on_video_wheel(self, _ctrl, _dx, dy):
+        if not features.enabled("wheel_browse") or dy == 0:
+            return False
+        self.go(1 if dy > 0 else -1)
+        return True
+
     def editable(self) -> bool:
         """La photo affichée peut-elle être retouchée et enregistrée ? (pas une animation ni un SVG)"""
         pic = self.picture
         return (features.enabled("edit") and not features.blocked("edit") and pic is not None and not pic.error
-                and pic.animation is None and pic.format not in ("SVG",)
+                and pic.animation is None and pic.format not in ("SVG",) and not pic.video
                 and 0 <= self.index < len(self.images) and pic.path == self.images[self.index].path)
 
     def pending(self) -> bool:
         return self.editable() and (self.view.rotation % 4 != 0 or self.view.crop is not None)
 
     def _sync_edit(self):
+        # vidéo affichée : ni pivoter, ni zoomer, ni annoter (le lecteur de GTK a ses propres commandes)
+        video = self.stack.get_visible_child_name() == "viewer" and self.showing_video()
+        for name in ("rotate-left", "rotate-right", "zoom-in", "zoom-out", "zoom-toggle", "zoom-fit", "zoom-100",
+                     "annotate"):
+            a = self.lookup_action(name)
+            if a is not None:
+                on = not video and (name != "annotate" or features.enabled("annotate"))
+                if name not in ("zoom-in", "zoom-out") or self.stack.get_visible_child_name() == "viewer":
+                    on = on and (self.stack.get_visible_child_name() == "viewer" or name == "annotate")
+                a.set_enabled(on)
         self.save_button.set_visible(self.pending())
         ok = self.editable()
         for name in ("crop", "save-as"):
@@ -876,7 +1006,7 @@ class MainWindow(FileMenu, Adw.ApplicationWindow):
                 a.set_enabled(ok and self.stack.get_visible_child_name() == "viewer")
 
     def rotate(self, quarter: int):
-        if self.view.cropping or self._saving:
+        if self.view.cropping or self._saving or self.showing_video():
             return
         self.view.rotate(quarter)
         self._sync_status()
@@ -1092,6 +1222,10 @@ class MainWindow(FileMenu, Adw.ApplicationWindow):
         if key == "grid_size":
             self.grid.set_size(nearest_size(value))
         elif key == "features":
+            if self.folder and self._scan_options()[3] != self._videos_shown:
+                if not self._scan_options()[3] and self.showing_video():
+                    self.show_browser()
+                self._rescan(quiet=True)                # vidéos montrées / retirées en direct
             self.annotate_button.set_visible(features.enabled("annotate"))
             a = self.lookup_action("annotate")
             if a is not None:
@@ -1108,8 +1242,11 @@ class MainWindow(FileMenu, Adw.ApplicationWindow):
         parts = []
         if 0 <= self.index < n:
             parts.append(f"{self.index + 1} / {n}")
-            self.viewer_title.set_subtitle(ntr("{0} sur {1} photo", "{0} sur {1} photos", n)
-                                           .format(self.index + 1, n))
+            if any(fold.is_video(e.name) for e in self.images):
+                self.viewer_title.set_subtitle(tr("{0} sur {1}").format(self.index + 1, n))
+            else:
+                self.viewer_title.set_subtitle(ntr("{0} sur {1} photo", "{0} sur {1} photos", n)
+                                               .format(self.index + 1, n))
         pic = self.picture
         if pic is not None and 0 <= self.index < n and pic.path == self.images[self.index].path:
             if pic.width:
@@ -1118,6 +1255,8 @@ class MainWindow(FileMenu, Adw.ApplicationWindow):
             parts.append(fold.human_size(pic.size))
             if pic.format:
                 parts.append(pic.format)
+            if pic.video and pic.duration:
+                parts.append(duration_text(pic.duration))
         if self.view.texture is not None:
             parts.append(percent(self.view.zoom))
         self.zoom_button.set_label(percent(self.view.zoom) if self.view.texture is not None else "—")
@@ -1204,6 +1343,9 @@ class MainWindow(FileMenu, Adw.ApplicationWindow):
         if self.slideshow_running() and keyval in (Gdk.KEY_space, Gdk.KEY_p, Gdk.KEY_P):
             self.toggle_slideshow_pause()
             return True
+        if self.showing_video() and keyval in (Gdk.KEY_space, Gdk.KEY_k, Gdk.KEY_K):
+            self.toggle_video()                       # vidéo : Espace = lecture / pause (pas la photo suivante)
+            return True
         if keyval in (Gdk.KEY_Right, Gdk.KEY_space, Gdk.KEY_Page_Down, Gdk.KEY_Down):
             if keyval == Gdk.KEY_Down and not self.view.fit:
                 return False
@@ -1244,6 +1386,7 @@ class MainWindow(FileMenu, Adw.ApplicationWindow):
         if self._monitor is not None:
             self._monitor.cancel()
         self.stop_slideshow()
+        self._stop_video()
         self._reset_chrome()
         settings.disconnect(self._on_setting)
         return False

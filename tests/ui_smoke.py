@@ -70,6 +70,69 @@ def dialogs(app):
     return [w for w in Gtk.Window.list_toplevels() if isinstance(w, Adw.MessageDialog) and w.get_visible()]
 
 
+def videos_step(win):
+    from argos import features as feats
+    folder = os.path.join(TMP, "Avec vidéo")
+    os.makedirs(folder)
+    for i in (1, 3):
+        subprocess.run(["convert", "-size", "120x80", f"xc:rgb({i * 60},90,40)", os.path.join(folder, f"{i} photo.jpg")],
+                       check=True)
+    subprocess.run(["ffmpeg", "-loglevel", "error", "-y", "-f", "lavfi", "-i", "testsrc=size=160x90:rate=15",
+                    "-t", "4", "-c:v", "libvpx-vp9", "-b:v", "100k", "-an", os.path.join(folder, "2 clip.webm")],
+                   check=True)
+    back = win.folder
+    win.open_folder(folder)
+    yield lambda: win.browser_stack.get_visible_child_name() == "grid" and len(win.images) == 3
+    check([e.name for e in win.images] == ["1 photo.jpg", "2 clip.webm", "3 photo.jpg"], "vidéo listée avec les photos")
+    from argos.i18n import ntr
+    check(ntr("{0} vidéo", "{0} vidéos", 1).format(1) in win.browser_status.get_label(),
+          "barre d'état : « 2 photos, 1 vidéo »")
+    win.show_index(1)
+    win.show_viewer()
+    yield lambda: win.showing_video() and win.video.get_media_stream() is not None \
+        and win.video.get_media_stream().get_playing()
+    check(win.showing_video() and win.view.texture is None, "vidéo : lue dans la visionneuse, tout de suite")
+    check(not win.editable() and not win.lookup_action("rotate-right").get_enabled(),
+          "vidéo : pas de retouche (pivoter grisé)")
+    labels = []
+    menu = win.file_menu(win.images[1].path)
+    for i in range(menu.get_n_items()):
+        sec = menu.get_item_link(i, "section")
+        labels += [sec.get_item_attribute_value(j, "label").get_string() for j in range(sec.get_n_items())]
+    check(tr("Imprimer…") not in labels and tr("Annoter l'image…") not in labels and tr("Renommer…") in labels,
+          "vidéo : clic droit sans ce qui touche à l'image")
+    win._on_key(None, Gdk.KEY_space, 0, 0)
+    yield 200
+    check(not win.video.get_media_stream().get_playing() and win.index == 1, "vidéo : Espace = pause")
+    yield lambda: win.picture is not None and win.picture.video and win.picture.duration > 3
+    check("0:04" in win.status.get_label(), "barre d'état : durée de la vidéo")
+    win.go(1)
+    yield lambda: win.picture is not None and win.picture.path.endswith("3 photo.jpg")
+    check(not win.showing_video() and win.view.texture is not None, "photo suivante : la vidéo s'arrête")
+    # diaporama : la vidéo est sautée
+    win.show_index(0)
+    yield lambda: win.picture is not None and win.picture.path.endswith("1 photo.jpg")
+    settings["slideshow_delay"] = 1
+    win.activate_action("win.slideshow", None)
+    yield lambda: win.index != 0
+    check(win.index == 2 and not win.showing_video(), "diaporama : vidéo sautée")
+    win._on_key(None, Gdk.KEY_Escape, 0, 0)
+    yield lambda: not win.is_fullscreen()
+    settings["slideshow_delay"] = 4
+    # interrupteur : coupé, la vidéo disparaît du dossier
+    win.show_browser()
+    feats.set_enabled("videos", False)
+    yield lambda: len(win.images) == 2
+    check([e.name for e in win.images] == ["1 photo.jpg", "3 photo.jpg"], "« Vidéos » coupée : photos seulement")
+    feats.set_enabled("videos", True)
+    yield lambda: len(win.images) == 3
+    win.open_folder(back)
+    yield lambda: win.browser_stack.get_visible_child_name() == "grid" and win.folder == back
+    win.show_index(0)
+    win.show_viewer()                       # rendu comme trouvé : la visionneuse
+    yield lambda: win.picture is not None and win.picture.path == win.images[0].path
+
+
 def steps(app):
     win = app.get_active_window()
     yield lambda: win.browser_stack.get_visible_child_name() == "grid"
@@ -292,6 +355,9 @@ def steps(app):
     check(not win.slideshow_running() and win.stack.get_visible_child_name() == "viewer",
           "Échap : diaporama arrêté, plein écran quitté")
     settings["slideshow_delay"] = 4
+
+    # vidéos (demande de Tof, comme gThumb) : dans la grille, lues dans la visionneuse, sautées par le diaporama
+    yield from videos_step(win)
 
     # annoter (repris d'Odysseus) : fenêtre, un rectangle, Ctrl+S remplace la photo, « Annuler » la remet
     from argos import features as feats

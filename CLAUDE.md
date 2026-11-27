@@ -19,7 +19,7 @@ Nom : Argos le géant aux cent yeux (et le chien d'Ulysse, le seul à le reconna
 - Dialogues : de vraies fenêtres (`common.AlertDialog`, `common.DialogWindow`, `Adw.PreferencesWindow`,
   `Adw.AboutWindow`). Thème du système : `data/base.css` ne fait que de la mise en page ; seule couleur fixe, le
   noir autour de la photo en plein écran (et le voile du recadrage).
-- Chaque fonctionnalité facultative est dans `argos/features.py` (wheel_browse, loop, preload, edit, annotate) et se
+- Chaque fonctionnalité facultative est dans `argos/features.py` (wheel_browse, loop, preload, edit, videos, annotate) et se
   consulte au moment de l'usage. `available` / `missing` : composant absent → interrupteur grisé.
 - Toute fonction passée à `idle_add` / `timeout_add` renvoie False (sauf répétition voulue).
 
@@ -107,6 +107,23 @@ Nom : Argos le géant aux cent yeux (et le chien d'Ulysse, le seul à le reconna
   « normale », les pixels sont déjà tournés ; vignette EXIF retirée) ; format que GdkPixbuf n'écrit pas (GIF, HEIC,
   AVIF, SVG ; WebP sans webp-pixbuf-loader) → « Enregistrer sous » « nom (annotée).png ». Testé : `test_annotate`,
   étape « Annoter » d'ui_smoke ; capture `tools/screenshot.py … --annotate` (site/img/annotate.png, Mount Everest).
+- Vidéos (demande de Tof, comme gThumb ; fonctionnalité `videos`, active par défaut, grisée sans le module GStreamer de
+  GTK — `Gtk.MediaFile.new()` = GtkNoMediaFile) : `folder.VIDEO_EXTS` / `is_video`, `scan(videos=)` (clé du cache des
+  dossiers, `_scan_options`[3] ; interrupteur → relecture en direct, `_videos_shown`). Miniatures : module repris
+  d'Odysseus (ffmpegthumbnailer sinon ffmpeg, cache freedesktop partagé), `ThumbLoader._make` en « video/ », image
+  qui remplit la case ; ▶ sur la vignette (`_Cell.badge`, `.argos-video-badge`). `loader.load` : `Picture(video=True)`
+  sans texture, dimensions / durée / codecs par ffprobe (`probe_video`, rotation comprise). Visionneuse :
+  `Gtk.Video` (autoplay) en overlay au-dessus de l'ImageView (`_play` / `_stop_video` : arrêtée en changeant
+  d'élément — dans `show_index`, le son s'arrête tout de suite —, en revenant à la grille, à la fermeture) ; erreur
+  du flux → page « Lecture impossible » en clair (message de GStreamer dans l'infobulle) + gstreamer1.0-libav.
+  Espace / K = lecture / pause (`toggle_video`), molette = élément suivant (contrôleur DISCRETE sur la vidéo, après
+  le volume du lecteur), double-clic = plein écran, clic droit = menu. Pas de retouche (`editable`, `_sync_edit`
+  grise pivoter / zoom / annoter ; menu sans arrière-plan, imprimer, copier l'image, convertir, annoter).
+  Diaporama : photos seulement (`_step_index(photos_only)` ; PIÈGE : dans `_slideshow_tick`, `_slideshow_id` vient
+  d'être remis à 0 → `slideshow_running()` est faux : `_go(1, photos_only=True)` explicite). Barre d'état : durée ;
+  grille : « 12 photos, 1 vidéo » (`count_text`). Recommends : libgtk-4-media-gstreamer, gstreamer1.0-plugins-good,
+  gstreamer1.0-libav, ffmpeg. Lanceur : PAS de types vidéo (c'est Nausicaa). Testé : `test_videos`, `videos_step`
+  d'ui_smoke (webm VP9 fait par ffmpeg : lu, pause, durée, suivante = arrêt, diaporama qui saute, interrupteur).
 - SVG (vu chez Tof : icône 48 × 48 minuscule puis pixelisée au zoom) : `ImageView.vector` = chemin du SVG →
   ajusté À la fenêtre (agrandi, comme gThumb), et redessiné net à la taille affichée (`_hires` :
   `Pixbuf.new_from_file_at_scale` dans un fil, 150 ms après le dernier changement de zoom, 6000 px au plus) ; en

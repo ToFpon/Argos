@@ -34,6 +34,8 @@ installed GTK4 theme).
 - **Simple editing**: rotate (R / Shift+R), crop (C, with aspect ratios), save (the original can be restored
   right after) or save as another format (JPEG, PNG, WebP, TIFF, BMP, GIF).
 - **Convert / resize** several photos at once (Ctrl+E): resize, rotate and convert in one go.
+- **Videos** (MP4, MKV, WebM, AVI, MOV…), like gThumb: shown in the grid with a ▶ on their thumbnail, played in
+  the viewer as soon as you reach them (Space = pause), skipped by the slideshow. A switch in Preferences → Features.
 - **Annotate** (A): rectangle, ellipse, arrow, line, freehand, highlighter, pixelate and text, with undo; the photo
   is replaced safely (Undo right after, date and camera details kept) or saved as a new image.
 - **Right-click**: set as wallpaper, print, open with, copy image, copy or move to, rename (F2), trash, delete.
@@ -78,6 +80,9 @@ couleur d'accent, thème GTK4 installé).
   rétabli juste après) ou enregistrer sous un autre format (JPEG, PNG, WebP, TIFF, BMP, GIF).
 - **Convertir / redimensionner** plusieurs photos d'un coup (Ctrl+E) : redimensionner, pivoter et convertir en une
   passe.
+- **Vidéos** (MP4, MKV, WebM, AVI, MOV…), comme gThumb : dans la grille avec un ▶ sur leur vignette, lues dans
+  la visionneuse dès qu'on arrive dessus (Espace = pause), sautées par le diaporama. Interrupteur dans Préférences →
+  Fonctionnalités.
 - **Annoter** (A) : rectangle, ellipse, flèche, trait, main levée, surligneur, pixellisation et texte, avec
   Ctrl+Z ; la photo est remplacée en toute sécurité (« Annuler » juste après, date et appareil gardés) ou
   enregistrée comme nouvelle image.

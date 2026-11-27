@@ -88,15 +88,18 @@ class FileMenu:
     def file_menu(self, path: str) -> Gio.Menu:
         if len(self._targets()) > 1:
             return self._multi_menu()
+        video = fold.is_video(os.path.basename(path))       # vidéo : rien de ce qui touche à l'image elle-même
         menu = Gio.Menu()
         s1 = Gio.Menu()
         s1.append(tr("Plein écran"), "win.ctx-fullscreen")
-        s1.append(tr("Diaporama"), "win.ctx-slideshow")
-        if background_settings() is not None:
+        if not video:
+            s1.append(tr("Diaporama"), "win.ctx-slideshow")
+        if background_settings() is not None and not video:
             s1.append(tr("Définir comme arrière-plan"), "win.wallpaper")
         menu.append_section(None, s1)
         s2 = Gio.Menu()
-        s2.append(tr("Imprimer…"), "win.print")
+        if not video:
+            s2.append(tr("Imprimer…"), "win.print")
         apps = Gio.Menu()
         own = self.get_application().get_application_id() + ".desktop"
         for app in Gio.AppInfo.get_all_for_type(content_type(path)):
@@ -111,12 +114,13 @@ class FileMenu:
         s2.append_submenu(tr("Ouvrir avec"), apps)
         menu.append_section(None, s2)
         s3 = Gio.Menu()
-        s3.append(tr("Copier l'image"), "win.copy-image")
-        if not features.blocked("edit"):
-            s3.append(tr("Convertir / redimensionner…"), "win.image-tools")
-        if features.enabled("annotate") and not features.blocked("annotate"):
-            s3.append(tr("Annoter l'image…"), "win.annotate")
-        menu.append_section(None, s3)
+        if not video:
+            s3.append(tr("Copier l'image"), "win.copy-image")
+            if not features.blocked("edit"):
+                s3.append(tr("Convertir / redimensionner…"), "win.image-tools")
+            if features.enabled("annotate") and not features.blocked("annotate"):
+                s3.append(tr("Annoter l'image…"), "win.annotate")
+            menu.append_section(None, s3)
         s4 = Gio.Menu()
         s4.append(tr("Copier vers…"), "win.copy-to")
         s4.append(tr("Déplacer vers…"), "win.move-to")
@@ -132,7 +136,7 @@ class FileMenu:
         """Plusieurs photos : seulement ce qui a un sens pour toutes."""
         menu = Gio.Menu()
         s0 = Gio.Menu()
-        if not features.blocked("edit"):
+        if not features.blocked("edit") and any(not fold.is_video(os.path.basename(p)) for p in self._targets()):
             s0.append(tr("Convertir / redimensionner…"), "win.image-tools")
             menu.append_section(None, s0)
         s1 = Gio.Menu()
@@ -147,7 +151,7 @@ class FileMenu:
 
     def image_tools(self):
         """Convertir / redimensionner / pivoter (outils image d'Odysseus) : photo affichée ou sélection."""
-        paths = self._targets()
+        paths = [p for p in self._targets() if not fold.is_video(os.path.basename(p))]     # photos seulement
         if not paths:
             return
         if features.blocked("edit"):
@@ -162,7 +166,7 @@ class FileMenu:
         if not features.enabled("annotate") or features.blocked("annotate"):
             return
         path = self._target()
-        if not path:
+        if not path or fold.is_video(os.path.basename(path)):
             return
         win = self._annotating.get(path)
         if win is not None:
@@ -222,7 +226,7 @@ class FileMenu:
         visible dans les Paramètres mais pas appliquée — même nom de copie = même adresse, GNOME ne voit aucun
         changement et ne recharge rien (et le thème sombre lit picture-uri-dark). Ancienne copie d'Argos retirée."""
         path, gs = self._target(), background_settings()
-        if path is None or gs is None:
+        if path is None or gs is None or fold.is_video(os.path.basename(path)):
             return
         folder = os.path.join(GLib.get_user_data_dir(), "backgrounds")
         stem, ext = os.path.splitext(os.path.basename(path))
@@ -256,7 +260,7 @@ class FileMenu:
 
     def print_photo(self):
         path = self._target()
-        if path is None:
+        if path is None or fold.is_video(os.path.basename(path)):
             return
         try:
             pb = GdkPixbuf.Pixbuf.new_from_file(path)
@@ -318,7 +322,7 @@ class FileMenu:
     def copy_image(self):
         """L'image (pour la coller dans un document, un courriel…) et le fichier (pour le coller dans Nautilus)."""
         path = self._target()
-        if path is None:
+        if path is None or fold.is_video(os.path.basename(path)):
             return
         try:
             tex = Gdk.Texture.new_from_filename(path)

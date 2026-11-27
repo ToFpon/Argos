@@ -11,7 +11,7 @@ import gi
 gi.require_version("Gtk", "4.0")
 from gi.repository import Gio, GLib, GObject, Gtk, Pango  # noqa: E402
 
-from ..backend.folder import Entry  # noqa: E402
+from ..backend.folder import Entry, is_video  # noqa: E402
 from .common import shown  # noqa: E402
 from .thumbs import shared  # noqa: E402
 
@@ -147,7 +147,15 @@ class _Cell(Gtk.Box):
         self.picture = Gtk.Picture(content_fit=Gtk.ContentFit.FILL, can_shrink=False, hexpand=True, vexpand=True,
                                    halign=Gtk.Align.CENTER, valign=Gtk.Align.CENTER)
         self.icon = Gtk.Image(pixel_size=size // 2, hexpand=True, halign=Gtk.Align.CENTER, valign=Gtk.Align.CENTER)
-        self.frame.append(self.picture)
+        # vidéo : petit ▶ au centre de la miniature, pour la distinguer d'une photo
+        self.badge = Gtk.Image(icon_name="media-playback-start-symbolic", pixel_size=max(12, size // 8),
+                               halign=Gtk.Align.CENTER, valign=Gtk.Align.CENTER, visible=False, can_target=False)
+        self.badge.add_css_class("argos-video-badge")
+        over = Gtk.Overlay(child=self.picture, hexpand=True, vexpand=True, halign=Gtk.Align.CENTER,
+                           valign=Gtk.Align.CENTER)
+        over.add_overlay(self.badge)
+        self.picture.bind_property("visible", over, "visible", GObject.BindingFlags.SYNC_CREATE)  # dossier : icône seule
+        self.frame.append(over)
         self.frame.append(self.icon)
         self.append(self.frame)
         self.label = None
@@ -169,6 +177,7 @@ class _Cell(Gtk.Box):
         self.set_tooltip_text(shown(entry.name))
         self.picture.set_paintable(None)
         self.picture.remove_css_class("argos-photo")
+        self.badge.set_visible(False)
         if entry.is_dir:
             self.picture.set_visible(False)
             self.icon.set_visible(True)
@@ -188,6 +197,7 @@ class _Cell(Gtk.Box):
                 return
             tex, photo = result
             self.picture.set_paintable(tex)
+            self.badge.set_visible(is_video(entry.name))
             if photo:
                 self.picture.add_css_class("argos-photo")
         self._cb = done

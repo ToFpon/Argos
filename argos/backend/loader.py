@@ -36,6 +36,51 @@ class Picture:
     animation: Optional[GdkPixbuf.PixbufAnimation] = None
     error: str = ""
     mtime: float = 0.0
+    video: bool = False                 # vidéo : lue par Gtk.Video, pas de texture
+    duration: float = 0.0               # secondes (vidéo)
+    codecs: tuple = ()                  # (« H.264 », « AAC »…) d'après ffprobe (vidéo)
+
+
+VIDEO_CODECS = {"h264": "H.264", "hevc": "HEVC (H.265)", "vp8": "VP8", "vp9": "VP9", "av1": "AV1",
+                "mpeg4": "MPEG-4", "mpeg2video": "MPEG-2", "aac": "AAC", "mp3": "MP3", "opus": "Opus",
+                "vorbis": "Vorbis", "ac3": "AC-3", "eac3": "E-AC-3", "flac": "FLAC", "dts": "DTS"}
+
+
+def probe_video(path: str) -> tuple[int, int, float, tuple]:
+    """(largeur, hauteur, durée, codecs) par ffprobe ; zéros si ffprobe manque ou échoue."""
+    import json
+    import shutil
+    import subprocess
+    if not shutil.which("ffprobe"):
+        return 0, 0, 0.0, ()
+    try:
+        out = subprocess.run(["ffprobe", "-v", "error", "-print_format", "json", "-show_format", "-show_streams",
+                              os.path.abspath(path)], capture_output=True, text=True, errors="replace", timeout=15).stdout
+        data = json.loads(out or "{}")
+    except (OSError, subprocess.SubprocessError, ValueError):
+        return 0, 0, 0.0, ()
+    w = h = 0
+    codecs = []
+    for s in data.get("streams", []):
+        kind, name = s.get("codec_type"), s.get("codec_name") or ""
+        if kind == "video" and not (s.get("disposition") or {}).get("attached_pic"):
+            if not w:
+                w, h = int(s.get("width") or 0), int(s.get("height") or 0)
+                rot = (s.get("tags") or {}).get("rotate") or next(
+                    (d.get("rotation") for d in s.get("side_data_list", []) if "rotation" in d), 0)
+                try:
+                    if int(float(rot)) % 180:
+                        w, h = h, w
+                except (TypeError, ValueError):
+                    pass
+            codecs.append(VIDEO_CODECS.get(name, name.upper()))
+        elif kind == "audio" and name:
+            codecs.append(VIDEO_CODECS.get(name, name.upper()))
+    try:
+        duration = float((data.get("format") or {}).get("duration") or 0)
+    except ValueError:
+        duration = 0.0
+    return w, h, duration, tuple(dict.fromkeys(c for c in codecs if c))
 
 
 HEIF_EXTS = {".avif": "AVIF", ".avifs": "AVIF", ".heic": "HEIC", ".heif": "HEIF", ".hif": "HEIF"}
@@ -112,6 +157,11 @@ def load(path: str) -> Picture:
         st = os.stat(path)
     except OSError as e:
         return Picture(path, None, 0, 0, 0, "", error=e.strerror or str(e))
+    from .folder import is_video
+    if is_video(path):
+        w, h, duration, codecs = probe_video(path)
+        return Picture(path, None, w, h, st.st_size, os.path.splitext(path)[1].lstrip(".").upper(),
+                       mtime=st.st_mtime, video=True, duration=duration, codecs=codecs)
     fmt = format_name(path)
     try:
         dims = image_size(path)
