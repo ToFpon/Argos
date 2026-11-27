@@ -69,6 +69,15 @@
   </requires>
   <content_rating type="oars-1.1"/>
   <releases>
+    <release version="0.4.0" date="2026-11-27">
+      <description>
+        <ul>
+          <li>Videos (MP4, MKV, WebM, AVI, MOV…), like gThumb: shown in the grid with a play sign on their thumbnail, played in the viewer as soon as you reach them (Space to pause), skipped by the slideshow</li>
+          <li>A “Videos” switch in Preferences → Features</li>
+          <li>A photo opened from the file manager keeps the zoom started while its folder is still being read</li>
+        </ul>
+      </description>
+    </release>
     <release version="0.3.0" date="2026-11-26">
       <description>
         <ul>

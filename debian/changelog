@@ -1,3 +1,14 @@
+argos-viewer (0.4.0~noble1) noble; urgency=medium
+
+  * Vidéos (MP4, MKV, WebM, AVI, MOV…), comme gThumb : dans la grille
+    avec un signe de lecture sur leur vignette, lues dans la visionneuse
+    dès qu'on arrive dessus (Espace pour la pause), sautées par le
+    diaporama. Interrupteur « Vidéos » dans les Fonctionnalités.
+  * Décodage logiciel pour ce lecteur : les décodeurs matériels de
+    GStreamer ne passaient pas dans le lecteur de GTK (HEVC 10 bits).
+
+ -- Tof <nourpon@gmail.com>  Fri, 27 Nov 2026 07:04:27 +0000
+
 argos-viewer (0.3.0~noble1) noble; urgency=medium
 
   * Annoter une photo (A, bouton crayon, clic droit) : rectangle, ellipse,
