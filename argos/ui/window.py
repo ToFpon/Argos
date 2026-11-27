@@ -947,7 +947,7 @@ class MainWindow(FileMenu, Adw.ApplicationWindow):
         self.error_page.set_icon_name("video-x-generic-symbolic")
         self.error_page.set_title(tr("Lecture impossible"))
         self.error_page.set_description(tr("Format non pris en charge, ou fichier abîmé.") + "\n\n" + tr(
-            "Il manque peut-être un décodeur : sudo apt install gstreamer1.0-libav — ou ouvrez la vidéo avec un "
+            "Il manque peut-être un décodeur : sudo apt install gstreamer1.0-libav gstreamer1.0-plugins-bad — ou ouvrez la vidéo avec un "
             "autre lecteur (clic droit, Ouvrir avec)."))
         self.error_page.set_tooltip_text(shown(err.message))
         self.error_page.set_visible(True)

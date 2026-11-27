@@ -1074,11 +1074,12 @@ msgstr "Slideshow resumed"
 
 #: argos/ui/window.py:949
 msgid ""
-"Il manque peut-être un décodeur : sudo apt install gstreamer1.0-libav — ou "
-"ouvrez la vidéo avec un autre lecteur (clic droit, Ouvrir avec)."
+"Il manque peut-être un décodeur : sudo apt install gstreamer1.0-libav "
+"gstreamer1.0-plugins-bad — ou ouvrez la vidéo avec un autre lecteur (clic "
+"droit, Ouvrir avec)."
 msgstr ""
-"A decoder may be missing: sudo apt install gstreamer1.0-libav — or open the "
-"video with another player (right-click, Open With)."
+"A decoder may be missing: sudo apt install gstreamer1.0-libav gstreamer1.0-"
+"plugins-bad — or open the video with another player (right-click, Open With)."
 
 #: argos/ui/window.py:1162
 msgid "Enregistrer sous"

@@ -121,7 +121,7 @@ Nom : Argos le géant aux cent yeux (et le chien d'Ulysse, le seul à le reconna
   grise pivoter / zoom / annoter ; menu sans arrière-plan, imprimer, copier l'image, convertir, annoter).
   Diaporama : photos seulement (`_step_index(photos_only)` ; PIÈGE : dans `_slideshow_tick`, `_slideshow_id` vient
   d'être remis à 0 → `slideshow_running()` est faux : `_go(1, photos_only=True)` explicite). Barre d'état : durée ;
-  grille : « 12 photos, 1 vidéo » (`count_text`). Recommends : libgtk-4-media-gstreamer, gstreamer1.0-plugins-good,
+  grille : « 12 photos, 1 vidéo » (`count_text`). Recommends : libgtk-4-media-gstreamer, gstreamer1.0-plugins-good, gstreamer1.0-plugins-bad (h265parse),
   gstreamer1.0-libav, ffmpeg. Lanceur : PAS de types vidéo (c'est Nausicaa). Testé : `test_videos`, `videos_step`
   d'ui_smoke (webm VP9 fait par ffmpeg : lu, pause, durée, suivante = arrêt, diaporama qui saute, interrupteur).
 - SVG (vu chez Tof : icône 48 × 48 minuscule puis pixelisée au zoom) : `ImageView.vector` = chemin du SVG →

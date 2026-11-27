@@ -1036,7 +1036,7 @@ msgid "Diaporama repris"
 msgstr ""
 
 #: argos/ui/window.py:949
-msgid "Il manque peut-être un décodeur : sudo apt install gstreamer1.0-libav — ou ouvrez la vidéo avec un autre lecteur (clic droit, Ouvrir avec)."
+msgid "Il manque peut-être un décodeur : sudo apt install gstreamer1.0-libav gstreamer1.0-plugins-bad — ou ouvrez la vidéo avec un autre lecteur (clic droit, Ouvrir avec)."
 msgstr ""
 
 #: argos/ui/window.py:1162
