@@ -912,14 +912,16 @@ class MainWindow(FileMenu, Adw.ApplicationWindow):
             self._stop_video()
             self.error_page.set_visible(False)
             # « En changeant de photo : garder le zoom » (Préférences, demande d'un utilisateur, comme gThumb) : le
-            # niveau choisi passe à la photo suivante ; ajustée, elle reste ajustée
-            keep_zoom = None if keep_view or self.view.fit or self.view.texture is None \
-                or settings["zoom_change"] != "keep" else self.view.zoom
+            # zoom passe à la photo suivante ; ajustée, elle reste ajustée. Zoom gardé PAR RAPPORT À L'AJUSTEMENT
+            # (retour du même utilisateur) : 50 % d'une carte de visite ajustée à 100 % agrandissait une affiche
+            # ajustée à 12 % ; maintenant chaque photo garde la même taille apparente (même taille : même zoom)
+            keep_ratio = None if keep_view or self.view.fit or self.view.texture is None \
+                or settings["zoom_change"] != "keep" else self.view.zoom / self.view.fit_zoom()
             self.view.set_picture(pic.texture, pic.animation, keep_view,
                                   vector=pic.path if pic.format in ("SVG", "SVGZ") else None,
                                   transition=transition)
-            if keep_zoom is not None:
-                self.view.set_zoom(keep_zoom)
+            if keep_ratio is not None:
+                self.view.set_zoom(keep_ratio * self.view.fit_zoom())
         self._sync_status()
         self._sync_info()
         self._sync_edit()
