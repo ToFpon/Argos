@@ -1,3 +1,12 @@
+argos-viewer (0.4.1~noble1) noble; urgency=medium
+
+  * Préférences, Affichage : « En changeant de photo », ajuster à la
+    fenêtre (comme avant) ou garder le zoom.
+  * Annoter : Ctrl+Z marche aussi quand le curseur est dans le champ
+    « Épaisseur » ; fermeture de la fenêtre plus sûre.
+
+ -- Tof <nourpon@gmail.com>  Fri, 27 Nov 2026 11:25:41 +0000
+
 argos-viewer (0.4.0~noble1) noble; urgency=medium
 
   * Vidéos (MP4, MKV, WebM, AVI, MOV…), comme gThumb : dans la grille

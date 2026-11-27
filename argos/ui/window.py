@@ -911,9 +911,15 @@ class MainWindow(FileMenu, Adw.ApplicationWindow):
         else:
             self._stop_video()
             self.error_page.set_visible(False)
+            # « En changeant de photo : garder le zoom » (Préférences, demande d'un utilisateur, comme gThumb) : le
+            # niveau choisi passe à la photo suivante ; ajustée, elle reste ajustée
+            keep_zoom = None if keep_view or self.view.fit or self.view.texture is None \
+                or settings["zoom_change"] != "keep" else self.view.zoom
             self.view.set_picture(pic.texture, pic.animation, keep_view,
                                   vector=pic.path if pic.format in ("SVG", "SVGZ") else None,
                                   transition=transition)
+            if keep_zoom is not None:
+                self.view.set_zoom(keep_zoom)
         self._sync_status()
         self._sync_info()
         self._sync_edit()

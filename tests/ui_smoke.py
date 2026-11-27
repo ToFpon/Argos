@@ -359,6 +359,19 @@ def steps(app):
     # vidéos (demande de Tof, comme gThumb) : dans la grille, lues dans la visionneuse, sautées par le diaporama
     yield from videos_step(win)
 
+    # « En changeant de photo » : garder le zoom (demande d'un utilisateur, comme gThumb) ou ajuster (défaut)
+    win.show_index(0)
+    yield lambda: win.picture is not None and win.picture.path == win.images[0].path
+    settings["zoom_change"] = "keep"
+    win.view.set_zoom(0.5)
+    win.go(1)
+    yield lambda: win.picture is not None and win.picture.path == win.images[1].path
+    check(not win.view.fit and abs(win.view.zoom - 0.5) < 1e-6, "garder le zoom : 50 % sur la photo suivante")
+    settings["zoom_change"] = "fit"
+    win.go(-1)
+    yield lambda: win.picture is not None and win.picture.path == win.images[0].path
+    check(win.view.fit, "ajuster à la fenêtre (défaut) : la photo suivante est ajustée")
+
     # annoter (repris d'Odysseus) : fenêtre, un rectangle, Ctrl+S remplace la photo, « Annuler » la remet
     from argos import features as feats
     from argos.ui.annotate import AnnotateWindow, Shape

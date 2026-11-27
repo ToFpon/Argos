@@ -69,6 +69,14 @@
   </requires>
   <content_rating type="oars-1.1"/>
   <releases>
+    <release version="0.4.1" date="2026-11-27">
+      <description>
+        <ul>
+          <li>Preferences → Display: “When changing photo”, fit to window (as before) or keep the zoom</li>
+          <li>Annotate: Ctrl+Z also works while the cursor is in the thickness field; closing the window is safer</li>
+        </ul>
+      </description>
+    </release>
     <release version="0.4.0" date="2026-11-27">
       <description>
         <ul>

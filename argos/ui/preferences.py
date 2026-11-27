@@ -91,6 +91,8 @@ class PreferencesWindow(Adw.PreferencesWindow):
         view.add(_choice(tr("Diaporama"), "slideshow_delay",
                          [ntr("{0} seconde par photo", "{0} secondes par photo", d).format(d) for d in delays], delays,
                          tr("F5, ou Diaporama dans le menu ; Espace pour la pause, Échap pour arrêter")))
+        view.add(_choice(tr("En changeant de photo"), "zoom_change",
+                         [tr("Ajuster à la fenêtre"), tr("Garder le zoom")], ["fit", "keep"]))
         view.add(_choice(tr("Transition entre les photos"), "slideshow_transition",
                          [tr("Glissement"), tr("Fondu enchaîné"), tr("Sans transition")], ["slide", "fade", "none"],
                          tr("Diaporama, flèches du clavier et molette")))

@@ -7,11 +7,11 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: argos/app.py:110
+#: argos/app.py:131
 msgid "Remerciements"
 msgstr "Danksagungen"
 
-#: argos/app.py:107
+#: argos/app.py:128
 msgid "Visionneuse de photos simple et rapide"
 msgstr "Ein einfacher, schneller Fotobetrachter"
 
@@ -169,32 +169,32 @@ msgstr "Textmarker"
 msgid "Pixelliser (masquer)"
 msgstr "Verpixeln (verbergen)"
 
-#: argos/ui/annotate.py:31 argos/ui/annotate.py:354
+#: argos/ui/annotate.py:31 argos/ui/annotate.py:358
 msgid "Texte"
 msgstr "Text"
 
-#: argos/ui/annotate.py:357
+#: argos/ui/annotate.py:361
 msgid "Ajouter un texte"
 msgstr "Text hinzufügen"
 
-#: argos/ui/annotate.py:358 argos/ui/annotate.py:491 argos/ui/common.py:222
+#: argos/ui/annotate.py:362 argos/ui/annotate.py:505 argos/ui/common.py:222
 #: argos/ui/filemenu.py:401
 msgid "Annuler"
 msgstr "Abbrechen"
 
-#: argos/ui/annotate.py:359
+#: argos/ui/annotate.py:363
 msgid "Ajouter"
 msgstr "Hinzufügen"
 
-#: argos/ui/annotate.py:468 argos/ui/window.py:1100 argos/ui/window.py:1200
+#: argos/ui/annotate.py:474 argos/ui/window.py:1106 argos/ui/window.py:1206
 msgid "Enregistrement impossible"
 msgstr "Speichern nicht möglich"
 
-#: argos/ui/annotate.py:490
+#: argos/ui/annotate.py:504
 msgid "Enregistrer les annotations ?"
 msgstr "Änderungen speichern?"
 
-#: argos/ui/annotate.py:490
+#: argos/ui/annotate.py:504
 msgid "Les modifications seront perdues sinon."
 msgstr "Andernfalls gehen die Änderungen verloren."
 
@@ -206,7 +206,7 @@ msgstr "Rückgängig (Strg+Z)"
 msgid "Rétablir (Ctrl+Maj+Z)"
 msgstr "Wiederholen (Strg+Umschalt+Z)"
 
-#: argos/ui/annotate.py:180 argos/ui/annotate.py:492
+#: argos/ui/annotate.py:180 argos/ui/annotate.py:506
 #: argos/ui/image_dialog.py:33 argos/ui/window.py:230
 msgid "Enregistrer"
 msgstr "Speichern"
@@ -239,7 +239,7 @@ msgstr "Verkleinern"
 msgid "Zoom avant"
 msgstr "Vergrößern"
 
-#: argos/ui/annotate.py:218 argos/ui/shortcuts.py:34
+#: argos/ui/annotate.py:218 argos/ui/preferences.py:95 argos/ui/shortcuts.py:34
 msgid "Ajuster à la fenêtre"
 msgstr "An Fenster anpassen"
 
@@ -247,7 +247,7 @@ msgstr "An Fenster anpassen"
 msgid "Taille réelle (100 %)"
 msgstr "Originalgröße (100 %)"
 
-#: argos/ui/annotate.py:416
+#: argos/ui/annotate.py:420
 msgid "Enregistrer l'image"
 msgstr "Bild speichern"
 
@@ -263,11 +263,11 @@ msgstr "Strichstärke"
 msgid "Opacité"
 msgstr "Deckkraft"
 
-#: argos/ui/annotate.py:432 argos/ui/window.py:1188
+#: argos/ui/annotate.py:437 argos/ui/window.py:1194
 msgid "Format inconnu"
 msgstr "Unbekanntes Format"
 
-#: argos/ui/annotate.py:473
+#: argos/ui/annotate.py:479
 msgid "Image enregistrée : {0}"
 msgstr "Bild gespeichert: {0}"
 
@@ -275,15 +275,15 @@ msgstr "Bild gespeichert: {0}"
 msgid "Annoter — {0}"
 msgstr "Bild bearbeiten — {0}"
 
-#: argos/ui/annotate.py:418
+#: argos/ui/annotate.py:422
 msgid "annotée"
 msgstr "bearbeitet"
 
-#: argos/ui/annotate.py:491
+#: argos/ui/annotate.py:505
 msgid "Ne pas enregistrer"
 msgstr "Nicht speichern"
 
-#: argos/ui/annotate.py:433 argos/ui/window.py:1189
+#: argos/ui/annotate.py:438 argos/ui/window.py:1195
 msgid "Terminez le nom par l'extension du format voulu : {0}"
 msgstr "Beenden Sie den Namen mit der Endung des gewünschten Formats: {0}"
 
@@ -668,7 +668,7 @@ msgstr "Blitz"
 msgid "Position"
 msgstr "Standort"
 
-#: argos/ui/info.py:143 argos/ui/preferences.py:108
+#: argos/ui/info.py:143 argos/ui/preferences.py:110
 msgid "Dossier"
 msgstr "Ordner"
 
@@ -712,7 +712,7 @@ msgstr "Vorschaugröße"
 msgid "Aussi Ctrl + molette ou Ctrl + + / − dans la grille"
 msgstr "Auch Strg + Mausrad oder Strg + + / − im Raster"
 
-#: argos/ui/preferences.py:105 argos/ui/preferences.py:130
+#: argos/ui/preferences.py:107 argos/ui/preferences.py:132
 msgid "Ouvrir Argos sur"
 msgstr "Argos öffnen in"
 
@@ -786,42 +786,46 @@ msgid ""
 msgstr "F5 oder Diashow im Menü; Leertaste zum Pausieren, Esc zum Beenden"
 
 #: argos/ui/preferences.py:94
+msgid "En changeant de photo"
+msgstr "Beim Bildwechsel"
+
+#: argos/ui/preferences.py:96
 msgid "Transition entre les photos"
 msgstr "Übergang zwischen Fotos"
 
-#: argos/ui/preferences.py:96
+#: argos/ui/preferences.py:98
 msgid "Diaporama, flèches du clavier et molette"
 msgstr "Diashow, Pfeiltasten und Mausrad"
 
-#: argos/ui/preferences.py:103
+#: argos/ui/preferences.py:105
 msgid "Comportement"
 msgstr "Verhalten"
 
-#: argos/ui/preferences.py:106
+#: argos/ui/preferences.py:108
 msgid "Le dernier dossier ouvert"
 msgstr "Der zuletzt geöffnete Ordner"
 
-#: argos/ui/preferences.py:106
+#: argos/ui/preferences.py:108
 msgid "Le dossier Images"
 msgstr "Der Bilder-Ordner"
 
-#: argos/ui/preferences.py:106
+#: argos/ui/preferences.py:108
 msgid "Un dossier choisi"
 msgstr "Ein gewählter Ordner"
 
-#: argos/ui/preferences.py:109
+#: argos/ui/preferences.py:111
 msgid "Aucun dossier choisi"
 msgstr "Kein Ordner gewählt"
 
-#: argos/ui/preferences.py:110
+#: argos/ui/preferences.py:112
 msgid "Choisir un dossier"
 msgstr "Ordner wählen"
 
-#: argos/ui/preferences.py:139
+#: argos/ui/preferences.py:141
 msgid "Fonctionnalités"
 msgstr "Funktionen"
 
-#: argos/ui/preferences.py:141
+#: argos/ui/preferences.py:143
 msgid ""
 "Chaque fonctionnalité s'active ou se coupe tout de suite, sans redémarrer "
 "Argos"
@@ -829,14 +833,18 @@ msgstr ""
 "Jede Funktion wird sofort ein- oder ausgeschaltet, ohne Argos neu zu starten"
 
 #: argos/ui/preferences.py:95
+msgid "Garder le zoom"
+msgstr "Zoom beibehalten"
+
+#: argos/ui/preferences.py:97
 msgid "Glissement"
 msgstr "Schieben"
 
-#: argos/ui/preferences.py:95
+#: argos/ui/preferences.py:97
 msgid "Fondu enchaîné"
 msgstr "Überblenden"
 
-#: argos/ui/preferences.py:95
+#: argos/ui/preferences.py:97
 msgid "Sans transition"
 msgstr "Ohne Übergang"
 
@@ -987,11 +995,11 @@ msgstr "Änderungen verwerfen"
 msgid "Diaporama — Espace : pause, Échap : arrêter"
 msgstr "Diashow — Leertaste: Pause, Esc: Beenden"
 
-#: argos/ui/window.py:948 argos/ui/window.py:908
+#: argos/ui/window.py:954 argos/ui/window.py:908
 msgid "Lecture impossible"
 msgstr "Lesen nicht möglich"
 
-#: argos/ui/window.py:1058
+#: argos/ui/window.py:1064
 msgid "Enregistrer les modifications ?"
 msgstr "Änderungen speichern?"
 
@@ -1076,7 +1084,7 @@ msgstr "Diashow pausiert"
 msgid "Diaporama repris"
 msgstr "Diashow fortgesetzt"
 
-#: argos/ui/window.py:949
+#: argos/ui/window.py:955
 msgid ""
 "Il manque peut-être un décodeur : sudo apt install gstreamer1.0-libav "
 "gstreamer1.0-plugins-bad — ou ouvrez la vidéo avec un autre lecteur (clic "
@@ -1086,7 +1094,7 @@ msgstr ""
 "gstreamer1.0-plugins-bad – oder öffnen Sie das Video mit einem anderen "
 "Player (Rechtsklick, Öffnen mit)."
 
-#: argos/ui/window.py:1162
+#: argos/ui/window.py:1168
 msgid "Enregistrer sous"
 msgstr "Speichern unter"
 
@@ -1132,15 +1140,15 @@ msgstr "Seitenverhältnis"
 msgid "Aucune photo pour le diaporama"
 msgstr "Keine Fotos für die Diashow"
 
-#: argos/ui/window.py:949
+#: argos/ui/window.py:955
 msgid "Format non pris en charge, ou fichier abîmé."
 msgstr "Format nicht unterstützt oder Datei beschädigt."
 
-#: argos/ui/window.py:1059
+#: argos/ui/window.py:1065
 msgid "« {0} » a été pivotée ou recadrée."
 msgstr "„{0}“ wurde gedreht oder zugeschnitten."
 
-#: argos/ui/window.py:1060
+#: argos/ui/window.py:1066
 msgid "Abandonner"
 msgstr "Verwerfen"
 
@@ -1158,31 +1166,31 @@ msgid_plural "{0} sélectionnées ({1})"
 msgstr[0] "{0} ausgewählt ({1})"
 msgstr[1] "{0} ausgewählt ({1})"
 
-#: argos/ui/window.py:1116
+#: argos/ui/window.py:1122
 msgid "« {0} » enregistrée"
 msgstr "„{0}“ gespeichert"
 
-#: argos/ui/window.py:1118
+#: argos/ui/window.py:1124
 msgid "Enregistrée sous « {0} »"
 msgstr "Gespeichert als „{0}“"
 
-#: argos/ui/window.py:1145
+#: argos/ui/window.py:1151
 msgid "« {0} » annotée"
 msgstr "„{0}“ bearbeitet"
 
-#: argos/ui/window.py:1111 argos/ui/window.py:1140
+#: argos/ui/window.py:1117 argos/ui/window.py:1146
 msgid "Impossible d'annuler"
 msgstr "Rückgängig machen nicht möglich"
 
-#: argos/ui/window.py:1164
+#: argos/ui/window.py:1170
 msgid "modifiée"
 msgstr "bearbeitet"
 
-#: argos/ui/window.py:1246
+#: argos/ui/window.py:1252
 msgid "{0} sur {1}"
 msgstr "{0} von {1}"
 
-#: argos/ui/window.py:1248
+#: argos/ui/window.py:1254
 msgid "{0} sur {1} photo"
 msgid_plural "{0} sur {1} photos"
 msgstr[0] "{0} von {1} Foto"
