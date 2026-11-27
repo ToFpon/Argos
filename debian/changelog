@@ -1,3 +1,10 @@
+argos-viewer (0.4.2~noble1) noble; urgency=medium
+
+  * « Garder le zoom » : le zoom suit l'ajustement de chaque photo ; une
+    grande photo n'est plus agrandie après une petite.
+
+ -- Tof <nourpon@gmail.com>  Fri, 27 Nov 2026 18:33:28 +0000
+
 argos-viewer (0.4.1~noble1) noble; urgency=medium
 
   * Préférences, Affichage : « En changeant de photo », ajuster à la
