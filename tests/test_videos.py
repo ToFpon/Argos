@@ -36,5 +36,17 @@ class VideoTest(unittest.TestCase):
         self.assertEqual(pic.codecs, ("VP9", "Opus"))
 
 
+class HardwareDecodersTest(unittest.TestCase):
+    def test_hardware_decoders_off_user_setting_kept_last(self):
+        from argos.app import software_video_decoding
+        env = {"GST_PLUGIN_FEATURE_RANK": "vah265dec:PRIMARY"}
+        software_video_decoding(env)
+        value = env["GST_PLUGIN_FEATURE_RANK"]
+        self.assertTrue(value.startswith("vah264dec:NONE,vah265dec:NONE"))
+        self.assertTrue(value.endswith(",vah265dec:PRIMARY"))          # le choix de l'utilisateur passe après : il gagne
+        software_video_decoding(env)
+        self.assertEqual(env["GST_PLUGIN_FEATURE_RANK"], value)       # pas de doublon
+
+
 if __name__ == "__main__":
     unittest.main()

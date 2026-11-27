@@ -12,7 +12,28 @@ import signal
 import sys
 import threading
 
-import gi
+# Vidéos : PAS de décodeur matériel de GStreamer dans Argos (vu chez Tof : MKV HEVC 10 bits « Lecture impossible »,
+# « streaming stopped, reason not-negotiated » — les images de vah265dec, en mémoire de la carte graphique, ne passent
+# pas dans le lecteur de GTK 4.14 ; gst-play-1.0 les lisait avec sa propre fenêtre). Décodage logiciel (avdec_*) :
+# léger pour un petit lecteur. Posé avant que GStreamer ne démarre (le module média de GTK le charge à la 1re vidéo) ;
+# un réglage de l'utilisateur dans la même variable reste, et passe après (il gagne).
+HW_DECODERS = ("vah264dec", "vah265dec", "vavp8dec", "vavp9dec", "vaav1dec", "vampeg2dec", "vajpegdec",
+               "vaapih264dec", "vaapih265dec", "vaapivp8dec", "vaapivp9dec", "vaapiav1dec", "vaapimpeg2dec",
+               "vaapivc1dec", "vaapijpegdec", "vaapidecodebin", "nvh264dec", "nvh265dec", "nvvp8dec", "nvvp9dec",
+               "nvav1dec", "nvmpeg2videodec", "nvh264sldec", "nvh265sldec", "nvvp9sldec", "nvav1sldec",
+               "v4l2slh264dec", "v4l2slh265dec", "v4l2slvp8dec", "v4l2slvp9dec", "v4l2slav1dec")
+
+
+def software_video_decoding(env=os.environ):
+    ours = ",".join(f"{name}:NONE" for name in HW_DECODERS)
+    user = env.get("GST_PLUGIN_FEATURE_RANK", "")
+    if ours not in user:
+        env["GST_PLUGIN_FEATURE_RANK"] = ours + ("," + user if user else "")
+
+
+software_video_decoding()
+
+import gi  # noqa: E402
 
 gi.require_version("Gtk", "4.0")
 gi.require_version("Adw", "1")

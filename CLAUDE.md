@@ -122,7 +122,11 @@ Nom : Argos le géant aux cent yeux (et le chien d'Ulysse, le seul à le reconna
   Diaporama : photos seulement (`_step_index(photos_only)` ; PIÈGE : dans `_slideshow_tick`, `_slideshow_id` vient
   d'être remis à 0 → `slideshow_running()` est faux : `_go(1, photos_only=True)` explicite). Barre d'état : durée ;
   grille : « 12 photos, 1 vidéo » (`count_text`). Recommends : libgtk-4-media-gstreamer, gstreamer1.0-plugins-good, gstreamer1.0-plugins-bad (h265parse),
-  gstreamer1.0-libav, ffmpeg. Lanceur : PAS de types vidéo (c'est Nausicaa). Testé : `test_videos`, `videos_step`
+  gstreamer1.0-libav, ffmpeg. Lanceur : PAS de types vidéo (c'est Nausicaa). PIÈGE vu chez Tof (MKV HEVC 10 bits, « not-negotiated »
+  alors que gst-play-1.0 le lisait) : les décodeurs MATÉRIELS de GStreamer (vah265dec de plugins-bad, vaapi…) sortent
+  des images en mémoire de la carte graphique que le lecteur de GTK 4.14 n'accepte pas → `app.software_video_decoding`
+  met leur rang à NONE dans GST_PLUGIN_FEATURE_RANK au démarrage (processus d'Argos seulement ; réglage de
+  l'utilisateur gardé, après, donc gagnant). Confirmé chez Tof avec la variable posée à la main. Testé : `test_videos`, `videos_step`
   d'ui_smoke (webm VP9 fait par ffmpeg : lu, pause, durée, suivante = arrêt, diaporama qui saute, interrupteur).
 - SVG (vu chez Tof : icône 48 × 48 minuscule puis pixelisée au zoom) : `ImageView.vector` = chemin du SVG →
   ajusté À la fenêtre (agrandi, comme gThumb), et redessiné net à la taille affichée (`_hires` :
