@@ -69,6 +69,13 @@
   </requires>
   <content_rating type="oars-1.1"/>
   <releases>
+    <release version="0.4.3" date="2026-11-27">
+      <description>
+        <ul>
+          <li>“Keep the zoom”: only zooming in carries over to the next photo; a zoomed-out photo leaves the next one fitted</li>
+        </ul>
+      </description>
+    </release>
     <release version="0.4.2" date="2026-11-27">
       <description>
         <ul>
