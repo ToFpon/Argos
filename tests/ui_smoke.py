@@ -363,25 +363,32 @@ def steps(app):
     win.show_index(0)
     yield lambda: win.picture is not None and win.picture.path == win.images[0].path
     settings["zoom_change"] = "keep"
-    ratio = 0.5 / win.view.fit_zoom()
-    win.view.set_zoom(0.5)
+    ratio = 2.0 / win.view.fit_zoom()
+    win.view.set_zoom(2.0)
     win.go(1)
     yield lambda: win.picture is not None and win.picture.path == win.images[1].path
     check(not win.view.fit and abs(win.view.zoom / win.view.fit_zoom() - ratio) < 1e-6,
           "garder le zoom : même rapport à l'ajustement sur la photo suivante")
-    # cas du retour : petite photo ajustée à 100 % puis réduite à 50 %, grande photo ajustée bien plus bas →
-    # la grande est montrée à 50 % de SON ajustement, pas agrandie à 50 % de sa taille réelle
+    # retours de l'utilisateur : grande photo après une petite → même rapport à SON ajustement (pas 200 % bruts) ;
+    # petite photo RÉDUITE sous son ajustement → la grande est simplement ajustée (pas minuscule)
     big = os.path.join(PHOTOS, "zz grande.jpg")
     subprocess.run(["convert", "-size", "2800x3800", "xc:navy", big], check=True)
     yield lambda: any(e.path == big for e in win.images)
+    big_at = next(i for i, e in enumerate(win.images) if e.path == big)
+    win.show_index(0)
+    yield lambda: win.picture is not None and win.picture.path == win.images[0].path
+    win.view.set_zoom(2.0)
+    win.show_index(big_at)
+    yield lambda: win.picture is not None and win.picture.path == big
+    fz = win.view.fit_zoom()
+    check(fz < 0.4 and abs(win.view.zoom - 2.0 * fz) < 1e-6,
+          f"garder le zoom : grande photo à 2 × son ajustement ({win.view.zoom:.3f}, ajustée {fz:.3f})")
     win.show_index(0)
     yield lambda: win.picture is not None and win.picture.path == win.images[0].path
     win.view.set_zoom(0.5)
-    win.show_index(next(i for i, e in enumerate(win.images) if e.path == big))
+    win.show_index(big_at)
     yield lambda: win.picture is not None and win.picture.path == big
-    fz = win.view.fit_zoom()
-    check(fz < 0.4 and abs(win.view.zoom - 0.5 * fz) < 1e-6,
-          f"garder le zoom : grande photo à 50 % de son ajustement ({win.view.zoom:.3f}, ajustée {fz:.3f})")
+    check(win.view.fit, "garder le zoom : photo réduite sous son ajustement → la suivante est ajustée")
     win.show_index(0)
     yield lambda: win.picture is not None and win.picture.path == win.images[0].path
     os.remove(big)
