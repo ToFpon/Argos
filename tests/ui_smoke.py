@@ -388,7 +388,9 @@ def steps(app):
     win.view.set_zoom(0.5)
     win.show_index(big_at)
     yield lambda: win.picture is not None and win.picture.path == big
-    check(win.view.fit, "garder le zoom : photo réduite sous son ajustement → la suivante est ajustée")
+    fz = win.view.fit_zoom()
+    check(not win.view.fit and abs(win.view.zoom - 0.5 * fz) < 1e-6,
+          "garder le zoom : réduite aussi, en proportion de l'ajustement de la suivante")
     win.show_index(0)
     yield lambda: win.picture is not None and win.picture.path == win.images[0].path
     os.remove(big)

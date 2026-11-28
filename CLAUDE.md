@@ -209,9 +209,10 @@ Nom : Argos le géant aux cent yeux (et le chien d'Ulysse, le seul à le reconna
 - « En changeant de photo » (Préférences → Affichage, demande de l'utilisateur allemand, comme gThumb ; réglage
   `zoom_change`) : « Ajuster à la fenêtre » (défaut, comme avant) ou « Garder le zoom » — le zoom choisi passe à la
   photo suivante (`_loaded`, après `set_picture`) PAR RAPPORT À L'AJUSTEMENT (zoom ÷ `fit_zoom`, même retour : 50 %
-  d'une carte de visite ajustée à 100 % agrandissait une affiche ajustée à 12 % ; même taille = même zoom) ; réduite SOUS son
-  ajustement → la suivante est ajustée (2e retour : la carte réduite à 50 % rendait l'affiche minuscule) ; une photo ajustée laisse la suivante ajustée. PAS de zoom retenu
-  photo par photo (choix de Tof : déroutant). Comportement FIGÉ en 0.4.3 (choix de Tof : « on n'y reviendra
+  d'une carte de visite ajustée à 100 % agrandissait une affiche ajustée à 12 % ; même taille = même zoom) ; réduction gardée
+  aussi, en proportion (0.4.3 ajustait la suivante d'une photo réduite ; à l'usage, le même utilisateur a préféré
+  la 0.4.2 : retour en 0.4.4, choix de Tof) ; une photo ajustée laisse la suivante ajustée. PAS de zoom retenu
+  photo par photo (choix de Tof : déroutant). Comportement FIGÉ en 0.4.4 (choix de Tof : « on n'y reviendra
   plus », d'autres retouches finiraient en bricolage). Testé dans ui_smoke.
 - « Ouvrir Argos sur » (même retour ; l'arbre des dossiers RESTE, choix de Tof, masquable par F9) : réglages
   `startup` (last par défaut / pictures / folder) + `startup_folder`, Préférences → Général → Comportement

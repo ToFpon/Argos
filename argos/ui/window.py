@@ -920,9 +920,9 @@ class MainWindow(FileMenu, Adw.ApplicationWindow):
             self.view.set_picture(pic.texture, pic.animation, keep_view,
                                   vector=pic.path if pic.format in ("SVG", "SVGZ") else None,
                                   transition=transition)
-            # photo RÉDUITE sous son ajustement : la suivante est simplement ajustée (même retour, 2e fois : une
-            # carte de visite réduite à 50 % rendait une affiche minuscule) ; on ne garde que l'agrandissement
-            if keep_ratio is not None and keep_ratio > 1:
+            # réduite aussi (0.4.3 ajustait la suivante d'une photo réduite : le même utilisateur préfère, à
+            # l'usage, que la réduction suive elle aussi — choix de Tof, retour au comportement de la 0.4.2)
+            if keep_ratio is not None:
                 self.view.set_zoom(keep_ratio * self.view.fit_zoom())
         self._sync_status()
         self._sync_info()
